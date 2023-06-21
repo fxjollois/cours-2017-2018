@@ -1,0 +1,219 @@
+---
+title: "TP3 - Medicaments"
+subtitle: "Diffusion interactive"
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+
+load("bd-medicaments.RData")
+load("bd-medicaments-tab.RData")
+
+CIS_active = subset(CIS, StatutAMM == "Autorisation active" & EtatComm == "Commercialisée")
+CIS_CIP_active = merge(CIS_active, CIS_CIP, by = "CodeCIS")
+
+SMR = data.frame(
+  valeur = c("Insuffisant","Faible", "Modéré", "Important", "Non précisé", "Commentaires", "Plusieurs avis", "Inconnu"),
+  icone = c("fa-thumbs-down", "fa-thumbs-o-down", "fa-thumbs-o-up", "fa-thumbs-up", "fa-question", "fa-comment", "fa-clone", "fa-question"),
+  couleur = c("red", "orange", "lightgreen", "green", "#666", "blue", "#900", "#666"),
+  stringsAsFactors = FALSE
+)
+```
+
+# Informations générales
+
+## Column 
+
+### Quelques infos (q1)
+
+```{r}
+knitr::kable(tab1, align = c("l", "r"))
+```
+
+### Répartition des médicaments (q3 - par type de générique)
+
+```{r}
+knitr::kable(tab3, digits = 2)
+```
+
+## Column 
+
+### Top 10 composants (q2)
+
+```{r}
+knitr::kable(tab2, row.names = FALSE)
+```
+
+# Détails {data-orientation=columns}
+
+## Col 1
+
+### Type de voies d'administration (q4)
+
+```{r}
+knitr::kable(tab4, row.names = FALSE)
+```
+
+## col 2
+
+### SMR insuffisant (q5)
+
+```{r}
+knitr::kable(subset(tab5, select = -CodeCIS), row.names = FALSE)
+```
+
+
+# Lien Remboursement-SMR
+
+### Lien
+
+```{r eval=FALSE}
+table = CIS_CIP_active  %>% 
+  inner_join(CIS_SMR, by = "CodeCIS") %>%
+  select(ValeurSMR, Taux) %>%
+  drop_na()
+ggplot(table, aes(ValeurSMR, factor(Taux))) +
+  scale_x_discrete(limits = c("Insuffisant", "Faible", "Modéré", "Important")) +
+  scale_y_discrete(limits = c("15", "30", "65", "100")) + 
+  geom_bin2d() +
+  ylab("Taux")
+```
+
+
+# Recherche {data-orientation=columns}
+
+## Colonne de choix {.sidebar}
+
+Vous pouvez rechercher ici un médicament en particulier pour avoir des informations sur lui
+
+```{r eval=FALSE}
+denom = CIS_active$Denomination
+espace = regexpr("[, ]", denom)
+premier = unique(substr(denom, 1, espace - 1))
+```
+
+```{r eval=FALSE}
+selectInput("initiale", label = "Première lettre",
+            choices = LETTERS)
+```
+
+```{r eval=FALSE}
+renderUI({
+  liste = premier[substr(premier, 1, 1) == input$initiale]
+  if (!is.null(liste)) {
+    selectInput("famille", 
+                label = "Famille de médicament",
+                choices = liste)
+  }
+})
+```
+
+```{r eval=FALSE}
+renderUI({
+  if (!is.null(input$famille)) {
+    possible = substr(CIS_active$Denomination, 1, nchar(input$famille)) == input$famille
+    selectInput("medoc", label = "Médicament",
+                choices = CIS_active$Denomination[possible])
+  }
+})
+```
+
+```{r eval=FALSE}
+renderUI({
+  table = subset(CIS_active, Denomination == input$medoc)
+  m = merge(table, CIS_CIP, by = "CodeCIS")
+  selectInput("pres", label = "Présentation",
+              choices = m$Libelle)
+})
+```
+
+## Colonne 
+
+### Informations sur le médicament choisi
+
+```{r eval=FALSE}
+renderTable({
+  table = subset(CIS_active, Denomination == input$medoc)
+  if (nrow(table) > 0)
+    data.frame(
+      Information = names(table),
+      Valeur = unlist(table),
+      stringsAsFactors = FALSE
+    )
+})
+```
+
+## Colonne 
+
+### Prix du médicament
+
+```{r eval=FALSE}
+renderValueBox({
+  prix = NULL
+  table = subset(CIS_CIP_active, 
+                 Denomination == input$medoc & Libelle == input$pres)
+  if (nrow(table) > 0)
+    prix = table$Prix
+  if (!is.null(prix)) {
+    if (!is.na(prix))
+      valueBox(prix, icon = "fa-euro", color = "lightblue")
+    else
+      valueBox("Inconnu", icon = "fa-euro", color = "red")
+  } else {
+    valueBox("Inconnu", icon = "fa-euro", color = "red")
+  }
+})
+```
+
+
+### Taux de remboursement
+
+```{r eval=FALSE}
+renderGauge({
+  taux = NULL
+  table = subset(CIS_CIP_active, 
+                 Denomination == input$medoc & Libelle == input$pres)
+  if (nrow(table) > 0)
+    taux = table$Taux
+  if (!is.null(taux)) {
+    if (!is.na(taux)) {
+      gauge(taux, 0, 100, symbol = "%",
+            gaugeSectors(success = c(80, 100), 
+                         warning = c(40, 79), 
+                         danger = c(0, 39)))
+    } else {
+      gauge(0, 0, 100, symbol = "%", label = "Inconnu")
+    }
+  } else {
+    gauge(0, 0, 100, symbol = "%", label = "Inconnu")
+  }
+})
+```
+
+### Statut Médical Rendu
+
+```{r eval=FALSE}
+renderValueBox({
+  table = subset(CIS_active, Denomination == input$medoc)
+  m = subset(CIS_SMR, CodeCIS == table$CodeCIS)
+  if (nrow(m) == 1)
+    smr = subset(SMR, valeur == m$ValeurSMR)
+  else {
+    if (nrow(m) > 1) {
+      smr = subset(SMR, valeur == "Plusieurs avis")
+    } else {
+      smr = subset(SMR, valeur == "Inconnu")
+    }
+  }
+  valueBox(smr$valeur, 
+           icon = smr$icone, 
+           color = smr$couleur)
+})
+```
+

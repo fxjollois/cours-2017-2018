@@ -1,0 +1,268 @@
+---
+title: "ACM - TD"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA)
+```
+
+Dans ce TD, nous aborderons la réalisation de l'ACM sous R. Vous devez exécuter l'ensemble des commandes réalisées ici (et les comprendre), afin de pouvoir les reproduire.
+
+En plus des packages présentés ci-dessous, nous devrons utiliser d'autres packages (inclus dans le chargement du package `tidyverse`) pour réaliser les graphiques et autres tableaux.
+
+```{r package}
+library(tidyverse)
+# library(stringr)
+library(formattable)
+```
+
+## Package `FactoMiner`
+
+Nous utilisons encore le package [`FactoMineR`](http://factominer.free.fr/) pour réaliser les calculs de l'ACM.
+
+
+### Données `poison`
+
+Nous allons utiliser le jeu de données [`poison`](https://rdrr.io/cran/FactoMineR/man/poison.html). Celui-ci concerne une étude sur une intoxication alimentaire d'enfants dans une école.
+
+```{r data}
+library(FactoMineR)
+data(poison)
+```
+
+```{r, echo=FALSE}
+formattable(poison)
+```
+
+
+### Calcul de l'ACM
+
+On utilise la fonction `MCA()`, dont voici les options principales
+
+- `ncp` : nombre de composantes à retenir (5 par défaut)
+- `graph` : affiche ou non les deux graphiques (oui par défaut)
+- ...
+
+Ici, nous ne voulons pas les graphiques tout de suite. Et nous réalisons l'ACM que sur les variables symptômes et consommations, pas les autres.
+
+```{r acp}
+acm = MCA(poison[,5:15], graph = FALSE)
+```
+
+L'objet renvoyé est une liste avec toutes les informations importantes.
+
+```{r names}
+names(acm)
+```
+
+Le contenu de cet objet est plutôt bien détaillé (mais en anglais) lorsqu'on l'affiche.
+
+```{r print}
+acm
+```
+
+
+### Variance expliquée
+
+L'objet `eig` est une `matrix`, contenant pour chaque composante :
+
+- la valeur propre
+- le pourcentage de variance expliquée
+- le pourcentage cumulé de variance expliquée
+
+```{r eigen}
+acm$eig
+```
+
+On peut donc produire le graphique de la variance expliquée, par composante. Remarquez que le graphique des valeurs propres donnent exactement le même graphique, à l'échelle des ordonnées près (*à tester*).
+
+```{r eigonplot1}
+barplot(acm$eig[,2])
+```
+
+On peut aussi montrer la variance expliquée cumulée.
+
+```{r eigenplot2}
+plot(acm$eig[,3])
+```
+
+Mais aussi, et c'est important en ACM, le saut de variance expliquée entre deux composantes.
+
+```{r}
+plot(acm$eig[-nrow(acm$eig),2] - acm$eig[-1,2],type = "b")
+```
+
+
+*A faire* : représenter dans un même graphique les deux informations comme ci-dessous par exemple.
+
+```{r eigenplot3, echo=FALSE}
+b = barplot(acm$eig[,2], 
+            xlab = "Composantes", ylab = "% variance expliquée",
+            col = "darkslategray")
+lines(b[-nrow(acm$eig)], acm$eig[-nrow(acm$eig),2] - acm$eig[-1,2],
+      type = "b", col = "red", lwd = 2)
+```
+
+
+### Représentation graphique
+
+#### Toutes les modalités
+
+Par défaut, lorsqu'on utilise la fonction `plot()` sur l'objet obtenu, on obtient le *premier plan factoriel*, avec les 2 premières composantes. Les individus et les modalités sont représentées.
+
+```{r plot}
+plot(acm)
+```
+
+Si on veut choisir les composantes à représenter, nous utilisons le paramètre `axes`.
+
+```{r plot13}
+plot(acm, axes = c(1, 3))
+```
+
+#### Individus uniquement
+
+Pour n'avoir que les individus, il faut rendre invisible les modalités. Ce sont toujours les 2 premières composantes par défaut (et la syntaxe est la même pour changer les composantes).
+
+```{r plotind}
+plot(acm, invisible = "var")
+```
+
+
+#### Modalités uniquement
+
+Et pour n'avoir que les modalités des variables, il faut rendre invisibles les individus
+
+```{r plotmodalites}
+plot(acm, invisible = "ind")
+```
+
+#### Variables
+
+Il est aussi possible d'avoir une représentation des variables, chacune étant un *pseudo*-barycentre de ces modalités.
+
+```{r plotvar}
+plot(acm, choix = "var")
+```
+
+
+### Contributions et qualité de représentation
+
+Il est possible d'obtenir la contribution de chaque modalité dans l'objet `contrib`, lui-même dans l'objet `var` du résultat de la fonction. Idem pour les individus (sous-objet `contrib` dans l'objet `ind`).
+
+Pour la qualité de représentation, celle-ci est stockée dans le sous-objet `cos2` (de `ind` pour les individus et de `var` pour les modalités).
+
+Ici, vu le nombre de modalités, il est possible de toutes les afficher pour mieux analyser.
+
+```{r axe1}
+round(acm$var$contrib)
+round(acm$var$cos2, 2)
+```
+
+On fait de même pour les individus (*à tester*). 
+
+Mais il y a de plus une valeur test pour chaque modalité (sous-objet objet `v.test` de `var`), permettant de savoir si celle-ci est significativement éloigné du centre de gravité ou non (vrai si valeur absolue $>$ 2).
+
+```{r}
+round(acm$var$v.test,1)
+```
+
+
+### Interprétation
+
+#### Nombre de composantes
+
+Si nous regardons la variance cumulée, nous remarquons qu'avec 2 composantes, nous expliquons 46% de l'information, et 81% avec 6 axes (la moitié).
+
+#### Axe 1
+
+Le premier axe est relié aux modalités suivantes (toutes avec des valeurs tests absolues supérieures à 3):
+
+- avec coordonnées positives : `Abdo_n`, `Diarrhea_n`, `Fever_n` et `Mayo_n` et das une moindre mesure `Cheese_n` ;
+- avec coordonnées négatives : `Diarrhea_y`, `Fever_y`, `Abdo_y`, `Vomit_y` et `Nausea_y`.
+
+```{r}
+ct1 = acm$var$contrib %>%
+  data.frame() %>%
+  rownames_to_column(var = "mod") %>%
+  transmute(modalite = mod, contribution = round(Dim.1, 1))
+co1 = acm$var$coord %>%
+  data.frame() %>%
+  rownames_to_column(var = "mod") %>%
+  transmute(modalite = mod, coordonnee = round(Dim.1, 1))
+vt1 = acm$var$v.test %>%
+  data.frame() %>%
+  rownames_to_column(var = "mod") %>%
+  transmute(modalite = mod, v.test = round(Dim.1, 1))
+ax1 = ct1 %>% inner_join(co1) %>% inner_join(vt1)
+ax1 %>%
+  arrange(desc(contribution))
+```
+
+Il oppose donc les enfants ayant des symptômes d'intoxication alimentaire, sur la gauche du graphique (valeurs négatives sur l'axe), contre ceux n'en présentant pas à droite (valeurs positives donc).
+
+#### Autres axes
+
+*A Faire* : si possible en automatisant le processus.
+
+## FactoInvestigate
+
+En plus du package `FactoMineR`, il existe le package [`FactoInvestigate`](http://factominer.free.fr/reporting/index_fr.html) qui permet de créer un rapport automatique pour l'interprétation d'un résultat d'une fonction de `FactoMineR` (ici, de `MCA()` donc). 
+
+Voila comment lancer la création du rapport.
+
+```{r investigate, eval=FALSE}
+library(FactoInvestigate)
+Investigate(acm, file = "Investigate-ACM.Rmd")
+```
+
+Une fois que la fonction a fini, elle affiche la page html créée dans un navigateur. Vous trouverez ici le [fichier produit](Investigate-ACM.html).
+
+## Package `Factoshiny`
+
+Dans le même état d'esprit, le package [`Factoshiny`](http://factominer.free.fr/graphs/factoshiny-fr.html) permet lui de lancer une application dans un navigateur web pour réaliser une analyse des résultats, ainsi que pour exporter des graphiques et récupérer des tableaux. Voici comment lancer l'application :
+
+```{r shiny, eval=FALSE}
+library(Factoshiny)
+MCAshiny(acm)
+```
+
+## A faire
+
+Merci de produire un document `Rmarkdown` contenant l'ensemble du code et des commentaires.
+
+### Continuer sur `poison`
+
+Reprendre l'ACM ci-dessous en ajoutant donc les quatre premières variables de la table `poison` en variables illustratives.
+
+### AirBnB à Paris
+
+Le site [Inside AirBnB](http://insideairbnb.com/) met à disposition les informations sur les logements proposés sur le site [AirBnB](https://www.airbnb.fr/) dans différentes villes, et en particulier [Paris](http://insideairbnb.com/paris/). Nous allons uiliser les données du [2 septembre 2015](airbnb-paris-2015-09-02.csv) (fichier légèrement retravaillé).
+
+```{r}
+airbnb = read.table("airbnb-paris-2015-09-02.csv", 
+                    header = T, sep = ",", quote = '"')
+```
+
+```{r, echo=FALSE}
+DT::datatable(head(airbnb, 100))
+```
+
+Nous allons nous intéresser aux informations sur les équipements des logements (ensemble des variables binaires).
+
+Vous devez donc réaliser les étapes suivantes :
+
+- Décrire rapidement les données
+- Réaliser une ACM et produire les graphiques nécessaires à l'interprétation
+    - ne pas hésiter à ajouter des variables en illustratives
+- Que peut-on dire globalement ?
+
+
+
+
+
+

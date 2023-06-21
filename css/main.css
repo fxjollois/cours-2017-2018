@@ -1,0 +1,100 @@
+/* structure global */
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+    font-family: "Open Sans", sans-serif;
+}
+
+nav ul,
+footer ul,
+.container {
+  margin: 0px auto;
+  width: 70%;
+}
+
+/* liste de nav et footer */
+nav ul,
+footer ul {
+  list-style: none;
+  font-weight: bold;
+}
+nav ul li,
+footer ul li {
+  display: inline;
+  margin-right: 20px;
+}
+
+/* nav */
+nav {
+  background-color: #333;
+    color: gainsboro;
+  height: 50px;
+  line-height: 50px;
+    margin-bottom: 50px;
+}
+nav a {
+  font-family: "Arvo", serif;
+  text-decoration: none;
+  color: white;
+}
+nav a:hover {
+  color: #ddd;
+}
+
+/* footer */
+footer {
+  border-top: 1px solid #d5d5d5;
+  margin-top: 30px;
+  padding-top: 10px;
+  font-size: 0.8em;
+}
+footer a {
+  text-decoration: none;
+  color: black;
+}
+footer a:hover {
+  color: #555;
+}
+
+/* container */
+.container a {
+  text-decoration: none;
+  color: tomato;
+    font-weight: 500;
+}
+.container a:hover {
+  color: orangered;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Arvo", serif;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+h1 {
+  margin-top: 20px;
+}
+h2 {
+  margin-top: 15px;
+}
+p {
+  margin-bottom: 10px;
+}
+ul, ol {
+  margin-left: 20px;
+}
+pre {
+    margin-bottom: 10px;
+    background-color: ghostwhite;
+    padding: 10px;
+}
+code {
+    background-color: ghostwhite;
+    font-family: 'Source Code Pro', monospace;
+}

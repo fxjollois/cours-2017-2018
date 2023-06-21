@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Using mixture models</title>
+
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<link href="libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="libs/highlightjs-1.1/highlight.js"></script>
+<!--
+    Font Awesome
+-->
+<script src="https://use.fontawesome.com/32d8325004.js"></script>
+<link rel="stylesheet" href="libs/font-awesome-4.7.0/css/font-awesome.min.css">
+
+<!--
+    CSS perso
+-->
+<style>
+    .contenu {
+        margin-bottom: 50px;
+    }
+
+    .contact-liens {
+        text-align: center;
+    }
+    .contact-liens:hover {
+        text-decoration: none;
+    }
+    .contact-icones {
+        height: 30px;
+    }
+
+    /* Espacement pour barre du haut et pied de page */
+    #header, .section.level1 {
+        margin-top: 60px;
+        margin-bottom: 60px;
+    }
+    /* Espacement pour table des matières */
+    #TOC {
+        margin-top: 100px;
+    }
+    
+    .footer {
+        position: fixed;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        left: 0;
+        background-color: #E6E6E6;
+    }
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="libs/bootstrap-journal.min.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-main">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">FX Jollois</a>
+    </div>
+    <div id="navbar-main" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Données <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+              <li><a href="accesdonnees.html">A télécharger</a></li>
+              <li><a href="donnees-integrees-r.html">Sous R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Enseignement <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">DUT 1ère année</li>
+            <li><a href="exploitation-donnees.html">Exploitation de données</a></li>
+            <li><a href="initiation-a-r.html">Initiation à R</a></li>
+            <li><a href="reporting.html">Reporting</a></li>
+            <li><a href="complements-r.html">Compléments sur R</a></li>
+            <li class="dropdown-header">DUT 2ème année</li>
+            <li><a href="prog-stat-r.html">Programmation statistique avec R</a></li>
+            <li class="dropdown-header">LP MDS Santé</li>
+            <li><a href="info-dec-sante.html">Informatique décisionnelle</a></li>
+            <li class="dropdown-header">DU Analyste Big Data</li>
+            <li><a href="initiation-r-du.html">Initiation à R</a></li>
+            <li><a href="connexion-r-mongodb.html">Connexion entre R et MongoDB</a></li>
+            <li class="dropdown-header">DU Dataviz</li>
+            <li><a href="analyse-donnees.html">Analyse de données</a></li>
+            <li><a href="visualisation-donnees.html">Visualisation de données - R</a></li>
+            <li><a href="visualisation-donnees-tableau.html">Visualisation de données - Tableau</a></li>
+            <li><a href="visualisation-donnees-d3.html">Visualisation de données - D3</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Master</li>
+            <li><a href="slides/cnam-classif-modeles.html">Classification et Modèles de mélange</a></li>
+            <li><a href="analyse-donnees-massives.html">Analyse de Données Massives</a></li>
+            <li class="dropdown-header">Iran</li>
+            <li><a href="stat-prog-R.html">Statistical Programming using R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Recherche <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="recherche.html">Sujets</a></li>
+            <li><a href="publications.html">Publications</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Réalisations <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="realisations.html">Détail</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://up5.fr/explore-data" target="_blank">explore-data</a></li>
+            <li><a href="http://fxjollois.github.io/cours-sql/" target="_blank">Appli web de cours pour SQL</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container-fluid -->
+</div>
+<div class="contenu">
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Using mixture models</h1>
+<h3 class="subtitle"><em>Statistical Programming using <code>R</code></em></h3>
+
+</div>
+
+
+<p>For mixture models clustering, we use the following packages:</p>
+<pre class="r"><code>library(mclust)
+library(Rmixmod)
+
+# We also need  
+library(ggplot2)</code></pre>
+<div id="package-mclust" class="section level2">
+<h2>Package <code>mclust</code></h2>
+<div id="direct-clustering" class="section level3">
+<h3>Direct clustering</h3>
+<p>In this package, the function <code>mclustBIC()</code> computes the <span class="math inline">\(EM\)</span> algorithm for many values of number of clusters (with <code>G</code> parameter, between 1 and 9 by default) and models (with <code>modelNames</code> parameter, all available models by default). It uses <span class="math inline">\(BIC\)</span> criterion to choose the best model.</p>
+<pre class="r"><code>mBIC = mclustBIC(iris[-5])
+summary(mBIC)</code></pre>
+<pre><code>## Best BIC values:
+##              VEV,2        VEV,3      VVV,2
+## BIC      -561.7285 -562.5514380 -574.01783
+## BIC diff    0.0000   -0.8229759  -12.28937</code></pre>
+<pre class="r"><code>plot(mBIC)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Now, we apply <code>Mclust()</code> function to get the results of the best model.</p>
+<pre class="r"><code>mBIC1 = Mclust(iris[-5], x = mBIC)
+summary(mBIC1, parameters = TRUE)</code></pre>
+<pre><code>## ----------------------------------------------------
+## Gaussian finite mixture model fitted by EM algorithm 
+## ----------------------------------------------------
+## 
+## Mclust VEV (ellipsoidal, equal shape) model with 2 components:
+## 
+##  log.likelihood   n df       BIC       ICL
+##        -215.726 150 26 -561.7285 -561.7289
+## 
+## Clustering table:
+##   1   2 
+##  50 100 
+## 
+## Mixing probabilities:
+##        1        2 
+## 0.333332 0.666668 
+## 
+## Means:
+##                   [,1]     [,2]
+## Sepal.Length 5.0060021 6.261996
+## Sepal.Width  3.4280046 2.871999
+## Petal.Length 1.4620006 4.905993
+## Petal.Width  0.2459998 1.675997
+## 
+## Variances:
+## [,,1]
+##              Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Sepal.Length   0.15065097  0.13080108  0.020844624 0.013091029
+## Sepal.Width    0.13080108  0.17604544  0.016032479 0.012214539
+## Petal.Length   0.02084462  0.01603248  0.028082603 0.006015675
+## Petal.Width    0.01309103  0.01221454  0.006015675 0.010423651
+## [,,2]
+##              Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Sepal.Length    0.4000437  0.10865439    0.3994013  0.14368238
+## Sepal.Width     0.1086544  0.10928074    0.1238902  0.07284378
+## Petal.Length    0.3994013  0.12389025    0.6109012  0.25738947
+## Petal.Width     0.1436824  0.07284378    0.2573895  0.16808166</code></pre>
+<pre class="r"><code>table(mBIC1$classification)</code></pre>
+<pre><code>## 
+##   1   2 
+##  50 100</code></pre>
+<pre class="r"><code>t(mBIC1$parameters$mean)</code></pre>
+<pre><code>##      Sepal.Length Sepal.Width Petal.Length Petal.Width
+## [1,]     5.006002    3.428005     1.462001   0.2459998
+## [2,]     6.261996    2.871999     4.905993   1.6759972</code></pre>
+<pre class="r"><code>plot(mBIC1, what = &quot;classification&quot;)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>plot(mBIC1, what = &quot;uncertainty&quot;)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<pre class="r"><code>plot(mBIC1, what = &quot;density&quot;)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
+<pre class="r"><code>table(iris$Species, mBIC1$classification)</code></pre>
+<pre><code>##             
+##               1  2
+##   setosa     50  0
+##   versicolor  0 50
+##   virginica   0 50</code></pre>
+<p>We see that the same model with 3 clusters is the second choice.</p>
+<pre class="r"><code>mBIC2 = Mclust(iris[-5], G = 3, modelNames = &quot;VEV&quot;)
+table(mBIC2$classification)</code></pre>
+<pre><code>## 
+##  1  2  3 
+## 50 45 55</code></pre>
+<pre class="r"><code>t(mBIC2$parameters$mean)</code></pre>
+<pre><code>##      Sepal.Length Sepal.Width Petal.Length Petal.Width
+## [1,]     5.006000    3.428000     1.462000    0.246000
+## [2,]     5.914717    2.777559     4.203528    1.298712
+## [3,]     6.546545    2.949380     5.481568    1.985130</code></pre>
+<pre class="r"><code>plot(mBIC2, what = &quot;classification&quot;)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>table(iris$Species, mBIC2$classification)</code></pre>
+<pre><code>##             
+##               1  2  3
+##   setosa     50  0  0
+##   versicolor  0 45  5
+##   virginica   0  0 50</code></pre>
+<p>If you prefer use the <span class="math inline">\(ICL\)</span> criterion, you can apply the <code>mclustICL()</code> function.</p>
+<pre class="r"><code>mICL = mclustICL(iris[-5])
+summary(mICL)</code></pre>
+<pre><code>## Best ICL values:
+##              VEV,2      VEV,3      VVV,2
+## ICL      -561.7289 -566.45770 -574.01910
+## ICL diff    0.0000   -4.72882  -12.29022</code></pre>
+<pre class="r"><code>plot(mICL)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Now, we apply <code>Mclust()</code> function to get the results of the best model. But, we have to indicate <em>manually</em> the number of clusters and the model to use in the <code>Mclust()</code> function.</p>
+<pre class="r"><code>mICL1 = Mclust(iris[-5], 
+               G = 2,
+               modelNames = &quot;VEV&quot;)
+summary(mICL1, parameters = TRUE)</code></pre>
+<pre><code>## ----------------------------------------------------
+## Gaussian finite mixture model fitted by EM algorithm 
+## ----------------------------------------------------
+## 
+## Mclust VEV (ellipsoidal, equal shape) model with 2 components:
+## 
+##  log.likelihood   n df       BIC       ICL
+##        -215.726 150 26 -561.7285 -561.7289
+## 
+## Clustering table:
+##   1   2 
+##  50 100 
+## 
+## Mixing probabilities:
+##        1        2 
+## 0.333332 0.666668 
+## 
+## Means:
+##                   [,1]     [,2]
+## Sepal.Length 5.0060021 6.261996
+## Sepal.Width  3.4280046 2.871999
+## Petal.Length 1.4620006 4.905993
+## Petal.Width  0.2459998 1.675997
+## 
+## Variances:
+## [,,1]
+##              Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Sepal.Length   0.15065097  0.13080108  0.020844624 0.013091029
+## Sepal.Width    0.13080108  0.17604544  0.016032479 0.012214539
+## Petal.Length   0.02084462  0.01603248  0.028082603 0.006015675
+## Petal.Width    0.01309103  0.01221454  0.006015675 0.010423651
+## [,,2]
+##              Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Sepal.Length    0.4000437  0.10865439    0.3994013  0.14368238
+## Sepal.Width     0.1086544  0.10928074    0.1238902  0.07284378
+## Petal.Length    0.3994013  0.12389025    0.6109012  0.25738947
+## Petal.Width     0.1436824  0.07284378    0.2573895  0.16808166</code></pre>
+<pre class="r"><code>table(mICL1$classification)</code></pre>
+<pre><code>## 
+##   1   2 
+##  50 100</code></pre>
+<pre class="r"><code>t(mICL1$parameters$mean)</code></pre>
+<pre><code>##      Sepal.Length Sepal.Width Petal.Length Petal.Width
+## [1,]     5.006002    3.428005     1.462001   0.2459998
+## [2,]     6.261996    2.871999     4.905993   1.6759972</code></pre>
+<pre class="r"><code>plot(mICL1, what = &quot;classification&quot;)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>table(iris$Species, mICL1$classification)</code></pre>
+<pre><code>##             
+##               1  2
+##   setosa     50  0
+##   versicolor  0 50
+##   virginica   0 50</code></pre>
+<p>We can also compute some other criteria, such as <span class="math inline">\(AIC\)</span> and <span class="math inline">\(AIC3\)</span>.</p>
+<pre class="r"><code>G = attr(mBIC, &quot;G&quot;)
+modelNames = attr(mBIC, &quot;modelNames&quot;)
+d = attr(mBIC, &quot;d&quot;)
+criterion = data.frame(G = rep(G, length(modelNames)),
+                       model = rep(modelNames, each = length(G)),
+                       AIC = NA,
+                       AIC3 = NA,
+                       stringsAsFactors = FALSE)
+for (i in 1:nrow(criterion)) {
+    m = Mclust(iris[-5], G = criterion$G[i], 
+               modelNames = criterion$model[i])
+    p = nMclustParams(criterion$model[i], d, criterion$G[i])
+    criterion[i, &quot;AIC&quot;] = -2 * m$loglik + 2 * p
+    criterion[i, &quot;AIC3&quot;] = -2 * m$loglik + 3 * p
+}
+head(criterion[order(criterion$AIC),], 3)</code></pre>
+<pre><code>##     G model      AIC     AIC3
+## 124 7   VVV 415.4447 519.4447
+## 107 8   VEV 429.1328 527.1328
+## 126 9   VVV 432.4844 566.4844</code></pre>
+<pre class="r"><code>ggplot(criterion, aes(G, AIC, color = model)) +
+    geom_line() +
+    scale_x_discrete(limits = G)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>head(criterion[order(criterion$AIC3),], 3)</code></pre>
+<pre><code>##     G model      AIC     AIC3
+## 102 3   VEV 448.1473 486.1473
+## 120 3   VVV 448.3719 492.3719
+## 103 4   VEV 453.3948 503.3948</code></pre>
+<pre class="r"><code>ggplot(criterion, aes(G, AIC3, color = model)) +
+    geom_line() +
+    scale_x_discrete(limits = G)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+</div>
+<div id="hierarchical-clustering" class="section level3">
+<h3>Hierarchical clustering</h3>
+<p>This package also contains the <code>hc()</code> function, computing a model-based hierarchical clustering. You have to specify the model to use.</p>
+<pre class="r"><code>hm = hc(iris[-5], &quot;VVV&quot;)
+hm2 = hclass(hm, 2)
+clPairs(iris[-5], cl = hm2)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>table(iris$Species, hm2)</code></pre>
+<pre><code>##             hm2
+##               1  2
+##   setosa     50  0
+##   versicolor  0 50
+##   virginica   0 50</code></pre>
+<pre class="r"><code>hm3 = hclass(hm, 3)
+clPairs(iris[-5], cl = hm3)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<pre class="r"><code>table(iris$Species, hm3)</code></pre>
+<pre><code>##             hm3
+##               1  2  3
+##   setosa     50  0  0
+##   versicolor  0 50  0
+##   virginica   0 14 36</code></pre>
+</div>
+</div>
+<div id="package-rmixmod" class="section level2">
+<h2>Package <code>Rmixmod</code></h2>
+<p>In this package, the function <code>mixmodCluster()</code> apply the <span class="math inline">\(EM\)</span> algorithm (initialized by <span class="math inline">\(smallEM\)</span>), with many values of number of clusters (with <code>nbCluster</code>parameter, without default value) and models (with <code>models</code> parameter, <code>&quot;Gaussian_pk_Lk_C&quot;</code> by default). It uses by default the <span class="math inline">\(BIC\)</span> criterion.</p>
+<pre class="r"><code>mixmodBIC = mixmodCluster(iris[-5], 1:9)
+mixmodBIC</code></pre>
+<pre><code>## ****************************************
+## *** INPUT:
+## ****************************************
+## * nbCluster =  1 2 3 4 5 6 7 8 9 
+## * criterion =  BIC 
+## ****************************************
+## *** MIXMOD Models:
+## * list =  Gaussian_pk_Lk_C 
+## * This list includes only models with free proportions.
+## ****************************************
+## * data (limited to a 10x10 matrix) =
+##       Sepal.Length Sepal.Width Petal.Length Petal.Width
+##  [1,] 5.1          3.5         1.4          0.2        
+##  [2,] 4.9          3           1.4          0.2        
+##  [3,] 4.7          3.2         1.3          0.2        
+##  [4,] 4.6          3.1         1.5          0.2        
+##  [5,] 5            3.6         1.4          0.2        
+##  [6,] 5.4          3.9         1.7          0.4        
+##  [7,] 4.6          3.4         1.4          0.3        
+##  [8,] 5            3.4         1.5          0.2        
+##  [9,] 4.4          2.9         1.4          0.2        
+## [10,] 4.9          3.1         1.5          0.1        
+## * ... ...
+## ****************************************
+## *** MIXMOD Strategy:
+## * algorithm            =  EM 
+## * number of tries      =  1 
+## * number of iterations =  200 
+## * epsilon              =  0.001 
+## *** Initialization strategy:
+## * algorithm            =  smallEM 
+## * number of tries      =  10 
+## * number of iterations =  5 
+## * epsilon              =  0.001 
+## * seed                 =  NULL 
+## ****************************************
+## 
+## 
+## ****************************************
+## *** BEST MODEL OUTPUT:
+## *** According to the BIC criterion
+## ****************************************
+## * nbCluster   =  4 
+## * model name  =  Gaussian_pk_Lk_C 
+## * criterion   =  BIC(602.9206)
+## * likelihood  =  -221.2901 
+## ****************************************
+## *** Cluster 1 
+## * proportion =  0.3571 
+## * means      =  6.5530 2.9639 5.5016 1.9988 
+## * variances  = |     0.3843     0.1305     0.2383     0.0635 |
+##                |     0.1305     0.1718     0.0925     0.0496 |
+##                |     0.2383     0.0925     0.2668     0.0669 |
+##                |     0.0635     0.0496     0.0669     0.0605 |
+## *** Cluster 2 
+## * proportion =  0.1402 
+## * means      =  5.2584 3.7404 1.4479 0.2529 
+## * variances  = |     0.1224     0.0416     0.0759     0.0202 |
+##                |     0.0416     0.0547     0.0295     0.0158 |
+##                |     0.0759     0.0295     0.0850     0.0213 |
+##                |     0.0202     0.0158     0.0213     0.0193 |
+## *** Cluster 3 
+## * proportion =  0.3096 
+## * means      =  5.9264 2.7660 4.2190 1.3037 
+## * variances  = |     0.2038     0.0692     0.1264     0.0337 |
+##                |     0.0692     0.0911     0.0490     0.0263 |
+##                |     0.1264     0.0490     0.1415     0.0355 |
+##                |     0.0337     0.0263     0.0355     0.0321 |
+## *** Cluster 4 
+## * proportion =  0.1931 
+## * means      =  4.8227 3.2012 1.4723 0.2410 
+## * variances  = |     0.1066     0.0362     0.0661     0.0176 |
+##                |     0.0362     0.0476     0.0256     0.0138 |
+##                |     0.0661     0.0256     0.0740     0.0186 |
+##                |     0.0176     0.0138     0.0186     0.0168 |
+## ****************************************</code></pre>
+<pre class="r"><code>summary(mixmodBIC)</code></pre>
+<pre><code>## **************************************************************
+## * Number of samples    =  150 
+## * Problem dimension    =  4 
+## **************************************************************
+## *       Number of cluster =  4 
+## *              Model Type =  Gaussian_pk_Lk_C 
+## *               Criterion =  BIC(602.9206)
+## *              Parameters =  list by cluster
+## *                  Cluster  1 : 
+##                          Proportion =  0.3571 
+##                               Means =  6.5530 2.9639 5.5016 1.9988 
+##                           Variances = |     0.3843     0.1305     0.2383     0.0635 |
+##                                       |     0.1305     0.1718     0.0925     0.0496 |
+##                                       |     0.2383     0.0925     0.2668     0.0669 |
+##                                       |     0.0635     0.0496     0.0669     0.0605 |
+## *                  Cluster  2 : 
+##                          Proportion =  0.1402 
+##                               Means =  5.2584 3.7404 1.4479 0.2529 
+##                           Variances = |     0.1224     0.0416     0.0759     0.0202 |
+##                                       |     0.0416     0.0547     0.0295     0.0158 |
+##                                       |     0.0759     0.0295     0.0850     0.0213 |
+##                                       |     0.0202     0.0158     0.0213     0.0193 |
+## *                  Cluster  3 : 
+##                          Proportion =  0.3096 
+##                               Means =  5.9264 2.7660 4.2190 1.3037 
+##                           Variances = |     0.2038     0.0692     0.1264     0.0337 |
+##                                       |     0.0692     0.0911     0.0490     0.0263 |
+##                                       |     0.1264     0.0490     0.1415     0.0355 |
+##                                       |     0.0337     0.0263     0.0355     0.0321 |
+## *                  Cluster  4 : 
+##                          Proportion =  0.1931 
+##                               Means =  4.8227 3.2012 1.4723 0.2410 
+##                           Variances = |     0.1066     0.0362     0.0661     0.0176 |
+##                                       |     0.0362     0.0476     0.0256     0.0138 |
+##                                       |     0.0661     0.0256     0.0740     0.0186 |
+##                                       |     0.0176     0.0138     0.0186     0.0168 |
+## *          Log-likelihood =  -221.2901 
+## **************************************************************</code></pre>
+<pre class="r"><code>plot(mixmodBIC)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>hist(mixmodBIC)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<p>If you want to use <span class="math inline">\(ICL\)</span> criterion, or even <span class="math inline">\(NEC\)</span>, you have to specify it with the <code>criterion</code> parameter.</p>
+<pre class="r"><code>mixmodICL = mixmodCluster(iris[-5], 1:9, criterion = &quot;ICL&quot;)
+mixmodICL</code></pre>
+<pre><code>## ****************************************
+## *** INPUT:
+## ****************************************
+## * nbCluster =  1 2 3 4 5 6 7 8 9 
+## * criterion =  ICL 
+## ****************************************
+## *** MIXMOD Models:
+## * list =  Gaussian_pk_Lk_C 
+## * This list includes only models with free proportions.
+## ****************************************
+## * data (limited to a 10x10 matrix) =
+##       Sepal.Length Sepal.Width Petal.Length Petal.Width
+##  [1,] 5.1          3.5         1.4          0.2        
+##  [2,] 4.9          3           1.4          0.2        
+##  [3,] 4.7          3.2         1.3          0.2        
+##  [4,] 4.6          3.1         1.5          0.2        
+##  [5,] 5            3.6         1.4          0.2        
+##  [6,] 5.4          3.9         1.7          0.4        
+##  [7,] 4.6          3.4         1.4          0.3        
+##  [8,] 5            3.4         1.5          0.2        
+##  [9,] 4.4          2.9         1.4          0.2        
+## [10,] 4.9          3.1         1.5          0.1        
+## * ... ...
+## ****************************************
+## *** MIXMOD Strategy:
+## * algorithm            =  EM 
+## * number of tries      =  1 
+## * number of iterations =  200 
+## * epsilon              =  0.001 
+## *** Initialization strategy:
+## * algorithm            =  smallEM 
+## * number of tries      =  10 
+## * number of iterations =  5 
+## * epsilon              =  0.001 
+## * seed                 =  NULL 
+## ****************************************
+## 
+## 
+## ****************************************
+## *** BEST MODEL OUTPUT:
+## *** According to the ICL criterion
+## ****************************************
+## * nbCluster   =  4 
+## * model name  =  Gaussian_pk_Lk_C 
+## * criterion   =  ICL(612.7233)
+## * likelihood  =  -216.7612 
+## ****************************************
+## *** Cluster 1 
+## * proportion =  0.3365 
+## * means      =  5.9442 2.7560 4.2719 1.3249 
+## * variances  = |     0.2351     0.1032     0.1255     0.0480 |
+##                |     0.1032     0.1317     0.0492     0.0281 |
+##                |     0.1255     0.0492     0.1472     0.0507 |
+##                |     0.0480     0.0281     0.0507     0.0353 |
+## *** Cluster 2 
+## * proportion =  0.2317 
+## * means      =  6.3662 2.9983 5.3342 2.1013 
+## * variances  = |     0.2504     0.1099     0.1337     0.0511 |
+##                |     0.1099     0.1404     0.0524     0.0299 |
+##                |     0.1337     0.0524     0.1568     0.0541 |
+##                |     0.0511     0.0299     0.0541     0.0377 |
+## *** Cluster 3 
+## * proportion =  0.3333 
+## * means      =  5.0060 3.4280 1.4620 0.2460 
+## * variances  = |     0.1536     0.0674     0.0820     0.0313 |
+##                |     0.0674     0.0861     0.0322     0.0184 |
+##                |     0.0820     0.0322     0.0962     0.0331 |
+##                |     0.0313     0.0184     0.0331     0.0231 |
+## *** Cluster 4 
+## * proportion =  0.0984 
+## * means      =  7.1033 2.9713 6.0661 1.8753 
+## * variances  = |     0.2932     0.1287     0.1566     0.0599 |
+##                |     0.1287     0.1643     0.0614     0.0351 |
+##                |     0.1566     0.0614     0.1836     0.0633 |
+##                |     0.0599     0.0351     0.0633     0.0441 |
+## ****************************************</code></pre>
+<pre class="r"><code>summary(mixmodICL)</code></pre>
+<pre><code>## **************************************************************
+## * Number of samples    =  150 
+## * Problem dimension    =  4 
+## **************************************************************
+## *       Number of cluster =  4 
+## *              Model Type =  Gaussian_pk_Lk_C 
+## *               Criterion =  ICL(612.7233)
+## *              Parameters =  list by cluster
+## *                  Cluster  1 : 
+##                          Proportion =  0.3365 
+##                               Means =  5.9442 2.7560 4.2719 1.3249 
+##                           Variances = |     0.2351     0.1032     0.1255     0.0480 |
+##                                       |     0.1032     0.1317     0.0492     0.0281 |
+##                                       |     0.1255     0.0492     0.1472     0.0507 |
+##                                       |     0.0480     0.0281     0.0507     0.0353 |
+## *                  Cluster  2 : 
+##                          Proportion =  0.2317 
+##                               Means =  6.3662 2.9983 5.3342 2.1013 
+##                           Variances = |     0.2504     0.1099     0.1337     0.0511 |
+##                                       |     0.1099     0.1404     0.0524     0.0299 |
+##                                       |     0.1337     0.0524     0.1568     0.0541 |
+##                                       |     0.0511     0.0299     0.0541     0.0377 |
+## *                  Cluster  3 : 
+##                          Proportion =  0.3333 
+##                               Means =  5.0060 3.4280 1.4620 0.2460 
+##                           Variances = |     0.1536     0.0674     0.0820     0.0313 |
+##                                       |     0.0674     0.0861     0.0322     0.0184 |
+##                                       |     0.0820     0.0322     0.0962     0.0331 |
+##                                       |     0.0313     0.0184     0.0331     0.0231 |
+## *                  Cluster  4 : 
+##                          Proportion =  0.0984 
+##                               Means =  7.1033 2.9713 6.0661 1.8753 
+##                           Variances = |     0.2932     0.1287     0.1566     0.0599 |
+##                                       |     0.1287     0.1643     0.0614     0.0351 |
+##                                       |     0.1566     0.0614     0.1836     0.0633 |
+##                                       |     0.0599     0.0351     0.0633     0.0441 |
+## *          Log-likelihood =  -216.7612 
+## **************************************************************</code></pre>
+<pre class="r"><code>plot(mixmodICL)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>hist(mixmodICL)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<p>If you want to test more models, you can use the <code>mixmodGaussianModel()</code> function to list them.</p>
+<pre class="r"><code>mixmodGaussianModel()</code></pre>
+<pre><code>## ****************************************
+## *** MIXMOD Models:
+## * list =  Gaussian_pk_L_I Gaussian_pk_Lk_I Gaussian_pk_L_B Gaussian_pk_Lk_B Gaussian_pk_L_Bk Gaussian_pk_Lk_Bk Gaussian_pk_L_C Gaussian_pk_Lk_C Gaussian_pk_L_D_Ak_D Gaussian_pk_Lk_D_Ak_D Gaussian_pk_L_Dk_A_Dk Gaussian_pk_Lk_Dk_A_Dk Gaussian_pk_L_Ck Gaussian_pk_Lk_Ck Gaussian_p_L_I Gaussian_p_Lk_I Gaussian_p_L_B Gaussian_p_Lk_B Gaussian_p_L_Bk Gaussian_p_Lk_Bk Gaussian_p_L_C Gaussian_p_Lk_C Gaussian_p_L_D_Ak_D Gaussian_p_Lk_D_Ak_D Gaussian_p_L_Dk_A_Dk Gaussian_p_Lk_Dk_A_Dk Gaussian_p_L_Ck Gaussian_p_Lk_Ck 
+## * This list includes models with free and equal proportions.
+## ****************************************</code></pre>
+<pre class="r"><code>mixmodGaussianModel(family = &quot;general&quot;)</code></pre>
+<pre><code>## ****************************************
+## *** MIXMOD Models:
+## * list =  Gaussian_pk_L_C Gaussian_pk_Lk_C Gaussian_pk_L_D_Ak_D Gaussian_pk_Lk_D_Ak_D Gaussian_pk_L_Dk_A_Dk Gaussian_pk_Lk_Dk_A_Dk Gaussian_pk_L_Ck Gaussian_pk_Lk_Ck Gaussian_p_L_C Gaussian_p_Lk_C Gaussian_p_L_D_Ak_D Gaussian_p_Lk_D_Ak_D Gaussian_p_L_Dk_A_Dk Gaussian_p_Lk_Dk_A_Dk Gaussian_p_L_Ck Gaussian_p_Lk_Ck 
+## * This list includes models with free and equal proportions.
+## ****************************************</code></pre>
+<pre class="r"><code>mixmodGaussianModel(family = &quot;spherical&quot;, 
+                    free.proportions = FALSE)</code></pre>
+<pre><code>## ****************************************
+## *** MIXMOD Models:
+## * list =  Gaussian_p_L_I Gaussian_p_Lk_I 
+## * This list includes only models with equal proportions.
+## ****************************************</code></pre>
+<p>Then, we test all the gaussian models. We also change the initialization strategy. By default, <code>mixmodCluster()</code> use a <span class="math inline">\(smallEM\)</span>, from 50 random starts. We decide here to test <span class="math inline">\(EM\)</span> with 20 random initialization.</p>
+<pre class="r"><code>mixmodAll = mixmodCluster(
+    iris[-5], 1:9,
+    criterion = c(&quot;BIC&quot;, &quot;ICL&quot;, &quot;NEC&quot;),
+    models = mixmodGaussianModel(),
+    strategy = mixmodStrategy(algo = &quot;EM&quot;,
+                              initMethod = &quot;random&quot;,
+                              nbTry = 20))
+
+temp = sapply(attr(mixmodAll, &quot;results&quot;), function(mod) {
+    K = attr(mod, &quot;nbCluster&quot;)
+    BIC = attr(mod, &quot;criterionValue&quot;)[1]
+    ICL = attr(mod, &quot;criterionValue&quot;)[2]
+    NEC = attr(mod, &quot;criterionValue&quot;)[3]
+    model = attr(mod, &quot;model&quot;)
+    return (c(K = K, model = model, BIC = BIC, ICL = ICL, NEC = NEC))
+})
+mixmodCriterion = transform(
+    data.frame(t(temp), stringsAsFactors = FALSE),
+    BIC = as.numeric(BIC),
+    ICL = as.numeric(ICL),
+    NEC = as.numeric(ICL))
+
+ggplot(mixmodCriterion, aes(K, model, fill = BIC)) + geom_bin2d()</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mixmodCriterion, aes(K, BIC, color = model)) + 
+    stat_summary(aes(group = model), fun.y = mean, geom = &quot;line&quot;)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(mixmodCriterion, aes(K, model, fill = ICL)) + geom_bin2d()</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-12-3.png" width="672" /></p>
+<pre class="r"><code>ggplot(mixmodCriterion, aes(K, ICL, color = model)) + 
+    stat_summary(aes(group = model), fun.y = mean, geom = &quot;line&quot;)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-12-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(mixmodCriterion, aes(K, model, fill = NEC)) + geom_bin2d()</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-12-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(mixmodCriterion, aes(K, NEC, color = model)) + 
+    stat_summary(aes(group = model), fun.y = mean, geom = &quot;line&quot;)</code></pre>
+<p><img src="stat-prog-R-4_files/figure-html/unnamed-chunk-12-6.png" width="672" /></p>
+</div>
+<div id="some-work" class="section level2">
+<h2>Some work</h2>
+<p>Finally, we want to use these methods to search a good number of clusters for each digit in the <code>pendigits</code> data.</p>
+</div>
+
+</div>
+<div class="footer">
+      Site créé avec <a href="http://www.r-project.org" target="_blank"><code>R</code></a> et la 
+      librairie  <a href="http://rmarkdown.rstudio.com/" target="_blank"><code>rmarkdown</code></a>.
+</div>
+<script>
+    $("#TOC").css("margin-top", "100px");
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

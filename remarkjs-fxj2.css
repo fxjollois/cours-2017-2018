@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css?family=Lato|Yanone+Kaffeesatz');
+.remark-container {
+}
+.remark-slide-content {
+	font-family: 'Lato', sans-serif;
+	font-size: 24px;
+}
+.remark-slide-content h1,
+.remark-slide-content h2,
+.remark-slide-content h3 {
+	font-family: 'Yanone Kaffeesatz', sans-serif;
+}
+.remark-slide-content h1 { font-size: 2em; }
+.remark-slide-content h2 { font-size: 1.5em; }
+.remark-slide-content h3 { font-size: 1.25em; }
+.footnote {
+	position: absolute;
+	bottom: .5em;
+}
+a {
+	color: rgb(249, 38, 114);
+	text-decoration: none;
+	font-weight: bold;
+}
+.small {
+	font-size: .8em;
+}
+
+/* pour deux colonnes */
+.left-column30 {
+	width: 28%;
+	float: left;
+}
+.right-column70 {
+	width: 68%;
+	float: right;
+}
+
+.left-column50 {
+	width: 48%;
+	float: left;
+}
+.right-column50 {
+	width: 48%;
+	float: right;
+}
+
+/* pour maximiser la taille des images */
+img {
+    max-width: 100%;
+}
+
+/* slide inverse niveau couleur */
+.inverse {
+	background: rgb(39, 40, 34);
+	color: #777872;
+}
+.inverse h1, 
+.inverse h2,
+.inverse h3 {
+	color: #f3f3f3;
+}
+.inverse strong {
+	color: #8B0000ff;
+}
+
+/* slide citation */
+/*
+.citation blockquote {
+	font-size: 3em;
+}
+*/
+
+/* footnote en petit */
+.footnote {
+    font-size: .75em;
+}

@@ -1,0 +1,45 @@
+---
+title: "ACP - TP"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA)
+```
+
+```{r package}
+library(tidyverse)
+library(stringr)
+```
+
+## Température mondiale
+
+Nous allons travailler ici sur les données de température mondiale **HadCRUT4**, fournies par [Climate Research Unit](https://crudata.uea.ac.uk/). Vous trouverez plus d'informations sur ces données sur ce [lien](https://crudata.uea.ac.uk/cru/data/temperature/). Nous avons ici l'historique des anomalies moyennes mensuelles et annuelles depuis 1850, au niveau mondial, par rapport à la période 1961-1990.
+
+Le code ci-dessous télécharge directement les dernières données disponibles et les met dans un `data.frame` dont vous avez un aperçu en dessous (en supprimant l'année 2017, incomplète).
+
+```{r temp}
+donnees = read_lines("https://crudata.uea.ac.uk/cru/data/temperature/HadCRUT4-gl.dat") %>% 
+  tibble() %>% 
+  slice(seq(1, n(), by = 2)) %>% 
+  transmute(val = str_replace_all(str_trim(.), "[\\s]+", " ")) %>%
+  separate(val, c("Year", month.abb, "Annual"), sep = " ", convert = TRUE)
+```
+
+```{r tempkable, echo=FALSE}
+knitr::kable(head(donnees), digits = 2)
+```
+
+Vous devez donc réaliser les étapes suivantes :
+
+- Décrire rapidement les données
+- Réaliser une ACP centrée ou normée (choix à justifier), sur les données mensuelles
+- Ajouter la moyenne annuelle en variable supplémentaire
+- Produire les graphiques nécessaires à l'interprétation
+- Identifier des années particulières
+    - Refaire l'ACP en les indiquant comme individus supplémentaires
+    - Comparer les résultats pour voir s'il est opportun ou non de les garder dans l'analyse
+- Que peut-on dire globalement ?
+
+
+

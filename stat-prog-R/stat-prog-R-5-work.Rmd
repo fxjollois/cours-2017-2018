@@ -1,0 +1,62 @@
+---
+title: "`pendigits` data - interactive analysis"
+subtitle: Statistical Programming using `R`
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      results = 'markdown')
+library(markdown)
+library(shiny)
+inclure <- function(fichier) {
+    name = tail(strsplit(fichier, "/")[[1]], 1)
+    tags$div(
+        tags$ul(tags$li(tags$a(tags$code(name), href = fichier))),
+        tags$pre(tags$code(includeText(fichier)),
+             class = "r")
+    )
+}
+```
+
+Now, we want to build an application which includes all the methods we see in previous sessions. Our goal is to create a tool that permits us to analyse the data, in order to chose an as good as possible number of clusters, for each digit.
+
+The app includes 4 panels: the description of data and one for each method (HAC, $k$-means, mixture model). The original data are also presented. Here is the *specifications* for each panel:
+
+- **Description**: 4 sub-panels
+    - Distribution of the digits (bar chart)
+    - Distribution of the coordinates, according to the digits (boxplot)
+    - Average digit
+    - PCA projection (global plot or separated for each digit)
+- For each method:
+    - Left side:
+        - Choice of the digit
+        - Choice of the number of clusters
+    - Right side:
+        - Specific graph:
+            - **HAC**: dendrogram
+            - **kmeans**: evolution of $r^2$
+            - **mclust**: evolution of the user specified criterion ($BIC$, $ICL$, $AIC$, $AIC3$)
+        - For each cluster:
+            - Plot of the average digit
+            - PCA projection
+
+You can run directly this application with:
+
+```{r, eval=FALSE, echo=TRUE}
+runUrl("http://fxjollois.github.io/stat-prog-R/pendigits.zip")
+```
+
+
+Here are the two files for this application:
+
+```{r}
+inclure("stat-prog-R/pendigits/ui.R")
+inclure("stat-prog-R/pendigits/server.R")
+```
+
+
+In `server.R`, we **load** a specific file, named a `RData` file. This file contains the results of the computation done in a third file (`code.R`, presented below). It allows us to pre-compute results, instead of online computing.
+
+```{r}
+inclure("stat-prog-R/pendigits/code.R")
+```

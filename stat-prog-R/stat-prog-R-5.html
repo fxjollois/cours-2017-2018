@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Interactive analysis</title>
+
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<link href="libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="libs/highlightjs-1.1/highlight.js"></script>
+<!--
+    Font Awesome
+-->
+<script src="https://use.fontawesome.com/32d8325004.js"></script>
+<link rel="stylesheet" href="libs/font-awesome-4.7.0/css/font-awesome.min.css">
+
+<!--
+    CSS perso
+-->
+<style>
+    .contenu {
+        margin-bottom: 50px;
+    }
+
+    .contact-liens {
+        text-align: center;
+    }
+    .contact-liens:hover {
+        text-decoration: none;
+    }
+    .contact-icones {
+        height: 30px;
+    }
+
+    /* Espacement pour barre du haut et pied de page */
+    #header, .section.level1 {
+        margin-top: 60px;
+        margin-bottom: 60px;
+    }
+    /* Espacement pour table des matières */
+    #TOC {
+        margin-top: 100px;
+    }
+    
+    .footer {
+        position: fixed;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        left: 0;
+        background-color: #E6E6E6;
+    }
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="libs/bootstrap-journal.min.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-main">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">FX Jollois</a>
+    </div>
+    <div id="navbar-main" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Données <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+              <li><a href="accesdonnees.html">A télécharger</a></li>
+              <li><a href="donnees-integrees-r.html">Sous R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Enseignement <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">DUT 1ère année</li>
+            <li><a href="exploitation-donnees.html">Exploitation de données</a></li>
+            <li><a href="initiation-a-r.html">Initiation à R</a></li>
+            <li><a href="reporting.html">Reporting</a></li>
+            <li><a href="complements-r.html">Compléments sur R</a></li>
+            <li class="dropdown-header">DUT 2ème année</li>
+            <li><a href="prog-stat-r.html">Programmation statistique avec R</a></li>
+            <li class="dropdown-header">LP MDS Santé</li>
+            <li><a href="info-dec-sante.html">Informatique décisionnelle</a></li>
+            <li class="dropdown-header">DU Analyste Big Data</li>
+            <li><a href="initiation-r-du.html">Initiation à R</a></li>
+            <li><a href="connexion-r-mongodb.html">Connexion entre R et MongoDB</a></li>
+            <li class="dropdown-header">DU Dataviz</li>
+            <li><a href="analyse-donnees.html">Analyse de données</a></li>
+            <li><a href="visualisation-donnees.html">Visualisation de données - R</a></li>
+            <li><a href="visualisation-donnees-tableau.html">Visualisation de données - Tableau</a></li>
+            <li><a href="visualisation-donnees-d3.html">Visualisation de données - D3</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Master</li>
+            <li><a href="slides/cnam-classif-modeles.html">Classification et Modèles de mélange</a></li>
+            <li><a href="analyse-donnees-massives.html">Analyse de Données Massives</a></li>
+            <li class="dropdown-header">Iran</li>
+            <li><a href="stat-prog-R.html">Statistical Programming using R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Recherche <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="recherche.html">Sujets</a></li>
+            <li><a href="publications.html">Publications</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Réalisations <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="realisations.html">Détail</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://up5.fr/explore-data" target="_blank">explore-data</a></li>
+            <li><a href="http://fxjollois.github.io/cours-sql/" target="_blank">Appli web de cours pour SQL</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container-fluid -->
+</div>
+<div class="contenu">
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Interactive analysis</h1>
+<h3 class="subtitle"><em>Statistical Programming using <code>R</code></em></h3>
+
+</div>
+
+
+<p>We present in this section the <code>shiny</code> package, which allows us to create web application (local to a computer, local into an inside network, or online).</p>
+<pre class="r"><code>library(shiny)</code></pre>
+<p>We see in the previous sessions that it is a diffuclt task to analysis deeply some datasets, when we produce a lot of tables and graphics. A good way to tackle this problem is to create a (simple) application, which allows us to interact with data and methods.</p>
+<div id="web-application" class="section level2">
+<h2>Web application</h2>
+<p>To create a web application with <code>shiny</code>, you have to create a specific folder with specifics files:</p>
+<ul>
+<li><em>one file app</em>: file named <code>app.R</code></li>
+<li><em>two files app</em>: files names <code>server.R</code> and <code>ui.R</code></li>
+</ul>
+<p>I prefer the second choice to separate the <em>user interface</em> side (in <code>ui.R</code>) and the <em>server</em> side (in <code>server.R</code>).</p>
+<p>Since we want an interactive application, we have to manage both sides of it:</p>
+<ul>
+<li><strong>UI</strong>: we explain here what is the format of our application (title, panels, …), and the possible interactions
+<ul>
+<li><strong>inputs</strong>: parameters the user can define</li>
+<li><strong>outputs</strong>: tables and graphics produce by the server</li>
+</ul></li>
+<li><strong>Server</strong>: we detail here how <code>R</code> produces the <strong>outputs</strong>, from data and <strong>inputs</strong></li>
+</ul>
+<p>In the following subsection are presented the contents of the two files. You can copy this to test inside <strong>RStudio</strong>.</p>
+<div id="first-application" class="section level3">
+<h3>First application</h3>
+<p>We create a folder, names for instance <code>web-application</code>, with two files:</p>
+<p><div>
+<ul>
+<li>
+<a href="stat-prog-R/web-application-1/ui.R">
+<code>ui.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+
+shinyUI(fluidPage(
+  titlePanel("Web application")
+))</code>
+</pre>
+</div><div>
+<ul>
+<li>
+<a href="stat-prog-R/web-application-1/server.R">
+<code>server.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+
+shinyServer(function(input, output) {
+
+})</code>
+</pre>
+</div></p>
+<p>In <strong>RStudio</strong>, when a file named <code>ui.R</code> or <code>server.R</code> or <code>app.R</code> is open, you get a button names <em>Run App</em>. If you click on them, you must have a new window with only the main title.</p>
+<p>The funtion <code>shinyUI()</code> define the <strong>UI</strong> section of an application. In this, we create a <code>fluidPage()</code>, which can contain many <em>panel</em>, as we see later.</p>
+<p>The function <code>shinyServer()</code> permits us to define a function taking <code>input</code> and <code>output</code> parameters defined in <code>ui.R</code>, to explain how <strong>outputs</strong> are created from data and <strong>inputs</strong>.</p>
+<p>If you want to run directly the application, write the following code into <code>R</code> console.</p>
+<pre class="r"><code>runUrl(&quot;http://fxjollois.github.io/stat-prog-R/web-application-1.zip&quot;)</code></pre>
+</div>
+<div id="adding-plot-and-table" class="section level3">
+<h3>Adding plot and table</h3>
+<p>We add in the preceding application a plot and a table, without any interaction at this moment. So, we have to define the outputs in <code>ui.R</code>, with functions names <code>plotOutput()</code> for any plot, and <code>tableOutput()</code> for tables. These functions must have a parameter, which is the name of the output.</p>
+<p>Now, in <code>server.R</code>, we define the plot and the table to produce. We use <code>iris</code> dataset, with functions <code>renderPlot()</code> for any plot, and <code>renderTable()</code> for tables.</p>
+<p>To enhance the presentation of the application, we use a <code>sidebarLayout</code> which divides the window into two sections:</p>
+<ul>
+<li><code>sidebarPanel()</code>: usually all the controls (interactions)</li>
+<li><code>mainPanel()</code>: the outputs generated from choice made by users</li>
+</ul>
+<p>And in the <code>server.R</code>, we compute <em>PCA</em> on the data before the definition of the server operation.</p>
+<p><div>
+<ul>
+<li>
+<a href="stat-prog-R/web-application-2/ui.R">
+<code>ui.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+
+shinyUI(fluidPage(
+  titlePanel("Web application"),
+  sidebarLayout(
+      sidebarPanel(),
+      mainPanel(
+          helpText("Mean values of attributes for each species"),
+          tableOutput("tab"),
+          helpText("PCA first factorial map for individuals"),
+          plotOutput("graph")
+      )
+  )
+))</code>
+</pre>
+</div><div>
+<ul>
+<li>
+<a href="stat-prog-R/web-application-2/server.R">
+<code>server.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+library(FactoMineR)
+pca = PCA(iris, quali.sup = 5, graph = FALSE)
+
+shinyServer(function(input, output) {
+
+    output$tab &lt;- renderTable({
+        aggregate(. ~ Species, iris, mean)
+    }, digits = 2)
+    
+    output$graph &lt;- renderPlot({
+        par(mar = c(4, 4, 0, 0) + .1)
+        plot(Dim.2 ~ Dim.1, pca$ind$coord,
+             col = rainbow(3)[iris$Species], pch = 19)
+    })
+})</code>
+</pre>
+</div></p>
+<p>If you want to run directly the application, write the following code into <code>R</code> console.</p>
+<pre class="r"><code>runUrl(&quot;http://fxjollois.github.io/stat-prog-R/web-application-2.zip&quot;)</code></pre>
+</div>
+<div id="adding-some-interaction" class="section level3">
+<h3>Adding some interaction</h3>
+<p>Now, we add interactions in the application, then the user (you or someone else if you publish your app) can interact with data. First, we add two inputs into <code>ui.R</code>:</p>
+<ul>
+<li>One drop down list to chose the statistic computing in the table, with <code>selectInput()</code> function ;</li>
+<li>Two groups of radio buttons to chose the dimension to plot, with <code>radioButtons()</code>.</li>
+</ul>
+<p>These two functions take at least three parameters:</p>
+<ul>
+<li>a name, to be use in <code>server.R</code></li>
+<li>a title, placed above the drop down menu</li>
+<li>a list of possible choices</li>
+</ul>
+<p>For <code>radioButtons()</code>, we add the parameter <code>inline=TRUE</code> to have all the button on one line.</p>
+<p>Second, we use theses inputs as object of <code>input</code> parameter in the server function, to use the user choice in the produced outputs. The value inside these inputs are <em>characters</em>.</p>
+<p><div>
+<ul>
+<li>
+<a href="stat-prog-R/web-application-3/ui.R">
+<code>ui.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+
+shinyUI(fluidPage(
+  titlePanel("Web application"),
+  sidebarLayout(
+      sidebarPanel(
+          helpText("Choose the statistic you want to compute"),
+          selectInput("stat", "Statistic", c("mean", "median", "min", "max")),
+          helpText("Choose the PCA dimension to plot"),
+          radioButtons("dimX", "X", choices = 1:4, inline = TRUE),
+          radioButtons("dimY", "Y", choices = 1:4, inline = TRUE)
+      ),
+      mainPanel(
+          # helpText("Mean values of attributes for each species"),
+          textOutput("text"),
+          tableOutput("tab"),
+          helpText("PCA first factorial map for individuals"),
+          plotOutput("graph")
+      )
+  )
+))</code>
+</pre>
+</div><div>
+<ul>
+<li>
+<a href="stat-prog-R/web-application-3/server.R">
+<code>server.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+library(FactoMineR)
+pca = PCA(iris, quali.sup = 5, graph = FALSE)
+
+shinyServer(function(input, output) {
+
+    output$text &lt;- renderText({
+        paste(input$stat, "values of attributes for each species")
+    })
+    
+    output$tab &lt;- renderTable({
+        aggregate(. ~ Species, iris, function(x) {
+            switch(input$stat,
+                   mean = mean(x),
+                   median = median(x),
+                   min = min(x),
+                   max = max(x))
+        })
+    }, digits = 2)
+    
+    output$graph &lt;- renderPlot({
+        dimX = as.numeric(input$dimX)
+        dimY = as.numeric(input$dimY)
+        m = data.frame(x = pca$ind$coord[,dimX],
+                       y = pca$ind$coord[,dimY])
+        par(mar = c(4, 4, 0, 0) + .1)
+        plot(y ~ x, m,
+             col = rainbow(3)[iris$Species], pch = 19,
+             xlab = paste("Dimension", dimX),
+             ylab = paste("Dimension", dimY))
+    })
+})</code>
+</pre>
+</div></p>
+<p>If you want to run directly the application, write the following code into <code>R</code> console.</p>
+<pre class="r"><code>runUrl(&quot;http://fxjollois.github.io/stat-prog-R/web-application-3.zip&quot;)</code></pre>
+</div>
+<div id="add-updates-and-dependencies" class="section level3">
+<h3>Add updates and dependencies</h3>
+<p>At the end, we add in our application three upgrades:</p>
+<ol style="list-style-type: decimal">
+<li>we update possible choices in the radio buttons according to the number of dimensions of our PCA result
+<ul>
+<li><code>ui.R</code>: the only choice is <code>0</code> at the beginning of the application</li>
+<li><code>server.R</code>: we indicate the new choices (between 1 and the number of dimension in PCA) in a <code>observe()</code> function, with <code>updateRadioButtons()</code></li>
+</ul></li>
+<li>we add dependency between <code>dimY</code> and <code>dimX</code> inputs, to change <code>dimY</code> value according to a new value of <code>dimX</code>
+<ul>
+<li><code>server.R</code>: we modify the selected value in <code>dimY</code> (with <code>updateRadioButtons()</code>) to the first value different from <code>dimX</code></li>
+</ul></li>
+<li>we create a <em>reactive</em> object to get the subset of PCA dimensions
+<ul>
+<li><code>server.R</code>:
+<ul>
+<li>create a function with <code>reactive()</code> returning the subset with the two choosen dimensions</li>
+<li>get the data by using the created function in the <code>renderPlot()</code></li>
+</ul></li>
+</ul></li>
+</ol>
+<p>We add some controls in the outputs to avoid error during the execution of the application.</p>
+<p><div>
+<ul>
+<li>
+<a href="stat-prog-R/web-application-4/ui.R">
+<code>ui.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+
+shinyUI(fluidPage(
+  titlePanel("Web application"),
+  sidebarLayout(
+      sidebarPanel(
+          helpText("Choose the statistic you want to compute"),
+          selectInput("stat", "Statistic", c("mean", "median", "min", "max")),
+          helpText("Choose the PCA dimension to plot"),
+          radioButtons("dimX", "X", choices = 0),
+          radioButtons("dimY", "Y", choices = 0)
+      ),
+      mainPanel(
+          helpText("Mean values of attributes for each species"),
+          tableOutput("tab"),
+          helpText("PCA first factorial map for individuals"),
+          plotOutput("graph")
+      )
+  )
+))</code>
+</pre>
+</div><div>
+<ul>
+<li>
+<a href="stat-prog-R/web-application-4/server.R">
+<code>server.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+library(FactoMineR)
+pca = PCA(iris, quali.sup = 5, graph = FALSE)
+nDim = ncol(pca$ind$coord)
+
+shinyServer(function(input, output, session) {
+    
+    observe({
+        updateRadioButtons(session, "dimX",
+                           choices = 1:nDim,
+                           inline = TRUE,
+                           selected = 1)
+        updateRadioButtons(session, "dimY",
+                           choices = 1:nDim,
+                           inline = TRUE,
+                           selected = 2)
+    })
+    
+    observe({
+        dimX = input$dimX
+        if (input$dimY == dimX) {
+            dimY = which(!(1:nDim == dimX))[1]
+            updateRadioButtons(session, "dimY",
+                               selected = dimY)
+        }
+    })
+    
+    output$tab &lt;- renderTable({
+        aggregate(. ~ Species, iris, function(x) {
+            switch(input$stat,
+                   mean = mean(x),
+                   median = median(x),
+                   min = min(x),
+                   max = max(x))
+        })
+    }, digits = 2)
+    
+    subPCA &lt;- reactive({
+        if (input$dimX == 0) return(NULL)
+        dimX = as.numeric(input$dimX)
+        dimY = as.numeric(input$dimY)
+        m = data.frame(x = pca$ind$coord[,dimX],
+                       y = pca$ind$coord[,dimY])
+    })
+    
+    output$graph &lt;- renderPlot({
+        m = subPCA()
+        if (is.null(m)) return(NULL)
+        par(mar = c(4, 4, 0, 0) + .1)
+        plot(y ~ x, m,
+             col = rainbow(3)[iris$Species], pch = 19,
+             xlab = paste("Dimension", input$dimX),
+             ylab = paste("Dimension", input$dimY))
+    })
+})</code>
+</pre>
+</div></p>
+<p>If you want to run directly the application, write the following code into <code>R</code> console.</p>
+<pre class="r"><code>runUrl(&quot;http://fxjollois.github.io/stat-prog-R/web-application-4.zip&quot;)</code></pre>
+</div>
+<div id="user-interface" class="section level3">
+<h3>User interface</h3>
+<p>We can modify the user interface in many different ways with <code>shiny</code> package. It exists also some other packages allowing us to personnalize applications (<code>shinydashboard</code>, <code>shinythemes</code>, …)</p>
+</div>
+</div>
+<div id="some-work" class="section level2">
+<h2>Some work</h2>
+<p>Use the <code>shiny</code> package to create an application able to help us in the clustering process of our data.</p>
+</div>
+
+</div>
+<div class="footer">
+      Site créé avec <a href="http://www.r-project.org" target="_blank"><code>R</code></a> et la 
+      librairie  <a href="http://rmarkdown.rstudio.com/" target="_blank"><code>rmarkdown</code></a>.
+</div>
+<script>
+    $("#TOC").css("margin-top", "100px");
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

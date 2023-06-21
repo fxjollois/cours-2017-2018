@@ -1,0 +1,358 @@
+---
+title: "`pendigits` data - first analysis"
+subtitle: Statistical Programming using `R`
+---
+
+Here are the packages we use in this work.
+
+```{r}
+library(reshape2)
+library(ggplot2)
+library(FactoMineR)
+```
+
+## Data files
+
+Download the two following files :
+
+- [pendigits.tra](donnees/pendigits.tra)
+- [pendigits.tes](donnees/pendigits.tes)
+
+Data description can be found [here](http://archive.ics.uci.edu/ml/datasets/Pen-Based+Recognition+of+Handwritten+Digits): each line represent a draw of a digit between 0 and 9, with 8 points ($(x,y)$ coordinates for each point) and the number drawn.
+
+## Importation
+
+The data files are here easy to read:
+
+- the names of the attributes are not present
+- the values are separated by a comma `","`
+
+```{r}
+pen.tra = read.table("donnees/pendigits.tra", sep = ",")
+pen.tes = read.table("donnees/pendigits.tes", sep = ",")
+```
+
+Now, to collapse them together, we use the following code
+
+```{r}
+pen = rbind(pen.tra, pen.tes)
+```
+
+At the end of the import process, we name the attributes according to what we know: the two first attributes are $(x_1, y_1)$, the third and the fourth $(x_2, y_2)$, and so on. The last attribute is the written digit. Then, we create the vector `"X1" "Y1" "X2" "Y2" ... "X8" "Y8" "digit"`.
+
+```{r}
+names(pen) = c(paste0(c("X", "Y"), rep(1:8, each = 2)), "digit")
+class(pen$digit)
+```
+
+`digit` variable is here a numeric attribute (`integer` more precisely). But, it is a *nominal* one in reality. So, we transform it into `factor`.
+
+```{r}
+pen$digit = factor(pen$digit)
+class(pen$digit)
+```
+
+
+We now have the following value (only 6 first are presented here).
+
+```{r, echo=FALSE}
+knitr::kable(head(pen))
+```
+
+## Description
+
+### One by one 
+
+Our variable of interest is the digit reprensented. So, we start by describe this attribute.
+
+```{r}
+table(pen$digit)
+```
+
+Then, we reprensent the bar chart of the distribution of digits. We add a color by digit, because we use these colors later.
+
+```{r}
+ggplot(pen, aes(digit, fill = digit)) + 
+    geom_bar() +
+    guides(fill = FALSE)
+```
+
+We present here the mean, the median and the standard deviation of each coordinates.
+
+```{r}
+tab = apply(pen[-17], 2, function(x) {
+    return (c(Mean = mean(x),
+              Median = median(x),
+              StdDev = sd(x)))
+})
+round(t(tab), 2)
+```
+
+We also represent the distribution of each coordinate by a boxplot. For that, we can do a plot for each one.
+
+```{r, eval=FALSE}
+for (j in 1:16)
+    boxplot(pen[,j])
+```
+
+But, at the end, it produces 16 graphics, hard to compare. So we can therefore reprensent in one graphic all $x_j$ distribution, and in other one all $y_j$ distribution. This operation can be done with the `melt()` function of the package `reshape2`, which transform the form of the data. Here the step by step procedure for $x$ coordinates
+
+```{r}
+pen.X = pen[seq(1, 15, 2)]
+names(pen.X)
+pen.X.melt = melt(pen.X)
+knitr::kable(head(pen.X.melt))
+```
+
+And the boxplots
+
+```{r}
+ggplot(pen.X.melt, aes(variable, value)) +
+    geom_boxplot()
+```
+
+Now, in one step for $y$  coordinates
+
+```{r}
+ggplot(melt(pen[seq(2, 16, 2)]), aes(variable, value)) + geom_boxplot()
+```
+
+### With respect to `digit`
+
+First, we present the mean value of each coordinate for each digit. We can do this step with `apply()` (and `tapply()`) or with `aggregate()`. 
+
+```{r, eval=FALSE}
+apply(pen[-17], 2, tapply, pen$digit, mean)
+```
+
+```{r}
+agg = aggregate(. ~ digit, pen, mean)
+```
+
+```{r}
+knitr::kable(agg, digits = 2)
+```
+
+
+For graphical representation, we have to produce a lot of boxplots. The most interesting ones in our case is a set of boxplot of $x_j$ coordinate for each digit (8 sets of 10 boxplots), and the same for each $y_j$. This can be done due to the `melt()` function.
+
+```{r}
+pen.melt = melt(pen, id.vars = 17)
+head(pen.melt)
+```
+
+And now the production of graphic.
+
+```{r}
+ggplot(pen.melt, aes(digit, value, color = digit)) + 
+    geom_boxplot() +
+    facet_wrap(~ variable)
+```
+
+To go further, we can try to do a heatmap of $(x_j,y_j)$ coordinates for each digit. But, it produces 8 heatmaps per digit. 80 graphics can be very too many to be usefull in this way of working. We will see later how we can take advantage of interactive possibility in `R` in data analysis.
+
+## Representation of a digit
+
+We want to represent the first `"0"` drawn. This step is interesting for further analysis. We select the first 0 digit, and extract $x$ and $y$ coordinates. After we plot these with a line, and add the number of the point.
+
+```{r, fig.height=2, fig.width=2}
+first.0 = subset(pen, digit == 0)[1,]
+x = unlist(first.0[seq(1,15, by = 2)])
+y = unlist(first.0[seq(2,16, by = 2)])
+par(mar = c(0, 0, 0, 0) + .1)
+plot(x, y, type = "b", pch = " ", axes = FALSE, col = "gray70")
+text(x, y, 1:8)
+```
+
+
+## Function 
+
+Now, we have the basis of a function that can reproduc each digit. We want the following constraints for this one :
+
+- Parameters:
+    - `v`: a vector with the 16 values of each point (if it is a `data.frame`, transform it as simple vector)
+    - `n`: a numeric value (with `NULL` value by default), denoting the number to drawn (possibly not pass)
+    - `point`: a boolean vector (with `FALSE` value by default), indicating if the point number has to be added to the graph
+    - `add`: a boolean vector (with `FALSE` value by default), indicating if the plot is to added to the previous one
+    - `color`: a specific color (with `"black"` value by default)
+- Output: 
+    - line representing the drawn
+    - number drawn as title (if known)
+    - point number (if wanted)
+
+Here is the final function.
+
+```{r}
+drawn <- function(v, n = NULL, point = FALSE, add = FALSE, color = "black") {
+    # Transformation of the data.frame if needed
+    if (is.data.frame(v))
+        v = unlist(v)
+    # extract x and y coordinates
+    x = v[seq(1, 15, by = 2)]
+    y = v[seq(2, 16, by = 2)]
+    # optimize space into graphics in reducing margin (sse ?par for more information)
+    opar = par(mar = c(0, 0, 2, 0) + .1)
+    if (!add) { # Create a graphic
+        plot(x, y, 
+             # Specify limits is a way to have always the same frame for plotting lines
+             xlim = c(-5, 105), ylim = c(-5, 105),
+             # Do not show axes
+             axes = FALSE,
+             # If point is TRUE, we add a space (with pch = " ") at each point
+             # If not, draw a line
+             type = ifelse(point, "b", "l"), 
+             pch = " ", 
+             # Specify color (black by default)
+             col = color,
+             # Add a title (NULL by default)
+             main = n)
+        if (point) text(x, y, 1:8)
+    } else { # Add line to the plot
+        # lines() add lines to an existing plot (the last produce)
+        lines(x, y, 
+              # same comment than before
+              xlim = c(-5, 105), ylim = c(-5, 105),
+              type = ifelse(point, "b", "l"), 
+              pch = " ", 
+              col = color)
+    }
+    par(opar)
+}
+```
+
+Now, here some use of this function
+
+```{r, fig.height=2, fig.width=2}
+drawn(first.0)
+drawn(first.0, n = 0)
+drawn(first.0, point = TRUE)
+drawn(first.0)
+first.1 = subset(pen, digit == 1)[1,]
+drawn(first.1, add = TRUE, col = "red")
+```
+
+## First drawn of each digit
+
+For our curiosity, we can now drawn each first digit of the data. The `mfrow` parameter of the `par()` function permits us to separate the graphical window into 10 cells (with 2 rows and 5 columns).
+
+```{r}
+par(mfrow = c(2, 5))
+for (i in 0:9) {
+    s = subset(pen, digit == i)[1,]
+    drawn(s[-16], n = i)
+}
+```
+
+## Average digit
+
+From the previous section, we now want to represent the *average* digit, *i.e.* a line produce by the average value for each coordinate. To see if there are some area that are not use for a particular digit, we represent also all the drawn in a very light gray.
+
+```{r}
+par(mfrow = c(2, 5))
+for (i in 0:9) {
+    s = subset(pen, digit == i)
+    # Computing the average values
+    mean = apply(s[-17], 2, mean)
+    # Drawn the first drawn
+    drawn(s[1,1:16], col = "gray90", n = i)
+    # Add all other drawn
+    for (j in 2:nrow(s)) 
+        drawn(s[j,1:16], col = "gray90", add = TRUE)
+    # Last, add the average line
+    drawn(mean[-17], add = TRUE)
+}
+```
+
+## PCA
+
+A good way to represent many variables in one plot is the *Principal Component Analysis*. Then, we perform PCA on the data, and look at the quality of the projection on the first components. 
+
+```{r}
+res = PCA(pen, quali.sup = 17, graph = FALSE)
+eig = data.frame(comp = 1:16,
+                 setNames(res$eig, c("eigenvalue", "percent", "cum.percent")))
+ggplot(eig) +
+    geom_bar(aes(comp, percent), stat = "identity") +
+    stat_summary(aes(comp, cum.percent, group = 1), 
+                 fun.y = sum, geom = "line")
+```
+
+Now, we plot the first plan with a specific color for each digit. For that, we have to add the `digit` variable to the coordinates `data.frame` produce by `PCA()`.
+
+```{r}
+res2 = data.frame(res$ind$coord, digit = pen$digit)
+ggplot(res2, aes(Dim.1, Dim.2, color = digit)) + 
+    geom_point()
+```
+
+## For each digit
+
+The above plot is hard to understand. So, we choose to represent each digit separately, to have a better idea on how digit are spread (or not) in the PCA projection.
+
+```{r}
+ggplot(res2, aes(Dim.1, Dim.2, color = digit)) +
+    geom_point() +
+    facet_wrap(~ digit) +
+    guides(color = FALSE)
+```
+
+
+> We conclude here that we surely need to clusters data separatly for each digit, to detect if there really are different ways to write a digit (and how).
+
+
+
+## Point representation with `ggplot()`
+
+We can also represent digit drawn with the `ggplot()` function. We have to use the `melt()` function, and to be careful on how we do this.
+
+### For the first 0
+
+```{r, fig.height=2, fig.width=2}
+f0 = data.frame(x = unlist(first.0[seq(1, 15, 2)]),
+                y = unlist(first.0[seq(2, 16, 2)]))
+ggplot(f0, aes(x, y)) + 
+    geom_path() +
+    theme_void()
+```
+
+### For the average digit, and all drawn.
+
+
+#### Construct the data for all drawn 
+
+```{r}
+pen$id = 1:nrow(pen)
+pen.melt = melt(pen, id.vars = c("id", "digit"))
+pen.melt$coord = substr(pen.melt$variable, 1, 1)
+pen.melt$point = substr(pen.melt$variable, 2, 2)
+pen.melt.X = subset(pen.melt, coord == "X", -c(variable, coord))
+names(pen.melt.X) = c("id", "digit", "x", "point")
+pen.melt.Y = subset(pen.melt, coord == "Y", -c(variable, coord))
+names(pen.melt.Y) = c("id", "digit", "y", "point")
+pen.merge = merge(pen.melt.X, pen.melt.Y)
+```
+
+#### Construct the data for average
+
+```{r}
+agg.melt = melt(agg, id.vars = "digit")
+agg.melt$coord = substr(agg.melt$variable, 1, 1)
+agg.melt$point = substr(agg.melt$variable, 2, 2)
+agg.melt.X = subset(agg.melt, coord == "X", -c(variable, coord))
+names(agg.melt.X) = c("digit", "x", "point")
+agg.melt.Y = subset(agg.melt, coord == "Y", -c(variable, coord))
+names(agg.melt.Y) = c("digit", "y", "point")
+agg.merge = merge(agg.melt.X, agg.melt.Y)
+```
+
+
+#### Plot it
+
+```{r}
+ggplot(pen.merge, aes(x, y)) +
+    geom_path(aes(group = id), color = "gray90") +
+    facet_wrap(~ digit) +
+    geom_path(data = agg.merge) +
+    theme_void()
+```
+

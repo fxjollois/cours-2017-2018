@@ -1,0 +1,2796 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="FX Jollois" />
+  <meta name="copyright" content="AFC - STID2A2"/>
+  <title>Analyse Factorielle des Correspondances (AFC)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link href="afc-cours_files/slidy-2/styles/slidy.css" rel="stylesheet" />
+  <script src="afc-cours_files/slidy-2/scripts/slidy.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="..\css\slidy-fxj.css" />
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Analyse Factorielle des Correspondances (AFC)</h1>
+  <h1 class="subtitle">DUT STID 2AFA</h1>
+  <p class="author">
+FX Jollois
+  </p>
+</div>
+<div id="que-veut-on-faire" class="slide section level1">
+<h1>Que veut-on faire ?</h1>
+<ul>
+<li>Décrire et/ou résumer l’information contenue dans les données
+<ul>
+<li>Sans formuler d’hypothèses au préalable</li>
+</ul></li>
+<li>Tableau individu <span class="math inline">\(\times\)</span> variable
+<ul>
+<li>On connaît : <strong>ACP</strong></li>
+</ul></li>
+<li>Table de contingence
+<ul>
+<li><strong>AFC</strong></li>
+</ul></li>
+<li>Plus largement sur un tableau de nombres non négatifs</li>
+</ul>
+<p><strong>Idée principale</strong> : Utiliser les principes de l’ACP en utilisant une autre métrique</p>
+</div>
+<div id="table-de-contingence" class="slide section level1">
+<h1>Table de contingence</h1>
+<p>Croisement de deux variables qualitatives, représentant les effectifs de chaque couple de modalité</p>
+<table class="table table-condensed centering">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+No
+</th>
+<th style="text-align:right;">
+Yes
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1st
+</td>
+<td style="text-align:right;">
+122
+</td>
+<td style="text-align:right;">
+203
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2nd
+</td>
+<td style="text-align:right;">
+167
+</td>
+<td style="text-align:right;">
+118
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3rd
+</td>
+<td style="text-align:right;">
+528
+</td>
+<td style="text-align:right;">
+178
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Crew
+</td>
+<td style="text-align:right;">
+673
+</td>
+<td style="text-align:right;">
+212
+</td>
+</tr>
+</tbody>
+</table>
+<p>Ici, nous représentons les passagers du Titanic répartis sur leur classe (1ère, 2nde, 3ème et équipage) et leur surie ou non (<em>i.e.</em> 178 passagers en 3ème classe ont survécu au naufrage).</p>
+</div>
+<div id="probleme-et-objectifs" class="slide section level1">
+<h1>Problème et objectifs</h1>
+<p>Visualiser les liens entre les deux variables</p>
+<ul>
+<li>Utiliser la représentation simultanée des deux variables pour analyser les liens entre les modalités des deux variables</li>
+<li>Détection de modalités atypiques</li>
+<li>Visualiser les ressemblances entre les modalités d’une même variable</li>
+</ul>
+<p><strong>Objectifs similaires à l’ACP</strong></p>
+</div>
+<div id="pourquoi-pas-une-acp-directement" class="slide section level1">
+<h1>Pourquoi pas une ACP directement ?</h1>
+<p>Tableau analysé :</p>
+<ul>
+<li>Individus : modalités de la variable en lignes</li>
+<li>Variables : madalités de la variable en colonnes</li>
+</ul>
+<p>Comparaison des distributions en <strong>fréquences absolues</strong></p>
+<ul>
+<li>Importance beaucoup trop importante d’une modalité très (trop) présente en lignes</li>
+<li>On est plutôt intéressé par les <strong>profils</strong></li>
+</ul>
+</div>
+<div id="quelques-notations" class="slide section level1">
+<h1>Quelques notations</h1>
+<ul>
+<li><span class="math inline">\(\mathbf{X}\)</span> et <span class="math inline">\(\mathbf{Y}\)</span> : deux variables qualitatives à respectivement <span class="math inline">\(p\)</span> et <span class="math inline">\(q\)</span> modalités</li>
+<li><span class="math inline">\(\mathbf{T} = (t_{ij})\)</span>, avec <span class="math inline">\(i=1,\ldots,p\)</span> et <span class="math inline">\(j=1,\ldots,q\)</span> :
+<ul>
+<li>nombre d’individus ayant la modalité <span class="math inline">\(i\)</span> pour <span class="math inline">\(X\)</span> et <span class="math inline">\(j\)</span> pour <span class="math inline">\(Y\)</span></li>
+<li><span class="math inline">\(\sum_{i=1}^p \sum_{j=1}^q t_{ij} = n\)</span></li>
+</ul></li>
+<li>Marge en ligne : <span class="math inline">\((t_{i.}) = \sum_{j=1}^q t_{ij}\)</span> (effectifs des modalités de <span class="math inline">\(X\)</span>)</li>
+<li>Marge en colonne : <span class="math inline">\((t_{.j}) = \sum_{i=1}^p t_{ij}\)</span> (effectifs des modalités de <span class="math inline">\(Y\)</span>)</li>
+<li><span class="math inline">\(\mathbf{D}_X\)</span> et <span class="math inline">\(\mathbf{D}_Y\)</span> matrice diagonale contenant les marges en lignes et en colonnes sur la diagonale</li>
+<li>Profils lignes : <span class="math inline">\(\frac{t_{ij}}{t_{i.}} = P(Y=j | X=i)\)</span>, donné par <span class="math inline">\(\mathbf{D}_X^{-1}\mathbf{T}\)</span></li>
+<li>Profils colonnes : <span class="math inline">\(\frac{t_{ij}}{t_{.j}} = P(X=i | Y=j)\)</span>, donné par <span class="math inline">\(\mathbf{T}\mathbf{D}_Y^{-1}\)</span></li>
+</ul>
+</div>
+<div id="independance" class="slide section level1">
+<h1>Indépendance</h1>
+<p>Rappel de l’Indépendance : <span class="math inline">\(P(AB) = P(A)P(B)\)</span></p>
+<p><span class="math inline">\(\chi^2\)</span> : Mesure de l’écart à l’indépendance <span class="math display">\[ \chi^2 (X,Y) = n \sum_{i=1}^p \sum_{j=1}^q \frac{\left( f_{ij} - f_{i.} f_{.j} \right)^2}{f_{i.} f_{.j}}\]</span></p>
+<ul>
+<li>Si les variables sont indépendantes, <span class="math inline">\(\chi^2 (X,Y) = 0\)</span>
+<ul>
+<li>cela voudra dire que <span class="math inline">\(f_{ij} = f_{i.}f_{.j}\)</span> pour chaque couple de modalités</li>
+</ul></li>
+<li>On a aussi <span class="math inline">\(\chi^2(X,Y) \le n \times \mbox{inf}(p-1,q-1)\)</span>. Si <span class="math inline">\(\chi^2(X,Y)\)</span> est égal respectivement à <span class="math inline">\(n(p-1)\)</span> ou <span class="math inline">\(n(q-1)\)</span>, cela voudra dire que <span class="math inline">\(X\)</span> (resp. <span class="math inline">\(Y\)</span>) est fonctionnellement liée à <span class="math inline">\(Y\)</span> (resp. <span class="math inline">\(X\)</span>).</li>
+<li>Contribution d’une cellule <span class="math inline">\(ij\)</span> : <span class="math inline">\(\frac{\left( f_{ij} - f_{i.} f_{.j} \right)^2}{f_{i.} f_{.j}}\)</span></li>
+</ul>
+</div>
+<div id="distance" class="slide section level1">
+<h1>Distance</h1>
+<p><strong>Idée</strong> : Les profils lignes et les profils colonnes sont deux nuages de points sur lesquels on pourra appliquer une ACP</p>
+<p>Distance entre 2 modalités de <span class="math inline">\(X\)</span> :</p>
+<p><span class="math display">\[ 
+  d_{\chi^2}^2(i,i&#39;) = \sum_{j=1}^q \frac{n}{t_{.j}} \left( \frac{t_{ij}}{t_{i.}} - \frac{t_{i&#39;j}}{t_{i&#39;.}} \right)^2 
+\]</span></p>
+<p>Cela revient à utiliser la métrique <span class="math inline">\(n\mathbf{D}_Y^{-1}\)</span> sur les profils lignes, ce qu’on appelle la <strong>métrique du <span class="math inline">\(\chi^2\)</span></strong>.</p>
+<p>Idem pour les colonnes.</p>
+</div>
+<div id="inertie" class="slide section level1">
+<h1>Inertie</h1>
+<p>Inertie du nuage des profils lignes, par rapport au centre de gravité de ce nuage <span class="math inline">\(g_\ell = (f_{.j})\)</span> :</p>
+<p><span class="math display">\[ 
+  I_{g_\ell} = \sum_{i=1}^p \frac{t_{i.}}{n} d_{\chi^2}^2 (i, g_\ell) = \chi^2 (X,Y) 
+\]</span></p>
+<p>Idem pour les colonnes.</p>
+<h3 id="avantage-de-cette-metrique">Avantage de cette métrique</h3>
+<p>Regroupement de modalités ne modifiant pas l’inertie et donc la valeur du <span class="math inline">\(\chi^2\)</span>, ni même les distances. C’est l’<strong>équivalence distributionnelle</strong>.</p>
+</div>
+<div id="acp-sur-les-profils" class="slide section level1">
+<h1>ACP sur les profils</h1>
+<p>Deux possibilités totalement symétriques :</p>
+<table>
+<thead>
+<tr class="header">
+<th>Info</th>
+<th>Profil lignes</th>
+<th>Profil colonnes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Données <span class="math inline">\(Z\)</span></td>
+<td><span class="math inline">\(D_X^{-1}T\)</span></td>
+<td><span class="math inline">\(D_Y^{-1}T&#39;\)</span></td>
+</tr>
+<tr class="even">
+<td>Métrique <span class="math inline">\(M\)</span></td>
+<td><span class="math inline">\(nD_Y^{-1}\)</span></td>
+<td><span class="math inline">\(nD_X^{-1}\)</span></td>
+</tr>
+<tr class="odd">
+<td>Poids <span class="math inline">\(D\)</span></td>
+<td><span class="math inline">\(D_X/n\)</span></td>
+<td><span class="math inline">\(D_Y/n\)</span></td>
+</tr>
+<tr class="even">
+<td>Centre</td>
+<td><span class="math inline">\(Z&#39;D1\)</span></td>
+</tr>
+<tr class="odd">
+<td>Variance-covariance</td>
+<td><span class="math inline">\(V = Z&#39;DZ - gg&#39;\)</span></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Calcul <strong>identiques à l’ACP</strong> avec ces définitions</li>
+<li>Deux analyses conduisant aux mêmes valeurs propres</li>
+<li>Facteurs principaux de l’une = composantes principales de l’autre.</li>
+</ul>
+</div>
+<div id="interpretation" class="slide section level1">
+<h1>Interprétation</h1>
+<h3 id="choix-du-nombre-daxes">Choix du nombre d’axes</h3>
+<ul>
+<li>Pproblème plus compliqué que dans l’ACP</li>
+<li>Critère de Kaiser s’applique mal</li>
+<li>Règle du coude toujours valide</li>
+</ul>
+<h3 id="coordonnees-de-points">Coordonnées de points</h3>
+<ul>
+<li>Principal résultat</li>
+<li>Représentation en 2 (ou plus) dimensions des modalités des deux variables</li>
+</ul>
+<p>Les deux nuages de points, et donc les deux ensembles de modalités (de <span class="math inline">\(X\)</span> et de <span class="math inline">\(Y\)</span>) peuvent être représentés <strong>sur le même graphique</strong>.</p>
+<p>Le cercle de corrélations n’a aucun intérêt ici.</p>
+</div>
+<div id="interpretation-1" class="slide section level1">
+<h1>Interpretation</h1>
+<h3 id="contributions">Contributions</h3>
+<ul>
+<li>De même que pour l’ACP</li>
+<li>Contribution de la modalité <span class="math inline">\(i\)</span> de <span class="math inline">\(X\)</span> = <span class="math inline">\(\frac{t_{i.}}{n} \frac{(a_{ki}^2}{\lambda_k}\)</span></li>
+<li>Contributions fortes (supérieures à <span class="math inline">\(1/p\)</span>)</li>
+<li>Idem les modalités <span class="math inline">\(j\)</span> de <span class="math inline">\(Y\)</span>.</li>
+</ul>
+<h3 id="qualite-de-representation">Qualité de représentation</h3>
+<p>Idem que pour l’ACP et que pour les contributions.</p>
+</div>
+<div id="plus-loin" class="slide section level1">
+<h1>Plus loin</h1>
+<p><strong>Modalités supplémentaires</strong> ne participant pas au calcul, mais pouvant être représentés sur les graphiques :</p>
+<ul>
+<li>Lignes et/ou colonnes supplémentaires : modalités de <span class="math inline">\(X\)</span> ou de <span class="math inline">\(Y\)</span> qu’on ne veut pas inclure dans le calcul de l’AFC</li>
+</ul>
+<p><strong>Regroupement de modalités</strong></p>
+<ul>
+<li>à considérer si une modalité est trop peu présente
+<ul>
+<li>elle <em>tire</em> le nuage vers elle</li>
+</ul></li>
+</ul>
+<p>Travail <em>envisageable</em> sur un jeu de données Individus x Variables, sous quelques conditions :</p>
+<ul>
+<li>Variables de mêmes unités ;</li>
+<li>Somme en lignes et en colonnes ayant un sens ;</li>
+<li>Recherche sur les profils (de consommation par exemple).</li>
+</ul>
+</div>
+<div id="exemple-simple" class="slide section level1">
+<h1>Exemple simple</h1>
+<p>Nous utilisons les données <code>occupationalStatus</code>, qui nous donne la répartition d’hommes britaniques suivant le statut professionnel de leur père (en ligne) et le leur (en colonne). Les statuts sont codés de 1 à 8, et nous n’avons aucune information sur ceux-ci.</p>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+dest=1
+</th>
+<th style="text-align:right;">
+dest=2
+</th>
+<th style="text-align:right;">
+dest=3
+</th>
+<th style="text-align:right;">
+dest=4
+</th>
+<th style="text-align:right;">
+dest=5
+</th>
+<th style="text-align:right;">
+dest=6
+</th>
+<th style="text-align:right;">
+dest=7
+</th>
+<th style="text-align:right;">
+dest=8
+</th>
+<th style="text-align:right;">
+Sum
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+orig=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a583">50</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">19</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27f">26</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">8</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">7</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">6</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">2</span>
+</td>
+<td style="text-align:right;">
+129
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">16</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481">40</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380">34</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">18</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d">20</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">8</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">3</span>
+</td>
+<td style="text-align:right;">
+150
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">12</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380">35</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">65</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">66</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380">35</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a88b">88</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">21</span>
+</td>
+<td style="text-align:right;">
+345
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d">20</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">58</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f">110</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481">40</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29d">183</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">64</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">32</span>
+</td>
+<td style="text-align:right;">
+518
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">8</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">12</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">25</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">46</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">12</span>
+</td>
+<td style="text-align:right;">
+156
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">12</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d">102</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7b099">162</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">90</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">554</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a6">230</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c">177</span>
+</td>
+<td style="text-align:right;">
+1355
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">6</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">19</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481">40</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">21</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7af98">158</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95">143</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787">71</span>
+</td>
+<td style="text-align:right;">
+458
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17c">14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">32</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17c">15</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac92">126</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">91</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">106</span>
+</td>
+<td style="text-align:right;">
+387
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sum
+</td>
+<td style="text-align:right;">
+103
+</td>
+<td style="text-align:right;">
+159
+</td>
+<td style="text-align:right;">
+330
+</td>
+<td style="text-align:right;">
+459
+</td>
+<td style="text-align:right;">
+244
+</td>
+<td style="text-align:right;">
+1186
+</td>
+<td style="text-align:right;">
+593
+</td>
+<td style="text-align:right;">
+424
+</td>
+<td style="text-align:right;">
+3498
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="proportions-globales" class="slide section level1">
+<h1>Proportions globales</h1>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+dest=1
+</th>
+<th style="text-align:right;">
+dest=2
+</th>
+<th style="text-align:right;">
+dest=3
+</th>
+<th style="text-align:right;">
+dest=4
+</th>
+<th style="text-align:right;">
+dest=5
+</th>
+<th style="text-align:right;">
+dest=6
+</th>
+<th style="text-align:right;">
+dest=7
+</th>
+<th style="text-align:right;">
+dest=8
+</th>
+<th style="text-align:right;">
+Sum
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+orig=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a583">1.43</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">0.54</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27f">0.74</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">0.23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">0.20</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.31</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.17</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.06</span>
+</td>
+<td style="text-align:right;">
+3.69
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">0.46</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481">1.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380">0.97</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">0.51</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.31</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d">0.57</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">0.23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.09</span>
+</td>
+<td style="text-align:right;">
+4.29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.34</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380">1.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">1.86</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">1.89</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a380">1.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a88b">2.52</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">0.66</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">0.60</span>
+</td>
+<td style="text-align:right;">
+9.86
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.31</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d">0.57</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">1.66</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f">3.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481">1.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29d">5.23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">1.83</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">0.91</span>
+</td>
+<td style="text-align:right;">
+14.81
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.06</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">0.23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.34</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">0.66</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">0.71</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a483">1.32</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">0.80</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.34</span>
+</td>
+<td style="text-align:right;">
+4.46
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.34</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">0.80</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d">2.92</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7b099">4.63</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">2.57</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">15.84</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a6">6.58</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c">5.06</span>
+</td>
+<td style="text-align:right;">
+38.74
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.17</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">0.54</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a481">1.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">0.60</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7af98">4.52</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95">4.09</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787">2.03</span>
+</td>
+<td style="text-align:right;">
+13.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.09</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17c">0.40</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">0.91</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17c">0.43</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac92">3.60</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">2.60</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">3.03</span>
+</td>
+<td style="text-align:right;">
+11.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sum
+</td>
+<td style="text-align:right;">
+2.94
+</td>
+<td style="text-align:right;">
+4.55
+</td>
+<td style="text-align:right;">
+9.43
+</td>
+<td style="text-align:right;">
+13.12
+</td>
+<td style="text-align:right;">
+6.98
+</td>
+<td style="text-align:right;">
+33.91
+</td>
+<td style="text-align:right;">
+16.95
+</td>
+<td style="text-align:right;">
+12.12
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="profils-lignes" class="slide section level1">
+<h1>Profils lignes</h1>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+dest=1
+</th>
+<th style="text-align:right;">
+dest=2
+</th>
+<th style="text-align:right;">
+dest=3
+</th>
+<th style="text-align:right;">
+dest=4
+</th>
+<th style="text-align:right;">
+dest=5
+</th>
+<th style="text-align:right;">
+dest=6
+</th>
+<th style="text-align:right;">
+dest=7
+</th>
+<th style="text-align:right;">
+dest=8
+</th>
+<th style="text-align:right;">
+Sum
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+orig=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b1d5e0">38.76</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a0">14.73</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bbaf">20.16</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">6.20</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a788">5.43</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90">8.53</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">4.65</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">1.55</span>
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae96">10.67</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c9c4c0">26.67</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d1bfb5">22.67</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b099">12.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0aa8d">7.33</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b29d">13.33</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a788">5.33</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">2.00</span>
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a483">3.48</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaad94">10.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d9b9ab">18.84</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d8baac">19.13</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaad94">10.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cbc2bd">25.51</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">6.67</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">6.09</span>
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">2.12</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">3.86</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af97">11.20</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d4bdb2">21.24</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">7.72</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b8d0d7">35.33</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b09a">12.36</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">6.18</span>
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">1.28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787">5.13</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">7.69</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a0">14.74</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #deb5a4">16.03</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c3c8c7">29.49</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dbb8a9">17.95</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">7.69</span>
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.89</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">2.07</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d">7.53</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7b099">11.96</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">6.64</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">40.89</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a6">16.97</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c">13.06</span>
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">1.31</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a584">4.15</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab91">8.73</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">4.59</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b9cfd5">34.50</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c0cacc">31.22</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dfb5a2">15.50</span>
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.78</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a483">3.62</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f">8.27</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">3.88</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bdcccf">32.56</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cfc0b8">23.51</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c8c5c2">27.39</span>
+</td>
+<td style="text-align:right;">
+100
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="profils-colonnes" class="slide section level1">
+<h1>Profils colonnes</h1>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+dest=1
+</th>
+<th style="text-align:right;">
+dest=2
+</th>
+<th style="text-align:right;">
+dest=3
+</th>
+<th style="text-align:right;">
+dest=4
+</th>
+<th style="text-align:right;">
+dest=5
+</th>
+<th style="text-align:right;">
+dest=6
+</th>
+<th style="text-align:right;">
+dest=7
+</th>
+<th style="text-align:right;">
+dest=8
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+orig=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">48.54</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaad94">11.95</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">7.88</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca27d">1.74</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">2.87</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.93</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">1.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.47</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c">15.53</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d4bdb1">25.16</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90">10.30</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">3.92</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">4.51</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">1.69</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">1.35</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">0.71</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ebad93">11.65</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d9b9aa">22.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ddb6a5">19.70</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b099">14.38</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b099">14.34</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">7.42</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">3.88</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">4.95</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac91">10.68</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95">12.58</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a1">17.58</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bbaf">23.97</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29e">16.39</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c">15.43</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac92">10.79</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">7.55</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">1.94</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">5.03</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">3.64</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">5.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90">10.25</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">3.88</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">4.72</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">2.83</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ebad93">11.65</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a1">17.61</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cac3be">30.91</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c3c8c8">35.29</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c0cacc">36.89</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b0d5e1">46.71</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bdccd0">38.79</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b8d0d6">41.75</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">3.77</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">5.76</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0aa8d">8.71</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98d">8.61</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af97">13.32</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bbaf">24.11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e2b39f">16.75</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">1.89</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a483">4.24</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a889">6.97</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787">6.15</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edac91">10.62</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e5b19c">15.35</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d4bcb1">25.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sum
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="part-de-la-variance-expliquee" class="slide section level1">
+<h1>Part de la variance expliquée</h1>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Valeur propre
+</th>
+<th style="text-align:right;">
+Variance (%)
+</th>
+<th style="text-align:right;">
+Cumulée (%)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+dim 1
+</td>
+<td style="text-align:right;">
+0.28
+</td>
+<td style="text-align:right;">
+69.53
+</td>
+<td style="text-align:right;">
+69.53
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 2
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+18.56
+</td>
+<td style="text-align:right;">
+88.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 3
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+6.75
+</td>
+<td style="text-align:right;">
+94.83
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 4
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+2.46
+</td>
+<td style="text-align:right;">
+97.29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 5
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+1.41
+</td>
+<td style="text-align:right;">
+98.70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 6
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+1.05
+</td>
+<td style="text-align:right;">
+99.75
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 7
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.25
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="afc-cours_files/figure-slidy/eigenfig-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>2 axes suffisent à représenter 88.1% de l’information présente dans les données.</p>
+</div>
+<div id="representation-graphique" class="slide section level1">
+<h1>Représentation graphique</h1>
+<p><img src="afc-cours_files/figure-slidy/graphs-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="representation-conjointe" class="slide section level1">
+<h1>Représentation conjointe</h1>
+<p><img src="afc-cours_files/figure-slidy/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="lignes-importants" class="slide section level1">
+<h1>Lignes importants</h1>
+<h3 id="contribution">Contribution</h3>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+contrib 1
+</th>
+<th style="text-align:right;">
+contrib 2
+</th>
+<th style="text-align:right;">
+contrib 3
+</th>
+<th style="text-align:right;">
+contrib 4
+</th>
+<th style="text-align:right;">
+contrib 5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+orig=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">57.96</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d1beb5">31.92</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a584">5.88</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.37</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29e">19.37</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98c">10.11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #becbce">45.34</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">0.77</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">9.49</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">4.81</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e0b4a2">21.63</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.24</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a483">5.03</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">9.39</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.08</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98d">10.28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29e">19.46</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.02</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.11</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">1.99</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.29</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af97">16.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c2c9ca">43.10</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a483">5.09</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.09</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">6.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">2.45</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #deb6a5">23.28</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">6.07</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">9.05</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">6.17</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bfcbce">45.16</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.29</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">6.62</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95">14.93</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7b098">16.61</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d3bdb2">30.56</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ebad94">13.97</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sum
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="lignes-importants-1" class="slide section level1">
+<h1>Lignes importants</h1>
+<h3 id="qualite-de-representation-1">Qualité de représentation</h3>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+qualité 1
+</th>
+<th style="text-align:right;">
+qualité 2
+</th>
+<th style="text-align:right;">
+qualité 3
+</th>
+<th style="text-align:right;">
+qualité 4
+</th>
+<th style="text-align:right;">
+qualité 5
+</th>
+<th style="text-align:right;">
+Somme
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+orig=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">0.86</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">0.13</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #baced4">0.72</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">0.10</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">0.16</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bcb0">0.43</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cdc1bb">0.52</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.02</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.02</span>
+</td>
+<td style="text-align:right;">
+0.98
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cdc1bb">0.52</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a7">0.36</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+0.90
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaae95">0.22</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae96">0.23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dcb7a7">0.36</span>
+</td>
+<td style="text-align:right;">
+0.81
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b5d2da">0.77</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">0.09</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">0.07</span>
+</td>
+<td style="text-align:right;">
+0.95
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c9c4c0">0.56</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaae95">0.22</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">0.05</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98c">0.15</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+0.98
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d0bfb7">0.49</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29e">0.29</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a789">0.12</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">0.08</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">0.02</span>
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="colonnes-importantes" class="slide section level1">
+<h1>Colonnes importantes</h1>
+<h3 id="contribution-1">Contribution</h3>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+contrib 1
+</th>
+<th style="text-align:right;">
+contrib 2
+</th>
+<th style="text-align:right;">
+contrib 3
+</th>
+<th style="text-align:right;">
+contrib 4
+</th>
+<th style="text-align:right;">
+contrib 5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+dest=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">55.37</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cdc1ba">33.26</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a788">7.44</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.13</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29d">18.32</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90">11.56</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bbced3">45.67</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">0.93</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">4.50</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">8.25</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98c">9.59</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.22</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a381">3.66</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.12</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.03</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaae95">14.10</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab90">11.29</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda07b">0.81</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787">7.10</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.15</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">5.39</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">2.17</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a483">4.72</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c1cacb">41.76</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">5.22</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f">11.06</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.58</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c8c5c1">36.64</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">6.23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90">11.74</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">6.48</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b8d0d6">47.46</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07a">0.49</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">6.42</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e9ae95">14.35</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7af98">15.66</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #c1cacb">41.83</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98c">9.27</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sum
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="colonnes-importantes-1" class="slide section level1">
+<h1>Colonnes importantes</h1>
+<h3 id="qualite-de-representation-2">Qualité de représentation</h3>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+qualité 1
+</th>
+<th style="text-align:right;">
+qualité 2
+</th>
+<th style="text-align:right;">
+qualité 3
+</th>
+<th style="text-align:right;">
+qualité 4
+</th>
+<th style="text-align:right;">
+qualité 5
+</th>
+<th style="text-align:right;">
+Somme
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+dest=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">0.85</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">0.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bbced2">0.70</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a789">0.12</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eeab8f">0.17</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b8d0d6">0.73</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af97">0.23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+0.97
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #bfcbcd">0.66</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ecac92">0.19</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fca17d">0.03</span>
+</td>
+<td style="text-align:right;">
+0.90
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27f">0.04</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d6bbaf">0.42</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f9a381">0.06</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">0.05</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e6b099">0.25</span>
+</td>
+<td style="text-align:right;">
+0.83
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #b9cfd5">0.72</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98d">0.15</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">0.10</span>
+</td>
+<td style="text-align:right;">
+0.97
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #cbc2bd">0.53</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b19c">0.27</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">0.05</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a98b">0.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">0.00</span>
+</td>
+<td style="text-align:right;">
+0.99
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dest=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d0bfb6">0.48</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e3b29d">0.28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787">0.11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a787">0.11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">0.01</span>
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="lien-avec-le-chi2" class="slide section level1">
+<h1>Lien avec le <span class="math inline">\(\chi^2\)</span></h1>
+<p>Il y a clairement un lien entre les deux variables.</p>
+<pre><code>## Warning in chisq.test(o): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  o
+## X-squared = 1416, df = 49, p-value &lt; 2.2e-16</code></pre>
+</div>
+<div id="residus" class="slide section level1">
+<h1>Résidus</h1>
+<p>Différence entre observé et estimé.</p>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+dest=1
+</th>
+<th style="text-align:right;">
+dest=2
+</th>
+<th style="text-align:right;">
+dest=3
+</th>
+<th style="text-align:right;">
+dest=4
+</th>
+<th style="text-align:right;">
+dest=5
+</th>
+<th style="text-align:right;">
+dest=6
+</th>
+<th style="text-align:right;">
+dest=7
+</th>
+<th style="text-align:right;">
+dest=8
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+orig=1
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #add8e6">23.71</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a1">5.42</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e5b19b">3.96</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">-2.17</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">-0.67</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ffa07a">-4.95</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa37f">-3.39</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">-3.45</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=2
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b4a1">5.51</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #ccc2bc">12.71</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e1b3a0">5.28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f1a88b">-0.38</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0aa8d">0.17</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">-4.33</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">-3.46</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27f">-3.56</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=3
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">0.58</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e2b39f">4.88</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e0b4a2">5.69</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e8af98">3.08</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaae95">2.23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">-2.68</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fea07b">-4.64</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">-3.22</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=4
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a788">-1.09</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a889">-0.73</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edac91">1.31</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e2b39f">5.10</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8f">0.64</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">0.56</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a483">-2.54</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27d">-3.89</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=5
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a788">-1.21</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d">0.34</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a889">-0.71</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8e">0.56</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b29c">4.28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f3a789">-0.95</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #efaa8d">0.30</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f5a686">-1.59</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=6
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17b">-4.42</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fda17c">-4.28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a584">-2.28</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f4a788">-1.18</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">-0.46</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e4b29d">4.41</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0a98c">0.02</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #edab90">1.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=7
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">-3.67</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa380">-3.25</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">-3.68</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">-2.59</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f6a585">-1.94</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f0aa8d">0.22</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #dbb8a8">7.42</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #eaad94">2.08</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+orig=8
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa37f">-3.38</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #faa27f">-3.48</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #fba27e">-3.73</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f8a482">-2.64</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f7a583">-2.31</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #f2a88a">-0.46</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #e7af98">3.14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: block; padding: 0 4px; border-radius: 4px; background-color: #d8baad">8.63</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+</body>
+</html>

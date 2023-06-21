@@ -1,0 +1,344 @@
+---
+title: Classification Ascendante Hiérarchique (CAH)
+subtitle: DUT STID 2AFA
+author: FX Jollois
+output: 
+    slidy_presentation:
+        footer: "CAH - STID2A2"
+        css: ../css/slidy-fxj.css
+        self_contained: false
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center", fig.height = 5)
+library(ggplot2)
+library(dplyr)
+library(NbClust)
+# library(tibble)
+# library(FactoMineR)
+# library(knitr)
+# library(kableExtra)
+# library(formattable)
+```
+
+# Que veut-on faire ?
+
+- Répartir les individus (ou objets) dans des groupes distincts
+- Obtenir des groupes homogènes
+    - deux individus proches dans une même classe
+    - deux individus éloignés dans des classes différentes
+- Déterminer le nombre de classes adapté
+    - trop faible : peu informatif
+    - trop élevé : trop spécifique et peu exploitable
+
+# Exemple : données `faithful` dans R
+
+```{r}
+faithful %>% 
+  ggplot(aes(waiting, eruptions)) +
+  geom_point() +
+  theme_classic()
+```
+
+# Objectif sur l'exemple
+
+```{r}
+res = kmeans(scale(faithful), 2)
+faithful %>% 
+  mutate(class = factor(res$cluster)) %>%
+  ggplot(aes(waiting, eruptions, color = class)) +
+  geom_point() +
+  theme_classic()
+```
+
+
+# Problème et histoire
+
+- **Comment** trouver ces groupes de manière **automatique** ?
+- Première classification connue : **Aristote**
+    - Classification des animaux (*Parties des Animaux*)
+    - utilisée jusqu'au milieu du XVIIème siècle
+- **Lamarck**, **Buffon** ou bien **von Linn** : nouvelles classifications
+    - Travaux de Lamarck à l'origine des travaux de Darwin et de la théorie de l'évolution
+- Au milieu du XXème siècle, premiers pas de la classification phylogénétique par **Hennig**, utilisée encore de nos jours
+- Toutes basées sur une approche hiérarchique et *manuelle*
+
+# Notions
+
+- $X = \{x_1,\ldots,x_n\}$ ensemble des objets à classer
+- **Partie** de $X$ : sous-ensemble $A = \{a_1,\ldots,a_p\}$
+    - chaque $a_j \in X, \forall j=1,\ldots,p$
+    - Si on compte l'ensemble vide et l'ensemble tout entier, il existe $2^n$ parties de $X$
+- Ensemble des parties muni de la relation d'ordre partiel ($A \subseteq B \Leftrightarrow(x \in A \Rightarrow x \in B)$)
+    - Deux parties d'un ensemble sont
+        - soit chevauchantes (non égales et d'intersection non nulle), 
+        - soit disjointes (sans élément commun), 
+        - soit incluses l'une dans l'autre, 
+        - soit identiques. 
+
+# Partition
+
+- **Partition** $Z = \{z_1,\ldots,z_K\}$ : sous-ensemble de parties $z_k$ 
+    - 2 à 2 disjointes : $k \neq k' \Rightarrow z_k \cap z_{k'} = \emptyset$
+    - Union  = ensemble : $\cup_{k = 1}^K z_k = X$
+- Complexité de la classification automatique due en grande partie au nombre de partitions possible de $n$ éléments
+    - Nombre de Bell :
+$$
+	B_n = \frac{1}{e} \sum_{k=1}^\infty \frac{k^n}{k!}
+$$
+    - Pour $n=4$ objets, 15 partitions différences
+    - Pour $n=30$ objets, nombre de partitions possibles = $8.47 \times 10^{23}$
+    
+> Nécessité de définir des critères de bonne classification et d'avoir des algorithmes performants, et optimisant la recherche d'une partition
+
+# Hiérachie
+
+- Classification hiérarchique : ensemble de classes, appelé **hiérarchie**
+    - Arbre binaire : **dendrogramme**
+- Hiérarchie de classes : ensemble de parties de $X$ ayant les propriétés suivantes :
+    - Partie vide $\emptyset$ incluse
+    - Parties réduites à un seul élément (${x_i} \forall i=1,\ldots,n$) incluses
+    - Ensemble $X$ inclus
+    - Pour chaque couple de classes $(z, z')$
+        - soit $z \subseteq z'$, 
+        - soit $z' \subseteq z$, 
+        - soit $z \cap z' = \emptyset$
+- Hiérarchie **valuée** : pour toute classe $z_k$, association d'une valeur $f(x_k)$ vérifiant
+    - si $x_k \subseteq x_{k'}$, alors $f(x_k) \leq f(x_{k'})$.
+
+# Exemple simple
+
+Considérons $X=\{a,b,c,d,e\}$. 
+
+- Ensemble des parties de $X$ :
+		$$\emptyset$$
+		$$\{a\}, \{b\}, \{c\}, \{d\}, \{e\}$$
+		$$\{ab\}, \{ac\}, \{ad\}, \{ae\}, \{bc\}, \{bd\}, \{be\}, \{cd\}, \{ce\}, \{de\}$$
+		$$\{abc\}, \{abd\}, \{abe\}, \{acd\}, \{ace\}, \{ade\}, \{bcd\}, \{bce\}, \{bde\}, \{cde\}$$
+		$$\{abcd\}, \{abce\}, \{acde\}, \{bcde\}$$
+		$$X=\{abcde\}$$
+- Exemple de partition
+		$$\{abc\}, \{de\}$$
+- Exemple de hiérarchie de classes 
+		$$\{a\}, \{b\}, \{c\}, \{d\}, \{e\}, \{ab\}, \{cd\}, \{cde\}, \{abcde\}$$
+
+```{r, fig.height=2.5,fig.width=2.5}
+x = data.frame(v = c(1, 2, 4, 5.5, 7), 
+               row.names = LETTERS[1:5])
+h = hclust(dist(x))
+par(mar = c(0, 0, 0, 0))
+plot(h, hang = -1, main = "", axes = FALSE)
+```
+
+# Inertie intraclasse et interclasse
+
+- **Inertie** totale $I$ d'une population : moyenne des carrés des distances des individus au barycentre
+$$
+	I = \frac{1}{n} \sum_{i=1}^n {(x_i - g)}^2
+$$
+- Avec une partition en $K$ classes
+    - Inertie **intraclasse** $W$ : somme des inerties $W_k$ de chaque classe 
+$$
+	W = \frac{1}{n} \sum_{k=1}^K W_k \mbox{ avec } W_k = \sum_{i \in z_k} {(x_i - g_k)}^2
+$$
+        - Classe homogène : inertie faible
+    - Inertie **interclasse** $B$ : inerties des centres des classes pondérés par le nombre d'individus par class
+$$
+	B = \frac{1}{n} \sum_{k=1}^K n_k {(g_k - g)}^2
+$$
+        - Plus $B$ grand, plus les classes seront séparées
+
+# Objectif
+
+- Bonne classification : inertie intraclasse $W$ petite et inertie interclasse $B$ grande
+- Formule de Huygens : ces deux valeurs sont liées 
+$$
+	I = B + W
+$$
+- Optimisation des deux critéres équivalente
+- Partition en $K+1$ classes : inertie interclasse $B$ plus élevée (et donc une inertie intraclasse $W$ plus faible) qu'une partition en $K$ classes
+
+#### Avec comme seul critère l'inertie :
+
+- **Meilleure partition** : partition en $n$ classes (chaque individu dans sa propre classe)
+- **Pire partition** : partition en 1 classe (tous les individus dans la même classe).
+
+# Qualité d'une partition
+
+- Nombre optimum de classes : sujet complexe et difficile 
+- Classes *naturelles* souvent loin d'être évidente
+- Utilisation d'analyses factorielles pas toujours d'une grande aide 
+- Utilisation de critères de choix (principalement graphique)   
+    - Aide au choix
+    - Différents nombres de classes intéressants parfois
+    - Discussion avec le *métier* importante pour cette étape
+- Vu ici : $R^2$, $CCC$ et $PseudoF$ 
+    - Car présents sous SAS et facilement obtenable sous R
+    - (mais beaucoup d'autres existent)
+
+# Critère $R^2$
+
+- Proportion de l'inertie explique par les classes 
+$$
+  R^2 = B / I
+$$
+- Plus il est proche de 1, meilleure est la classification
+- Un bon critère est de prendre $k+1$ classes lorsque le passage entre $K$ et $K+1$ reprèsente le dernier saut important.
+
+# Critère $CCC$
+
+- *Cubic Clustering Criterion* indique si la classification est
+    - Bonne ($CCC > 2$),
+    - A vérifier (entre 0 et 2)
+    - Susceptible d'être affectée par des outliers ($CCC < 0$)
+    - Si $CCC$ très légèrement négatif : présence de petites classes
+- Bonne partition en $K+1$ classes : creuxà $K$ classes et pic à $K+1$ classes, suivi par une évolution lente du $CCC$.
+
+# Critère $PseudoF$
+
+- Séparation entre toutes les classes
+$$
+	PseudoF = \frac{ \frac{R^2}{K - 1} }{ \frac{1 - R^2}{n - K} }
+$$
+- Nombre de classes $K$ pour $Pseudo F$ maximal
+
+# Iris 
+
+```{r, warning=FALSE}
+res = lapply(1:20, function(k) return(kmeans(iris[-5], k)))
+r2 = sapply(res, function(r) return(r$betweenss / r$totss))
+ccc = c(NA, NbClust(iris[-5], method = "kmeans", index = "ccc", max.nc = 20)$All.index)
+psf = sapply(res, function(r) {
+  r2 = r$betweenss / r$totss
+  k = length(r$size)
+  n = sum(r$size)
+  if (k == 1) return(NA)
+  (r2 / (k - 1)) / ((1 - r2) / (n - k))
+})
+data.frame(
+  k = rep(1:20, times = 3),
+  critere = rep(c("r2", "ccc", "pseudof"), each = 20),
+  valeur = c(r2, ccc, psf)
+) %>%
+  ggplot(aes(k, valeur, color = critere)) +
+  geom_vline(xintercept = 3, lty = 2, color = "grey50") +
+  geom_line(show.legend = FALSE) +
+  facet_wrap(~ critere, scales = "free") +
+  theme_classic()
+```
+
+
+# Classification hiérarchique
+
+- Recherche d'une hiérarchie valuée
+- Partition compatible avec cette hiérachie : partition dont les classes sont des éléments (disjoints) 
+    - Coupure de l'arbre selon une horizontale 
+- Basée sur la notion de **dissimilarité**/**distance** entre individus
+    - Application $d$ : indice de distance si
+        - $d(i,j) = d(j,i)$
+        - $d(i,j) = 0 \Leftrightarrow i = j$ (dissimilarité si uniquement $\Leftarrow$)
+- Données quantitatives : distance euclidienne (ou $L_2$) $d^2(x_i,x_{i'}) = \sum_{j=1}^d (x_i^j - x_{i'}^j)^2$
+- Données binaires : distance $L_1$ (de manhattan) $d_{L_1}(x_i,x_{i'}) = \sum_{j=1}^d |x_i^j - x_{i'}^j|$
+
+# Distance entre parties
+
+- Indice de distance entre éléments de $H$ : $d(A,B)$ 
+    - Niveau d'agrégation de $A$ et de $B$
+    - Indice de la plus petite partie de $H$ contenant $A$ et $B$
+- Propriété ultramétrique :
+$$ d(a,b) \leq \sup\{d(a,c);d(b,c)\} \ \forall a, b, c $$
+
+Recherche de d'une classification hiérarchique = recherche d'une ultram�trique.
+
+> Connaissant une métrique sur $X$, en déduire une ultramétrique aussi proche que possible de la métrique de départ
+
+# Classification Ascendante Hiérachique (CAH)
+
+**Algorithme**
+
+1. Chaque élément dans sa propre classe
+1. Calculer les distances entre chaque élément
+1. Regrouper les deux éléments les plus proches, et recalculer les distances entre cette nouvelle classe et les autres
+1. Recommencer l'étape précédente jusqu'à n'avoir plus qu'une seule classe avec tous les éléments
+
+**Problème**
+
+- Distance entre éléments (cf plus haut)
+- Distance entre classes (cf ci-après)
+
+# Distance entre deux classes : critères d'agrégation 
+
+- **Lien complet** : distance maximale entre deux points de chaque classe
+    - très sensible aux outliers et assez peu utilisée
+    - critère du saut maximum, critère du diamètre, *complete linkage*
+$$ d(z_a, z_b) = \max(d(x_i,x_{i'})), x_i \in a, x_{i'} \in b $$
+- **Lien simple** : distance minimale entre deux points de chaque classe
+    - sensible à l'effet de chaîne (parfois inconvénient, parfois avantage)
+    - critère du saut minimum, *single linkage*
+$$ d(z_a, z_b) = \min(d(x_i,x_{i'})), x_i \in a, x_{i'} \in b $$
+- **Lien moyen** : distance moyenne entre les points de chaque classe
+    - intermédiaire entre complet et simple, moins sensible au bruit
+    - critèrre du saut moyen, *average linkage*
+$$ d(z_a, z_b) = \frac{1}{\#z_a \#z_b} \sum_{x_i \in a, x_{i'} \in b} d(x_i,x_{i'})  $$
+
+# Distance entre deux classes : critères d'agrégation 
+
+- **Méthode des centroïdes** : distance entre les barycentres (ou centroïdes) des deux classes
+    - plus robuste mais moins précise
+    - plus simple à calculer
+$$ d(z_a, z_b) = d^2(g_a, g_b) $$
+- **Critère de Ward** : baisse d'inertie interclasse obtenue en fusionnant ces deux classes
+    - version pondérée de la méthode des centroïdes
+    - fusion de deux classes occasionnant obligatoirement une baisse de l'inertie interclasse
+$$ d(z_a, z_b) = \frac{d^2(g_a, g_b)}{\frac{1}{\#z_a} + \frac{1}{\#z_b}} $$
+    - calcul récursif possible
+$$ d(z_a, z_b) = \frac{(\#z_{a_1} + \#z_b) d(a_i, b) + (\#z_{a_2} + \#z_b) d(a_2, b) - \#z_b d(a_1, a_2) }{\#z_{a_1} + \#z_{a_2} + \#z_b} $$
+    - classes sphériques et de même effectifs
+    - la plus utilisée en CAH
+
+# Exemple simple
+
+Les données
+
+```{r}
+df = faithful[1:5,]
+plot(df)
+do = dist(df)
+```
+
+La matrice de distance initiale
+
+```{r}
+round(do)
+```
+
+L'arbre obtenu (lien complet)
+
+```{r}
+h = hclust(dist(df))
+plot(h)
+```
+
+L'ultramétrique obtenu
+
+```{r}
+du = do
+du[1:length(du)] = h$height[4]
+du[2] = h$height[1]
+du[6] = h$height[2]
+du[c(4,9)] = h$height[3]
+round(du)
+```
+
+# Iris
+
+```{r}
+par(mar = c(0, 0, 0, 0))
+plot(hclust(dist(iris[-5]), "ward.D2"), 
+     hang = -1, labels = FALSE, main = "", axes = FALSE)
+abline(h = 22, lty = 2, col = "gray50")
+text(150, 22, "en 2 classes", adj = c(1, -.5), col = "gray50")
+abline(h = 9, lty = 2, col = "gray50")
+text(150, 9, "en 3 classes", adj = c(1, -.5), col = "gray50")
+```
+

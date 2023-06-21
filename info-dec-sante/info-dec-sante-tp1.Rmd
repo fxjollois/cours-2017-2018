@@ -1,0 +1,257 @@
+---
+title: Base de données Médicaments
+subtitle: Informatique Décisionnelle - LP MDS Santé
+---
+
+Dans ce TP, nous allons utilier la [base de données publique des médicaments](http://base-donnees-publique.medicaments.gouv.fr/). Dans la page *Téléchargement* (lien situé tout en bas du site), vous trouverez les liens vers un fichier explicatif (en PDF) et les fichiers de données (au format texte). 
+
+Vous devez déjà tous les télécharger (9 fichiers au total), et les placer idéalement dans un répertoire dédié.
+
+Nous allons utiliser dans ce TP certains packages de [`tidyverse`]() - ensemble de paquets **R** pour la *Data Science*. Vous pouvez les installer avec la commande suivante :
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+```
+
+Pour les charger, il est nécessaire de les appeler :
+
+```{r}
+library(lubridate)  # Gestion des dates
+library(readr)      # Importation de fichiers texte
+library(dplyr)      # Manipulation des données
+library(tibble)     # Format de données
+```
+
+
+## Dates
+
+Comme dans tous les systèmes, les dates sous `R` sont stockées sous forme d'entiers représentant un nombre de jours depuis une certaine date, sous le format `Date`. Le package [`lubridate`](http://lubridate.tidyverse.org/) permet de manipuler facilement ces dates. Ci-dessous, nous récupérons la date du jour, nous l'affichons, et nous la décomposons.
+
+
+```{r}
+# Date du jour
+auj = today()
+auj
+# Nombre de jours depuis la date d'origine
+as.numeric(auj)
+# Date d'origine (et exemple de soustraction de jours d'une date)
+auj - as.numeric(auj)
+
+# Décomposition
+year(auj)
+month(auj)
+day(auj)
+yday(auj)
+mday(auj)
+wday(auj)
+week(auj)
+```
+
+Il est aussi possible de traduire une date écrite en *jour/mois/année*, avec la fonction `dmy()` (`d` pour jour, `m` pour mois et `y` pour année). Il existe aussi les fonctions `ymd()`, `ydm()`, `myd()`, ...
+
+```{r}
+# Conversion de dates classiques
+dmy("13/11/2016")
+dmy("13/11-17")
+```
+
+Enfin, pour des dates écrites dans des formats plus exotiques, il existe la fonction `parse_date_time()`.
+
+```{r}
+# Conversion de dates spécifiques
+parse_date_time("13 nov 2017", "d b! y")
+```
+
+
+## Importation de données
+
+Le `tidyverse` inclut trois packages permettant l'importation de données externes, contenues dans des fichiers (ainsi que l'exportation). Nous allons ici importer des données classiques (150 *iris* de trois espèces différentes, décrits par 4 variable), disponibles dans trois formats : [texte délimité](../donnees/Iris.txt), [Excel](../donnees/Iris.xlsx) et [SAS](../donnees/Iris.sas7bdat). Les trois fonctions qu'on va utiliser renvoient un objet de type `tibble`.
+
+### Texte délimité
+
+Pour cela, nous utilisons le package [`readr`](http://readr.tidyverse.org/), qui améliore les fonctions déjà présentes. Les nouvelles fonctions sont plutôt performantes, et *comprennent* les données, ce qui permet de limiter les besoins de paramétrisation de celles-ci.
+
+```{r}
+library(readr)
+iris_txt = read_delim("../donnees/Iris.txt", delim = "\t")
+iris_txt
+```
+
+### Fichier Excel
+
+Le package [`readxl`](http://readxl.tidyverse.org/) permet donc de lire des fichiers Excel (quelque soit le format : `xlsx` ou `xls`). La fonction `read_excel()` détecte justement le format du fichier.
+
+```{r}
+library(readxl)
+iris_xlsx = read_excel("../donnees/Iris.xlsx")
+iris_xlsx
+```
+
+### Fichier SAS
+
+Enfin, pour importer des données SAS mais aussi SPSS et Stata, il existe le package [`haven`](http://haven.tidyverse.org/), avec la fonction `read_sas()`.
+
+```{r}
+library(haven)
+iris_sas = read_sas("../donnees/Iris.sas7bdat")
+iris_sas
+```
+
+
+## Manipulation de données
+
+Pour tout ce qui est manipulation de données, au sens `SQL`, nous disposons du package [`dplyr`](http://dplyr.tidyverse.org/) qui fournit toutes les fonctions utilisées ici. Bien qu'il y ait aussi des fonctions de base dans R, ce package est préférable.
+
+Vous remarquerez l'utilisation de l'opérateur `%>%` pour enchaîner les opérations. Celui-ci est fournit par le package [`magrittr`](http://magrittr.tidyverse.org/), lui aussi dans le `tidyverse`. Ce formalisme permet d'avoir un code plus lisible, car déroulant les étapes les unes après les autres, contrairement à la programmation classique dans R.
+
+```{r}
+library(dplyr)
+```
+
+
+### Restriction et projection
+
+Ici, les deux opérations consistent respectivement à sélectionner des lignes (*restriction*) ou des colonnes (*projection*).
+
+#### Restriction par filtre
+
+```{r}
+mtcars %>% filter(mpg > 30)
+mtcars %>% filter(mpg > 30 & qsec < 19)
+mtcars %>% filter(carb == 8)
+mtcars %>% filter(between(mpg, 30, 32))
+```
+
+#### Sélection de lignes par indices
+
+```{r}
+mtcars %>% slice(1:5)
+mtcars %>% slice(25:n()) # n() indique le nombre de lignes de la table
+mtcars %>% slice(seq(1, n(), by = 4))
+```
+
+#### Projection
+
+```{r}
+head(mtcars) %>% select(mpg)
+head(mtcars) %>% select(qsec, mpg, hp)
+head(mtcars) %>% select(5, 3, 9)
+head(mtcars) %>% select(starts_with("c")) # d'autres possibilités de ce type existent (voir ?select_helpers)
+```
+
+#### Suppression des doublons
+
+```{r}
+head(mtcars) %>% select(cyl)
+```
+
+```{r}
+head(mtcars) %>% select(cyl) %>% distinct()
+```
+
+### Tri
+
+La fonction `arrange()` permet le tri sur une ou plusieurs variables, avec `desc()` pour indiquer un ordre décroissant.
+
+```{r}
+head(mtcars) %>% arrange(mpg)
+head(mtcars) %>% arrange(am, mpg)
+head(mtcars) %>% arrange(desc(mpg))
+```
+
+### Ajout de variables
+
+Comme vous avez pu le remarquer, dans les différents exemples ci-dessus, le nom des lignes est supprimé. Pour le récupérer, nous utilisons la fonction `rownames_to_column()`, qui permet de le transformer en variable.
+
+```{r}
+head(mtcars) %>% rownames_to_column(var = "car")
+```
+
+Pour ajouter une variable, il existe la fonction `mutate()`.
+
+```{r}
+head(mtcars) %>% mutate(ratio = wt / hp, zero = 0, wt = NULL, hp = NULL)
+head(mtcars) %>% mutate(n = row_number(), rang_mpg = min_rank(desc(mpg)))
+```
+
+Si l'on veut garder uniquement la variable nouvellement créée, on utilise `transmute()`.
+
+```{r}
+head(mtcars) %>% transmute(ratio = wt / hp)
+```
+
+
+### Calcul d'agrégat
+
+Pour résumer une ou plusieurs variables, nous utilisons la fonction `summarise()`.
+
+```{r}
+mtcars %>% summarise(
+  n = n(),
+  mpg_mean = mean(mpg),
+  nbtype_carb = n_distinct(carb)
+)
+```
+
+Et si l'on souhaite effecture par groupes déterminés par les modalités d'une variable, il existe la fonction `group_by()`.
+
+```{r}
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(
+  n = n(),
+  mpg_mean = mean(mpg),
+  nbtype_carb = n_distinct(carb)
+)
+```
+
+
+### Jointure
+
+Pour tester les méthodes, nous créons une nouvelle table `engine`, indiquant le type en fonction de la valeur de `cyl`. Vous remarquerez que par rapport à `mtcars`, il y a une valeur en moins (4) et une valeur en plus (12).
+
+```{r}
+engine = tibble(
+  cyl = c(6, 8, 12),
+  type = c("medium", "big", "very big")
+)
+```
+
+Nous pouvons maintenant utiliser les différentes fonctions de jointure disponibles.
+
+```{r}
+mtcars %>% inner_join(engine)
+mtcars %>% left_join(engine)
+mtcars %>% right_join(engine)
+mtcars %>% full_join(engine)
+mtcars %>% semi_join(engine)
+mtcars %>% anti_join(engine)
+```
+
+## Exercices
+
+### Importation
+
+La première étape ici est donc d'importer les données. Il faut pour cela utiliser la fonction `read.table()`, en évitant que les variables textuelles deviennent des `factors`. Il faut aussi renommer les variables pour chaque table, selon les informations fournies dans le PDF associé aux données. Il faut aussi gérer les dates pour qu'elles soient correctement représentées. Pour certaines variables, nous avons le descriptif des modalités dans ce document. Enfin, il faudrait ajouter le court descriptif de chaque table comme attribut de celles-ci.
+
+
+### Interrogation
+
+1. On veut les informations suivantes dans une table à deux colonnes (`statistique`, `valeur`) :
+    - Nombre de médicaments
+    - Nombre de médicaments avec autorisation active
+    - Nombre de médicaments avec surveillance renforcée
+    - Taux moyen de remboursement (pour ceux avec autorisation active)
+    - Prix moyen (idem que le taux)
+    - Durée moyenne de leur mise sur le marché (en nombre de jours - idem que le taux)
+2. Quels sont les dix médicaments avec le plus de composants (Code CIS, Dénomination et nombre de composants) ?
+3. Pour chaque type de générique, on veut savoir le nombre de médicaments associés, ainsi que leur taux de remboursement moyen et leur prix moyen.
+4. Quelles sont les voies d'administration possibles ? Et combien de médicaments sont concernés pour chaque voie ?
+5. Quels sont les médicaments dont le service médical rendu (ou **SMR**) est jugé insuffisant ? Indiquez leur taux de remboursement et leur prix, en les classant par prix décroissant.
+
+**NB** : 
+
+- les taux et les prix sont dans au format chaîne de caractères (resp. `"xx %"` et `"xx,xx"`) et donc à modifier avant calcul.
+- les voies d'administration sont listées dans une seule variable, et séparées par des ";" (par exemple `"cutanée;orale;sublinguale"`). Il faut donc ici aussi faire un pré-traitement.
+
+

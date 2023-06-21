@@ -1,0 +1,345 @@
+---
+title: "ACP - TD"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA)
+```
+
+Dans ce TD, nous aborderons la réalisation de l'ACP sous R. Vous devez exécuter l'ensemble des commandes réalisées ici (et les comprendre), afin de pouvoir les reproduire.
+
+En plus des packages présentés ci-dessous, nous devrons utiliser d'autres packages (inclus dans le chargement du package `tidyverse`) pour réaliser les graphiques et autres tableaux.
+
+```{r package}
+library(tidyverse)
+library(stringr)
+```
+
+## Package `FactoMiner`
+
+Nous allons voir comment utiliser le package [`FactoMineR`](http://factominer.free.fr/) pour réaliser les calculs de l'ACP. Ce package est très complet et nous retourne tes les informations nécessaires.
+
+### Données `decathlon`
+
+En premier lieu, on doit charger la librairie (voire l'installer si ce n'est pas déjà fait). Nous allons utiliser le jeu de données [`decathlon`](https://rdrr.io/cran/FactoMineR/man/decathlon.html).
+
+```{r data}
+library(FactoMineR)
+data(decathlon)
+```
+
+### Calcul de l'ACP
+
+On utilise la fonction `PCA()`, dont voici les options principales
+
+- `scale.unit` : travaille sur la matrice centrée par défaut (`FALSE` si on ne veut pas)
+- `ncp` : nombre de composantes à retenir (5 par défaut)
+- `graph` : affiche ou non les deux graphiques (oui par défaut)
+
+Ici, nous ne voulons pas les graphiques tout de suite.
+
+```{r acp}
+acp = PCA(decathlon[,1:10], graph = FALSE)
+```
+
+L'objet renvoyé est une liste avec toutes les informations importantes.
+
+```{r names}
+names(acp)
+```
+
+Le contenu de cet objet est plutôt bien détaillé (mais en anglais) lorsqu'on l'affiche.
+
+```{r print}
+acp
+```
+
+
+### Variance expliquée
+
+L'objet `eig` est une `matrix`, contenant pour chaque composante :
+
+- la valeur propre
+- le pourcentage de variance expliquée
+- le pourcentage cumulé de variance expliquée
+
+```{r eigen}
+acp$eig
+```
+
+On peut donc produire le graphique de la variance expliquée, par composante. Remarquez que le graphique des valeurs propres donnent exactement le même graphique, à l'échelle des ordonnées près (*à tester*).
+
+```{r eigonplot1}
+barplot(acp$eig[,2])
+```
+
+On peut aussi montrer la variance expliquée cumulée.
+
+```{r eigenplot2}
+plot(acp$eig[,3])
+```
+
+*A faire* : représenter dans un même graphique les deux informations comme ci-dessous par exemple.
+
+```{r eigenplot3, echo=FALSE}
+b = barplot(acp$eig[,2], ylim = c(0, 110),
+            xlab = "Composantes", ylab = "% variance expliquée")
+lines(c(b), acp$eig[,3], type = "b")
+```
+
+ou
+
+```{r eigenplot4, echo=FALSE}
+df = transform(data.frame(acp$eig, row.names = NULL), comp = 1:nrow(acp$eig))
+ggplot(df) +
+  geom_col(aes(factor(comp), percentage.of.variance)) +
+  geom_line(aes(comp, cumulative.percentage.of.variance)) +
+  labs(x = "Composantes", y = "% variance expliquée") +
+  theme_minimal()
+```
+
+
+### Représentation graphique
+
+#### Individus
+
+Par défaut, lorsqu'on utilise la fonction `plot()` sur l'objet obtenu, on obtient le *premier plan factoriel*, avec les 2 premières composantes.
+
+```{r plot}
+plot(acp)
+```
+
+Si on veut choisir les composantes à représenter, nous utilisons le paramètre `axes`.
+
+```{r plot13}
+plot(acp, axes = c(1, 3))
+```
+
+#### Variables
+
+Pour obtenir le cercle de corrélation (si ACP normée), il faut afficher que le paramètre `choix` est égal à `"var"`. Ce sont toujours les 2 premières composantes par défaut (et la syntaxe est la même pour changer les composantes).
+
+```{r plotvar}
+plot(acp, choix = "var")
+```
+
+
+```{r plotvar13}
+plot(acp, choix = "var", axes = c(1, 3))
+```
+
+### Contributions et qualité de représentation
+
+Il est possible d'obtenir la contribution de chaque individu dans l'objet `contrib`, lui-même dans l'objet `ind` du résultat de la fonction. Idem pour les variables (sous-objet `contrib` dans l'objet `var`).
+
+Pour la qualité de représentation, celle-ci est stockée dans le sous-objet `cos2` (de `ind` pour les individus et de `var` pour les variables).
+
+Bien évidemment, tous les afficher seraient difficile à lire, particulièrement pour les individus. Il faut donc se restreindre à ceux ayant une forte valeur, et ce pour chaque axe. 
+
+Pour l'axe 1, nous pourrions faire ainsi :
+
+- Sélectionner les individus ayant une contribution supérieure à $\frac{1}{n}$ (voire plutôt $\frac{2}{n}$ ou $\frac{3}{n}$)
+- Sélectionner les individus ayant une qualité de représentation supérieure à $\frac{1}{p}$
+- Joindre les deux (en gardant toutes les lignes : *jointure extérieure* - le *SQL* n'est jamais très loin...)
+
+(On peut aussi procéder autrement pour créer ce tableau final.)
+
+```{r axe1}
+ind.contrib.1 = subset(data.frame(acp$ind$contrib), 
+                       subset = Dim.1 > (300/nrow(decathlon)), 
+                       select = "Dim.1")
+ind.cos2.1 = subset(data.frame(acp$ind$cos2), 
+                    subset = Dim.1 > (1/ncol(decathlon)), 
+                    select = "Dim.1")
+merge(setNames(ind.contrib.1, "Contribution"), 
+      setNames(ind.cos2.1, "Qualite"), 
+      by = "row.names", all = T)
+```
+
+Il faut faire de même pour les variables (*à tester*).
+
+*A faire* : Rédiger un programme permettant de sortir les variables importantes pour chaque dimension retenue, comme ci-dessous par exemple.
+
+```{r axeauto, echo=FALSE}
+varimp = list()
+for (v in colnames(acp$var$contrib)) {
+  cat("--------------------------------------------------\n", v, "\n\n")
+  contrib = acp$var$contrib[,v]
+  qualite = acp$var$cos2[,v] * 100
+  df = data.frame(var = names(contrib), contrib = contrib, qualite = qualite, row.names = NULL)
+  df2 = subset(df, contrib > 100/ncol(decathlon) & qualite > 1/ncol(decathlon))
+  print(df2, digits = 0)
+  cat("\n\n")
+  varimp[[length(varimp) + 1]] = as.character(df2$var)
+}
+```
+
+### Interprétation
+
+#### Nombre de composantes
+
+Si nous regardons les valeurs propres, nous remarquons qu'il y en 4 supérieures à 1 (critère de Kaiser). Par contre, avec 2 composantes, nous expliquons 50% de l'information, et 64% avec 3 axes.
+
+```{r affind, echo=FALSE}
+decat.m = decathlon %>% 
+  select(1:10, Competition) %>% 
+  rownames_to_column(var = "Nom") %>% 
+  gather(Epreuve, Resultat, -Nom, -Competition)
+
+affIndividu <- function(individu, vars = as.character(unique(decat.m$Epreuve))) {
+  df = decat.m %>% filter(Epreuve %in% vars)
+  ggplot(df, aes("", Resultat)) +
+    geom_boxplot() +
+    facet_wrap(~ Epreuve, scales = "free") +
+    geom_point(data = df %>% filter(Nom == individu), col = "red") +
+    ggtitle(individu)
+}
+```
+
+
+#### Axe 1
+
+7 épreuves sont importantes pour la première composante : 
+
+- *courses courtes* : 100m, 400m,  110m haies (sur la gauche de l'axe) ;
+- *sauts/lancer*  : saut en hauteur, saut en longueur, lancer du poids et du disque (sur la droite).
+
+Cet axe résume la performance des décathloniens sur une épreuve, avec les meilleurs ayant des coordonnées les plus élevés (avec des valeurs fortes pour les sauts et lancers, et faibles pour les courses).
+
+Nous pouvons donc noter les très bonnes performances de trois décathloniens (Karpov, puis Sebrie et Clay), au Jeux Olympiques. Par contre, BOURGUIGNON, au Decastar, a réalisé la plus mauvaise performance.
+
+```{r axe1ind1, echo=FALSE}
+affIndividu("Karpov", varimp[[1]])
+```
+
+
+
+```{r axe1ind2, echo=FALSE}
+affIndividu("BOURGUIGNON", varimp[[1]])
+```
+
+
+#### Axe 2
+
+Ici, seulement 4 variables sont importantes :
+
+- *courses longues* : 400m et 1500m (sur le haut de l'axe) ;
+- *lancers* : poids et disque (aussi en haut de l'axe).
+
+Cet axe doit opposer deux styles d'athlètes : ceux plutôt orientés vers les lancers (en haut de l'axe), et ceux plutôt orientés vers les courses longues.
+
+Par exemple, Casarsa a réalisé le plus mauvais temps au 400m et un temps élevéau 1500m, mais a réussi des lancers de poids et de disque plutôt bons.
+
+```{r axe2ind1, echo=FALSE}
+affIndividu("Casarsa", varimp[[2]])
+```
+
+Au contraire, les performances de Drews aux lancers sont faibles, mais ses temps au 400m et 1500m sont bons.
+
+```{r axe2ind2, echo=FALSE}
+affIndividu("Drews", varimp[[2]])
+```
+
+#### Axe 3
+
+Sur cet axe, les variables retenues sont au nombre de trois et assez disparatre :
+
+- saut à la perche et 1500m en haut de l'axe
+- javelot de l'autre côté (mais de manière assez faible finalement)
+
+Idem que pour l'axe 2, celui-ci semble opposé des styles de sportifs.
+
+Korkizoglou a réussi le plus mauvais temps au 1500m, et une performance très moyenne au saut à la perche (ainsi qu'au javelot).
+
+```{r axe3ind1}
+affIndividu("Korkizoglou", varimp[[3]])
+```
+
+On voit bien que Macey n'a pas réussi de saut très haut à la perche, alors que son temps au 1500m est très bon.
+
+```{r axe3ind2}
+affIndividu("Macey", varimp[[3]])
+```
+
+## FactoInvestigate
+
+En plus du package `FactoMineR`, il existe le package [`FactoInvestigate`](http://factominer.free.fr/reporting/index_fr.html) qui permet de créer un rapport automatique pour l'interprétation d'un résultat d'une fonction de `FactoMineR` (ici, de `PCA()` donc). 
+
+Voila comment lancer la création du rapport.
+
+```{r investigate, eval=FALSE}
+library(FactoInvestigate)
+Investigate(acp, file = "Investigate-ACP.Rmd")
+```
+
+Une fois que la fonction a fini, elle affiche la page html créée dans un navigateur. Vous trouverez ici le [fichier produit](Investigate-ACP.html).
+
+## Package `Factoshiny`
+
+Dans le même état d'esprit, le package [`Factoshiny`](http://factominer.free.fr/graphs/factoshiny-fr.html) permet lui de lancer une application dans un navigateur web pour réaliser une analyse des résultats, ainsi que pour exporter des graphiques et récupérer des tableaux. Voici comment lancer l'application :
+
+```{r shiny, eval=FALSE}
+library(Factoshiny)
+PCAshiny(acp)
+```
+
+## A faire
+
+Merci de produire un document `Rmarkdown` contenant l'ensemble du code et des commentaires.
+
+### Worldwide Governance Indicators
+
+La [banque mondiale](http://www.banquemondiale.org) fournit un grand nombre de données, dont des indicateurs de gouvernance au niveau mondial (voir [ici](https://data.worldbank.org/data-catalog/worldwide-governance-indicators)). Le code ci-dessous importe les données du fichier [`WGI_Data.csv`](WGI_Data.csv) (que vous devez donc télécharger) pour les importer. Les informations concernant la définition des indicateurs et leur source se trouvent dans le fichier [`WGI_Definition and Source.csv`](WGI_Definition and Source.csv).
+
+```{r wgi}
+wgi.m = read_csv("WGI_Data.csv", quote = '"') %>%
+  mutate_at("Value", funs(as.numeric))
+wgi = wgi.m %>% 
+  select(`Country Name`, `Series Code`, Value) %>% 
+  spread(`Series Code`, Value) %>%
+  rename_at(vars(ends_with("EST")), funs(sub(".EST", "", .)))
+```
+
+
+```{r wgikable, echo=FALSE}
+knitr::kable(head(wgi), digits = 2)
+```
+
+Vous devez donc réaliser les étapes suivantes :
+
+- Décrire rapidement les données
+- Réaliser une ACP centrée ou normée (choix à justifier), sur les données 
+- Produire les graphiques nécessaires à l'interprétation
+- Que peut-on dire globalement ?
+
+### Température mondiale
+
+Nous allons travailler ici sur les données de température mondiale **HadCRUT4**, fournies par [Climate Research Unit](https://crudata.uea.ac.uk/). Vous trouverez plus d'informations sur ces données sur ce [lien](https://crudata.uea.ac.uk/cru/data/temperature/). Nous avons ici l'historique des anomalies moyennes mensuelles et annuelles depuis 1850, au niveau mondial, par rapport à la période 1961-1990.
+
+Le code ci-dessous télécharge directement les dernières données disponibles et les met dans un `data.frame` dont vous avez un aperçu en dessous (en supprimant l'année 2017, incomplète).
+
+```{r temp}
+donnees = read_lines("https://crudata.uea.ac.uk/cru/data/temperature/HadCRUT4-gl.dat") %>% 
+  tibble() %>% 
+  slice(seq(1, n(), by = 2)) %>% 
+  transmute(val = str_replace_all(str_trim(.), "[\\s]+", " ")) %>%
+  separate(val, c("Year", month.abb, "Annual"), sep = " ", convert = TRUE)
+```
+
+```{r tempkable, echo=FALSE}
+knitr::kable(head(donnees), digits = 2)
+```
+
+Vous devez donc réaliser les étapes suivantes :
+
+- Décrire rapidement les données
+- Réaliser une ACP centrée ou normée (choix à justifier), sur les données mensuelles
+- Ajouter la moyenne annuelle en variable supplémentaire
+- Produire les graphiques nécessaires à l'interprétation
+- Identifier des années particulières
+    - Refaire l'ACP en les indiquant comme individus supplémentaires
+    - Comparer les résultats pour voir s'il est opportun ou non de les garder dans l'analyse
+- Que peut-on dire globalement ?
+
+

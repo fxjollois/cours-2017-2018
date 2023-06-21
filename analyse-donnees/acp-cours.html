@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="FX Jollois" />
+  <meta name="copyright" content="ACP - STID2A2"/>
+  <title>Analyse en Composantes Principales (ACP)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link href="acp-cours_files/slidy-2/styles/slidy.css" rel="stylesheet" />
+  <script src="acp-cours_files/slidy-2/scripts/slidy.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="..\css\slidy-fxj.css" />
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Analyse en Composantes Principales (ACP)</h1>
+  <h1 class="subtitle">DUT STID 2AFA</h1>
+  <p class="author">
+FX Jollois
+  </p>
+</div>
+<div id="origine" class="slide section level2">
+<h2>Origine</h2>
+<p>Figure extraite de Karl Pearson, 1901 sur l’ACP (<a href="http://stat.smmu.edu.cn/history/pearson1901.pdf">article original</a>)</p>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Karl_Pearson_line_of_best_fit_diagramm_from_philosophical_magazine_1901_2_559-572.jpg" alt="Extrait de Karl Pearson, 1901 sur l'ACP, source Wikimedia" height=400></p>
+</div>
+<div id="que-veut-on-faire" class="slide section level2">
+<h2>Que veut-on faire ?</h2>
+<ul>
+<li>Décrire et/ou résumer l’information contenue dans les données</li>
+<li>Sans formuler d’hypothèses au préalable</li>
+<li>Technique efficace de réduction de dimension</li>
+<li>Méthode de visualisation des données très pertinente</li>
+<li>Méthode de décorrélation des variables, utile pour certaines méthodes statistiques.</li>
+</ul>
+<p><strong>Comment ?</strong></p>
+<ul>
+<li>Transformations linéaires d’un grand nombre de variables intercorrélées</li>
+<li>Nombre relativement limité de composantes non corrélées</li>
+<li>Regroupant les données en des ensembles plus petits</li>
+<li>Permettant d’éliminer les problèmes de multicolinéarité entre les variables.</li>
+</ul>
+</div>
+<div id="methodes-descriptives" class="slide section level2">
+<h2>Méthodes descriptives</h2>
+<ul>
+<li>Pas de modèle probabiliste, mais elles dépendent d’un modèle géométrique</li>
+<li>Représentations géométriques de ces unités et de ces variables</li>
+<li>Représentations des individus permettent de voir s’il existe une structure, non connue a priori</li>
+<li>Représentations des variables permettent d’étudier les structures de liaisons linéaires</li>
+</ul>
+<p><strong>Lecture</strong></p>
+<ul>
+<li>Distinguer des groupes dans l’ensemble des individus en regardant quelles sont les individus qui se ressemblent, celles qui se distinguent des autres, etc…</li>
+<li>Pour les variables, on cherchera quelles sont celles qui sont très corrélées entre elles, celles qui, au contraire ne sont pas corrélées aux autres, …</li>
+</ul>
+<p><strong>Idée principale</strong> : Projeter le nuage dans un sous-espace de dimension inférieure</p>
+</div>
+<div id="probleme" class="slide section level2">
+<h2>Problème</h2>
+<ul>
+<li>Etudier simultanément <span class="math inline">\(p\)</span> variables (<span class="math inline">\(p\)</span> grand)</li>
+<li>A l’aide d’informations sur <span class="math inline">\(n\)</span> individus (<span class="math inline">\(n\)</span> encore plus grand)</li>
+</ul>
+<h3 id="detection">Détection</h3>
+<ul>
+<li>d’individus atypiques</li>
+<li>de liaisons entre variables</li>
+<li>Recherche de “bonnes” variables</li>
+</ul>
+<h3 id="representation-graphique">Représentation graphique</h3>
+<ul>
+<li>des variables</li>
+<li>des individus</li>
+</ul>
+</div>
+<div id="objectifs" class="slide section level2">
+<h2>Objectifs</h2>
+<ul>
+<li>Constructions de nouvelles variables (appelées facteurs)
+<ul>
+<li>Concentrant la variance du nuage de points</li>
+<li>Sur un petit nombre <span class="math inline">\(q\)</span> de facteurs</li>
+</ul></li>
+<li>Représentation graphiques des variables
+<ul>
+<li>Dans un sous-espace de faible dimension (<span class="math inline">\(q=2\)</span> ou <span class="math inline">\(q=3\)</span>)</li>
+<li>Explicitant les liaisons initiales entre variables</li>
+</ul></li>
+<li>Représentation graphiques des individus
+<ul>
+<li>Minimisant les déformations du nuage de points</li>
+<li>Dans un sous-espace de dimension <span class="math inline">\(q\)</span> (<span class="math inline">\(q&lt;p\)</span>)</li>
+</ul></li>
+<li>Réduction de la dimension (compression)
+<ul>
+<li>Approximation de <span class="math inline">\(X\)</span> par un tableau de ranq <span class="math inline">\(q\)</span></li>
+<li><span class="math inline">\(q &lt;&lt; p\)</span></li>
+</ul></li>
+</ul>
+</div>
+<div id="principe" class="slide section level2">
+<h2>Principe</h2>
+<ul>
+<li>Facteurs principaux : combinaisons linéaires non corrélées 2 à 2 des variables initiales</li>
+<li>1ère composante principale
+<ul>
+<li>Combinaison linéaire des variables qui explique le mieux la variabilité de l’échantillon</li>
+<li>Géométriquement, déterminée par la direction de l’allongement maximum du nuage de points</li>
+</ul></li>
+<li>2ème composante principale
+<ul>
+<li>Combinaison linéaire des variables expliquant au mieux la variance résiduelle</li>
+<li>Direction orthogonale à la précédente</li>
+</ul></li>
+<li>Itération de l’étape précédente</li>
+</ul>
+</div>
+<div id="matrice-de-correlation-ou-de-covariance" class="slide section level2">
+<h2>Matrice de corrélation ou de covariance ?</h2>
+<h3 id="correlation">Corrélation</h3>
+<ul>
+<li>Les variables sont réduites (donc sans unité) et de même dispersion (écart-type 1)</li>
+<li>Le choix par défaut le plus fréquent (données en général hétérogènes)</li>
+<li>Diagonalisation de la matrice des corrélations</li>
+</ul>
+<h3 id="covariance">Covariance</h3>
+<ul>
+<li>Les variables sont uniquement centrées</li>
+<li>ont des unités et des dispersions différentes</li>
+<li>A n’utiliser que si les données sont homogènes</li>
+<li>Diagonalisation de la matrice des covariances</li>
+</ul>
+</div>
+<div id="combien-daxes-retenir" class="slide section level2">
+<h2>Combien d’axes retenir ?</h2>
+<ul>
+<li>Question délicate, sans réponse définitive</li>
+<li>Critère empirique : point d’inflexion sur les spectres des valeurs propres</li>
+</ul>
+<h3 id="but-representation-graphique">But = Représentation graphique</h3>
+<ul>
+<li>Conserver l’essentiel de la variabilité tout en retenant un faible nombre de facteurs</li>
+<li>Représenter sur 2 axes (éventuellement 3, voire 4 maximum)</li>
+</ul>
+<h3 id="but-preparation-des-donnees">But = Préparation des données</h3>
+<ul>
+<li>Préalablement à la réalisation d’une classification</li>
+<li>Pas un inconvénient de retenir beaucoup d’axes<br />
+</li>
+<li>Supprimer les directions correspondant aux plus petites valeurs propres
+<ul>
+<li>Critère de Kaiser : vp <span class="math inline">\(&gt;\)</span> moyenne des vp</li>
+<li>si ACP normée, vp <span class="math inline">\(&gt;\)</span> 1</li>
+<li>Supprimer le bruit</li>
+</ul></li>
+</ul>
+</div>
+<div id="quelques-notations" class="slide section level2">
+<h2>Quelques notations</h2>
+<ul>
+<li><span class="math inline">\(\mathbf{I}_p\)</span> : matrice identité (diagonale = 1 et le reste = 0), <span class="math inline">\(\mathbf{1}_n\)</span> : vecteur unité (que des 1)</li>
+<li><span class="math inline">\(\mathbf{X} = (x_i^j), i=1,\ldots,n, j=1,\ldots,p\)</span> : matrice des données</li>
+<li><span class="math inline">\(\mathbf{x}_i = (x_i^1,\ldots,x_i^p)\)</span> : vecteur individu <span class="math inline">\(i\)</span></li>
+<li><span class="math inline">\(\mathbf{x}^j = (x_1^j,\ldots,x_n^j)\)</span> : vecteur variable <span class="math inline">\(j\)</span></li>
+<li><span class="math inline">\(p_i, i=1,\ldots,n\)</span> : poids des individus (très souvent égaux à <span class="math inline">\(\frac{1}{n}\)</span>)
+<ul>
+<li>représentés dans la matrice <span class="math inline">\(\mathbf{D}\)</span> (poids sur la diagonale et le reste égal à 0)</li>
+<li>si poids identiques, <span class="math inline">\(\mathbf{D} = \frac{1}{n}\mathbf{I}_p\)</span></li>
+</ul></li>
+<li><span class="math inline">\(\mathbf{M}\)</span> : métrique utilisée
+<ul>
+<li><span class="math inline">\(\mathbf{I}_p\)</span> : si ACP centrée uniquement</li>
+<li><span class="math inline">\(\mathbf{D}_\frac{1}{\delta}\)</span> : si ACP centrée réduite (avec <span class="math inline">\((\frac{1}{\delta_j})\)</span> sur la diagonale (écart-type de <span class="math inline">\(j\)</span>))</li>
+<li><span class="math inline">\(\mathbf{M}&#39;\)</span> : transposée de <span class="math inline">\(\mathbf{M}\)</span></li>
+</ul></li>
+</ul>
+</div>
+<div id="premiers-calculs" class="slide section level2">
+<h2>Premiers calculs</h2>
+<p>Utilisation de moyenne arithmétique (pondérée éventuellement), de la variance (elle-aussi pondérée), et de la covariance et de la corrélation entre deux variables</p>
+<ul>
+<li><span class="math inline">\(\mathbf{g} = (\bar{x}^1,\ldots,\bar{x}^p)\)</span> : point moyen (barycentre), on a <span class="math inline">\(\mathbf{g} = \mathbf{X}&#39;\mathbf{D}\mathbf{1}_n\)</span></li>
+<li>Tableau centré <span class="math inline">\(\mathbf{Y} = \mathbf{X}-\mathbf{1}_n\mathbf{g} = (\mathbf{I}_p - \mathbf{1}_n\mathbf{1}_n&#39;\mathbf{D})\mathbf{X}\)</span></li>
+<li>Matrice de variance-covariance <span class="math inline">\(\mathbf{V} = \mathbf{X}&#39;\mathbf{D}\mathbf{X} - \mathbf{g}\mathbf{g}&#39; = \mathbf{Y}&#39;\mathbf{D}\mathbf{Y}\)</span></li>
+<li>Matrice de corrélation <span class="math inline">\(\mathbf{R} = \mathbf{D_\frac{1}{s}}\mathbf{V}\mathbf{D_\frac{1}{s}}\)</span></li>
+<li>Données centrées-réduites <span class="math inline">\(\mathbf{Z} = \mathbf{Y}\mathbf{D}_\frac{1}{s}\)</span></li>
+</ul>
+</div>
+<div id="inertie" class="slide section level2">
+<h2>Inertie</h2>
+<p>Inertie d’un nuage de points :</p>
+<p><span class="math display">\[ 
+    I_g = \sum_{i=1}^n p_i d_\mathbf{M}^2(x_i - g) = \frac{1}{2} \sum_{i=1}^n \sum_{i&#39;=1}^n p_i p_{i&#39;} d_\mathbf{M}^2(x_i - x_{i&#39;}) = Tr(\mathbf{M}\mathbf{V}\mathbf{M})
+\]</span></p>
+<ul>
+<li>Si classique (<span class="math inline">\(\mathbf{Y}\)</span>) : <span class="math inline">\(I_g = Tr(\mathbf{V}) = \sum_{j=1}^p \delta_j^2\)</span>.</li>
+<li>Si données réduites (<span class="math inline">\(\mathbf{Z}\)</span>) : <span class="math inline">\(I_g = Tr(\mathbf{D}_\frac{1}{\delta^2}\mathbf{V}) = Tr(\mathbf{D}_\frac{1}{\delta}\mathbf{V}\mathbf{D}_\frac{1}{\delta}) = Tr(\mathbf{R}) = p\)</span></li>
+</ul>
+<p>L’ACP revient à chercher <span class="math inline">\(F_k\)</span>, sous espace de dimension <span class="math inline">\(k\)</span> de <span class="math inline">\(F_p\)</span>, tel que l’inertie du nuage projeté sur <span class="math inline">\(F_k\)</span> soit maximale.</p>
+</div>
+<div id="rappel-vecteur-et-valeur-propre" class="slide section level2">
+<h2>Rappel : Vecteur et valeur propre</h2>
+<p><span class="math inline">\(\mathbf{v} \ne 0\)</span> vecteur propre de <span class="math inline">\(\mathbf{A}\)</span></p>
+<ul>
+<li>s’il existe <span class="math inline">\(\lambda\)</span> tel que <span class="math inline">\(\mathbf{A}\mathbf{v} = \lambda\mathbf{v}\)</span></li>
+<li><span class="math inline">\(\lambda\)</span> valeur propre associée à <span class="math inline">\(\mathbf{v}\)</span></li>
+</ul>
+<p>Matrice de dimension <span class="math inline">\((p,p)\)</span> : <span class="math inline">\(p\)</span> valeurs propres</p>
+</div>
+<div id="analyse-de-mathbfmmathbfvmathbfm" class="slide section level2">
+<h2>Analyse de <span class="math inline">\(\mathbf{M}\mathbf{V}\mathbf{M}\)</span></h2>
+<p>Matrice carrée <span class="math inline">\((p,p)\)</span> :</p>
+<ul>
+<li>Diagonalisable</li>
+<li>Valeurs propres <span class="math inline">\(\lambda_1,\ldots,\lambda_p\)</span> réelles</li>
+<li>Axes principaux d’inertie : <span class="math inline">\(p\)</span> vecteurs propres (notés <span class="math inline">\(\mathbf{a}_k\)</span>)</li>
+<li>Valeurs propres positives : tri par ordre décroissant</li>
+</ul>
+<p>Lien avec l’inertie : <span class="math inline">\(I_g = Tr(\mathbf{M}\mathbf{V}\mathbf{M}) = \sum_{j=1}^p \lambda_j\)</span></p>
+<p>En ne gardant que les <span class="math inline">\(q\)</span> premiers axes d’inertie</p>
+<ul>
+<li>Inertie expliquée : <span class="math inline">\(\sum_{j=1}^q \lambda_j\)</span></li>
+</ul>
+<p>Remarque : l’ACP sur <span class="math inline">\(k+1\)</span> variables est obtenue par ajout d’une variable d’inertie maximale à l’ACP sur <span class="math inline">\(k\)</span> variables. Il n’est pas nécessaire de refaire tout le calcul.</p>
+</div>
+<div id="composantes-principales" class="slide section level2">
+<h2>Composantes Principales</h2>
+<p>Coordonnées des individus données par projections orthogonales sur axes principaux</p>
+<ul>
+<li>Composantes principales <span class="math inline">\(\mathbf{c}_k\)</span> (qui correspondent aux coordonnées des individus sur l’axe <span class="math inline">\(k\)</span>) :</li>
+</ul>
+<p><span class="math display">\[
+    \mathbf{c}_k = \mathbf{Y} \mathbf{M} \mathbf{a}_k
+\]</span></p>
+<ul>
+<li>Axe <span class="math inline">\(k\)</span> expliquant une certaine part d’inertie, déterminée par <span class="math inline">\(\frac{\lambda_k}{I_g}\)</span></li>
+</ul>
+<p>ACP avec <span class="math inline">\(q\)</span> axes retenus expliquera donc une part d’inertie égale à</p>
+<p><span class="math display">\[
+    \frac{\sum_{j=1}^q \lambda_j}{\sum_{j=1}^p \lambda_j}
+\]</span></p>
+</div>
+<div id="interpretation" class="slide section level2">
+<h2>Interprétation</h2>
+<h3 id="cercle-des-correlations">Cercle des corrélations</h3>
+<p>Sur des données centrées-réduites, il est possible de déterminer le cercle des corrélations, représentation des corrélations entre les variables et les composantes principales. Plus la variable sera proche de 1 ou -1 sur une composante, plus celles-ci seront corrélées.</p>
+<h3 id="contribution-des-individus-et-des-variables">Contribution des individus et des variables</h3>
+<p>La contribution d’un individu à un axe est égale à <span class="math inline">\(\frac{p_i (c_{ik})^2}{\lambda_k}\)</span>. Si celle-ci est supérieure à <span class="math inline">\(\alpha p_i\)</span> (<span class="math inline">\(\alpha\)</span> étant généralement choisi entre 2 et 4), l’individu seront considéré comme fortement contributeur à la création de l’axe. Mais si elle est très forte, il faudra peut-être considéré l’individu comme aberrant et donc envisager de le mettre de côté pour l’analyse. De manière duale, la contribution d’une variable à un axe est égale à <span class="math inline">\(\frac{\sqrt{\lambda_k}a_k^j}{s_j}\)</span>. Si elle est supérieure à <span class="math inline">\(\frac{1}{p}\)</span>, alors la variable sera considérée comme fortement contribuante.</p>
+</div>
+<div id="interpretation-1" class="slide section level2">
+<h2>Interprétation</h2>
+<h3 id="qualite-de-representation">Qualité de représentation</h3>
+<p>La qualité de représentation d’un individu par un axe est égale é <span class="math inline">\(\frac{(c_{ik})^2}{\sum_{\ell=1}^p (c_{i\ell})^2}\)</span>. Plus elle est grande mieux l’individu est représenté sur l’axe <span class="math inline">\(k\)</span>. De manière duale, la qualité de représentation d’une variable par un axe est égale à <span class="math inline">\(\frac{\lambda_k (a_k^j)^2}{\sum_{\ell=1}^p \lambda_\ell (a_\ell^j)^2}\)</span>. Idem que pour les individus, plus cette valeur est grande et plus la variable est bien représentée sur l’axe <span class="math inline">\(k\)</span>.</p>
+<h3 id="que-faire-pour-interpreter-un-axe">Que faire pour interpréter un axe</h3>
+<p>Pour comprendre ce que reprèsente un axe, il est nécessaire de recenser les variables qui contribuent le plus, ainsi que celles qui sont très bien représentées. Une fois cette étape réalisée, il est possible (si <span class="math inline">\(n\)</span> n’est pas très grand) de chercher les individus bien représentés ou contribuant fortement à l’axe.</p>
+</div>
+<div id="en-plus" class="slide section level2">
+<h2>En plus</h2>
+<p>Il est aussi possible d’introduire des éléments supplémentaires ne participant pas au calcul, mais pouvant être représentés sur les graphiques :</p>
+<ul>
+<li>Variables quantitatives : utile pour expliquer le lien de ces variables avec les variables de l’ACP</li>
+<li>Variables qualitatives : idem</li>
+<li>Individus : utile pour mettre de côté des individus particuliers ou pour analyser des individus d’un autre échantillon</li>
+</ul>
+</div>
+<div id="exemple-simple" class="slide section level2">
+<h2>Exemple simple</h2>
+<p>Notes obtenues par 9 élèves dans 4 matières (cf Besse and Baccini)</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Math</th>
+<th align="right">Phys</th>
+<th align="right">Fran</th>
+<th align="right">Angl</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>jean</td>
+<td align="right">6.0</td>
+<td align="right">6.0</td>
+<td align="right">5.0</td>
+<td align="right">5.5</td>
+</tr>
+<tr class="even">
+<td>alan</td>
+<td align="right">8.0</td>
+<td align="right">8.0</td>
+<td align="right">8.0</td>
+<td align="right">8.0</td>
+</tr>
+<tr class="odd">
+<td>anni</td>
+<td align="right">6.0</td>
+<td align="right">7.0</td>
+<td align="right">11.0</td>
+<td align="right">9.5</td>
+</tr>
+<tr class="even">
+<td>moni</td>
+<td align="right">14.5</td>
+<td align="right">14.5</td>
+<td align="right">15.5</td>
+<td align="right">15.0</td>
+</tr>
+<tr class="odd">
+<td>didi</td>
+<td align="right">14.0</td>
+<td align="right">14.0</td>
+<td align="right">12.0</td>
+<td align="right">12.5</td>
+</tr>
+<tr class="even">
+<td>andr</td>
+<td align="right">11.0</td>
+<td align="right">10.0</td>
+<td align="right">5.5</td>
+<td align="right">7.0</td>
+</tr>
+<tr class="odd">
+<td>pier</td>
+<td align="right">5.5</td>
+<td align="right">7.0</td>
+<td align="right">14.0</td>
+<td align="right">11.5</td>
+</tr>
+<tr class="even">
+<td>brig</td>
+<td align="right">13.0</td>
+<td align="right">12.5</td>
+<td align="right">8.5</td>
+<td align="right">9.5</td>
+</tr>
+<tr class="odd">
+<td>evel</td>
+<td align="right">9.0</td>
+<td align="right">9.5</td>
+<td align="right">12.5</td>
+<td align="right">12.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="variance-et-correlation-des-variables" class="slide section level2">
+<h2>Variance et corrélation des variables</h2>
+<p>Les variables ont des variances sensiblement différentes.</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">Math</td>
+<td align="right">12.81</td>
+</tr>
+<tr class="even">
+<td align="left">Phys</td>
+<td align="right">10.06</td>
+</tr>
+<tr class="odd">
+<td align="left">Fran</td>
+<td align="right">13.57</td>
+</tr>
+<tr class="even">
+<td align="left">Angl</td>
+<td align="right">8.90</td>
+</tr>
+</tbody>
+</table>
+<p>On voit bien qu’il y a deux groupes de variables.</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Math</th>
+<th align="right">Phys</th>
+<th align="right">Fran</th>
+<th align="right">Angl</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Math</td>
+<td align="right">1.00</td>
+<td align="right">0.98</td>
+<td align="right">0.23</td>
+<td align="right">0.51</td>
+</tr>
+<tr class="even">
+<td>Phys</td>
+<td align="right">0.98</td>
+<td align="right">1.00</td>
+<td align="right">0.40</td>
+<td align="right">0.65</td>
+</tr>
+<tr class="odd">
+<td>Fran</td>
+<td align="right">0.23</td>
+<td align="right">0.40</td>
+<td align="right">1.00</td>
+<td align="right">0.95</td>
+</tr>
+<tr class="even">
+<td>Angl</td>
+<td align="right">0.51</td>
+<td align="right">0.65</td>
+<td align="right">0.95</td>
+<td align="right">1.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="part-de-la-variance-expliquee" class="slide section level2">
+<h2>Part de la variance expliquée</h2>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">Valeur propre</th>
+<th align="right">Variance (%)</th>
+<th align="right">Cumulée (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>comp 1</td>
+<td align="right">2.88</td>
+<td align="right">71.89</td>
+<td align="right">71.89</td>
+</tr>
+<tr class="even">
+<td>comp 2</td>
+<td align="right">1.12</td>
+<td align="right">27.99</td>
+<td align="right">99.88</td>
+</tr>
+<tr class="odd">
+<td>comp 3</td>
+<td align="right">0.00</td>
+<td align="right">0.09</td>
+<td align="right">99.97</td>
+</tr>
+<tr class="even">
+<td>comp 4</td>
+<td align="right">0.00</td>
+<td align="right">0.03</td>
+<td align="right">100.00</td>
+</tr>
+</tbody>
+</table>
+<p><img src="acp-cours_files/figure-slidy/eigenfig-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>2 axes suffisent à représenter 99.9% de l’information présente dans les données.</p>
+</div>
+<div id="representation-graphique-1" class="slide section level2">
+<h2>Représentation graphique</h2>
+<p><img src="acp-cours_files/figure-slidy/graphs-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="individus-importants" class="slide section level2">
+<h2>Individus importants</h2>
+<h3 id="contribution">Contribution</h3>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">contrib 1</th>
+<th align="right">contrib 2</th>
+<th align="right">contrib 3</th>
+<th align="right">contrib 4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>jean</td>
+<td align="right">29.1</td>
+<td align="right">1.8</td>
+<td align="right">1.6</td>
+<td align="right">5.4</td>
+</tr>
+<tr class="even">
+<td>alan</td>
+<td align="right">5.9</td>
+<td align="right">0.2</td>
+<td align="right">0.1</td>
+<td align="right">5.3</td>
+</tr>
+<tr class="odd">
+<td>anni</td>
+<td align="right">4.1</td>
+<td align="right">10.9</td>
+<td align="right">10.6</td>
+<td align="right">0.1</td>
+</tr>
+<tr class="even">
+<td>moni</td>
+<td align="right">38.1</td>
+<td align="right">0.3</td>
+<td align="right">0.4</td>
+<td align="right">23.8</td>
+</tr>
+<tr class="odd">
+<td>didi</td>
+<td align="right">16.3</td>
+<td align="right">3.9</td>
+<td align="right">1.9</td>
+<td align="right">38.0</td>
+</tr>
+<tr class="even">
+<td>andr</td>
+<td align="right">3.6</td>
+<td align="right">22.3</td>
+<td align="right">2.1</td>
+<td align="right">19.2</td>
+</tr>
+<tr class="odd">
+<td>pier</td>
+<td align="right">0.4</td>
+<td align="right">37.2</td>
+<td align="right">9.5</td>
+<td align="right">0.9</td>
+</tr>
+<tr class="even">
+<td>brig</td>
+<td align="right">1.5</td>
+<td align="right">16.5</td>
+<td align="right">13.6</td>
+<td align="right">1.6</td>
+</tr>
+<tr class="odd">
+<td>evel</td>
+<td align="right">1.0</td>
+<td align="right">6.7</td>
+<td align="right">60.2</td>
+<td align="right">5.7</td>
+</tr>
+<tr class="even">
+<td>Sum</td>
+<td align="right">100.0</td>
+<td align="right">100.0</td>
+<td align="right">100.0</td>
+<td align="right">100.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="individus-importants-1" class="slide section level2">
+<h2>Individus importants</h2>
+<h3 id="qualite-de-representation-1">Qualité de représentation</h3>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">qualité 1</th>
+<th align="right">qualité 2</th>
+<th align="right">qualité 3</th>
+<th align="right">qualité 4</th>
+<th align="right">Somme</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>jean</td>
+<td align="right">1.0</td>
+<td align="right">0.0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td>alan</td>
+<td align="right">1.0</td>
+<td align="right">0.0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td>anni</td>
+<td align="right">0.5</td>
+<td align="right">0.5</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td>moni</td>
+<td align="right">1.0</td>
+<td align="right">0.0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td>didi</td>
+<td align="right">0.9</td>
+<td align="right">0.1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td>andr</td>
+<td align="right">0.3</td>
+<td align="right">0.7</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td>pier</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td>brig</td>
+<td align="right">0.2</td>
+<td align="right">0.8</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td>evel</td>
+<td align="right">0.3</td>
+<td align="right">0.7</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="variables-importantes" class="slide section level2">
+<h2>Variables importantes</h2>
+<h3 id="contribution-1">Contribution</h3>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">contrib 1</th>
+<th align="right">contrib 2</th>
+<th align="right">contrib 3</th>
+<th align="right">contrib 4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Math</td>
+<td align="right">22.9</td>
+<td align="right">30.5</td>
+<td align="right">4.1</td>
+<td align="right">42.5</td>
+</tr>
+<tr class="even">
+<td>Phys</td>
+<td align="right">28.3</td>
+<td align="right">16.5</td>
+<td align="right">19.5</td>
+<td align="right">35.7</td>
+</tr>
+<tr class="odd">
+<td>Fran</td>
+<td align="right">19.7</td>
+<td align="right">38.6</td>
+<td align="right">28.3</td>
+<td align="right">13.4</td>
+</tr>
+<tr class="even">
+<td>Angl</td>
+<td align="right">29.1</td>
+<td align="right">14.4</td>
+<td align="right">48.1</td>
+<td align="right">8.4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="qualite-de-representation-2">Qualité de représentation</h3>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">qualité 1</th>
+<th align="right">qualité 2</th>
+<th align="right">qualité 3</th>
+<th align="right">qualité 4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Math</td>
+<td align="right">0.7</td>
+<td align="right">0.3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td>Phys</td>
+<td align="right">0.8</td>
+<td align="right">0.2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td>Fran</td>
+<td align="right">0.6</td>
+<td align="right">0.4</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td>Angl</td>
+<td align="right">0.8</td>
+<td align="right">0.2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dautres-exemples" class="slide section level2">
+<h2>D’autres exemples</h2>
+<p><a href="acp-exemple-compression.html">Compression d’image</a></p>
+<p><a href="acp-exemple-visualisation.html">Visualisation de données</a></p>
+</div>
+
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+</body>
+</html>

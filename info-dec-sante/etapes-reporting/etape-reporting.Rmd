@@ -1,0 +1,99 @@
+---
+title: "Evolution CA"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+load("../donnees/ca/ca.RData")
+```
+
+# Synthèse
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Evolution mois par mois
+
+```{r}
+d = setNames(aggregate(ca / 1000000 ~ mois_no, ca_tout, sum), c("mois", "ca"))
+par(mar = c(4, 4, 0, 0) + .1)
+plot(ca ~ mois, d, type = "b",
+     xlab = "Mois", ylab = "Chiffre d'affaires (M€)")
+abline(h = mean(d$ca), lty = 3, col = "gray50")
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Comparaison mois par mois (en k€)
+
+```{r}
+d = aggregate(cbind(ca2003, ca2004, evolution) / 1000 ~ mois + mois_numero, 
+              ca_evol, sum)
+d = subset(d, select = -mois_numero)
+names(d) = c("Mois", "2003", "2004", "Evolution")
+knitr::kable(d, digits = 0)
+```
+
+
+### Augmentation entre 2003 et 2004
+
+```{r}
+d = aggregate(ca ~ annee, ca_tout, sum)
+v = paste(round((d$ca[2] / d$ca[1] - 1) * 100, 2), "%")
+valueBox(v, icon = "fa-arrow-circle-up", color = "green")
+```
+
+# Détail {data-orientation=rows}
+
+## Ligne 1
+
+### Par département (en k€)
+
+```{r}
+evol.dpt = aggregate(cbind(ca2003, ca2004, evolution) / 1000 ~ departement, 
+                     ca_evol, sum)
+names(evol.dpt) = c("Département", "2003", "2004", "Evolution")
+knitr::kable(evol.dpt, digits = 0)
+```
+
+### Par provenance (en k€)
+
+```{r}
+evol.prov = aggregate(cbind(ca2003, ca2004, evolution) / 1000 ~ provenance, 
+                      ca_evol, sum)
+names(evol.prov) = c("Provenance", "2003", "2004", "Evolution")
+knitr::kable(evol.prov, digits = 0)
+```
+
+## Ligne 2
+
+### Nombre de département en hausse
+
+```{r}
+gauge(sum(evol.dpt$Evolution > 0), 0, nrow(evol.dpt))
+```
+
+### Département avec la plus grosse évolution
+
+```{r}
+valueBox(evol.dpt$Département[which.max(evol.dpt$Evolution)], icon = "fa-level-up")
+```
+
+### Nombre de provenance en hausse
+
+```{r}
+gauge(sum(evol.prov$Evolution > 0), 0, nrow(evol.prov))
+```
+
+### Provenance avec la plus grosse évolution
+
+```{r}
+valueBox(evol.prov$Provenance[which.max(evol.prov$Evolution)], icon = "fa-level-up")
+```
+
+

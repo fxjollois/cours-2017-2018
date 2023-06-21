@@ -1,0 +1,239 @@
+---
+title: Connexion entre `R` et MongoDB
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+Dans ce document est l'utilisation du package [`mongolite`](https://jeroen.github.io/mongolite/) permettant la connection à une base de données [MongoDB](https://www.mongodb.com/fr).
+
+## Connexion
+
+Pour interroger MongoDB dans `R`, il faut créer une connexion entre les deux. Ici, on créée une connexion au serveur distant, en indiquant précisemment la base de données et la collection cibles. 
+
+```{r}
+library(mongolite)
+db = mongo(
+  collection = "restaurants", 
+  db = "test", 
+  url = "mongodb://193.51.82.104:2343"
+)
+```
+
+L'objet ainsi créé contient un ensemble de fonctions permettant l'accès aux données de MongoDB.
+
+## Recherche d'informations
+
+Nous allons voir dans la suite les équivalents `R` des fonctions déjà vues directement dans la console MongoDB.
+
+Une fois cette connexion créée, il est possible de regarder combien de documents sont présents dans la collection.
+
+```{r}
+# Nombre d'enregistrement 
+db$count()
+```
+
+Puisqu'on n'a pas de schéma, on peut aussi vouloir avoir la liste des valeurs prises par un élément particulier.
+
+```{r}
+# Liste des valeurs 
+db$distinct("borough")
+```
+
+Dans Mongo, il n'y a pas de schéma pour une base de données, ni même pour une collection. Un moyen de s'approprier les données est donc de regarder le premier élément. C'est pourquoi il existe la fonction `find()` avec le paramètre `limit`. Cette fonction transforme le résultat en `data.frame`, ce qui n'est pas forcément désiré. Il existe donc la fonction `iterate()`, qui renvoie un curseur dans lequel il est possible de naviguer avec la fonction `one()` (renvoie les éléments un par un) ou la fonction `batch()` (renvoie tous les éléments en une liste).
+
+```{r}
+# Premier enregistrement de la collection 
+db$find(limit = 1)
+# Idem mais conservé en liste
+db$iterate(limit = 1)$one()
+db$iterate(limit = 1)$batch()
+```
+
+Sur cet enregistrement, on peut vouloir avoir accès aux données directement. Voici comment faire avec soit le retour de `find()`, soit le retour de `iterate()`
+
+```{r}
+# Avec find(limit = 1)
+enr1 = db$find(limit = 1)
+enr1$name
+enr1$borough
+# Avec iterate(limit = 1)$one()
+enr1bis = db$iterate(limit = 1)$one()
+enr1bis$name
+enr1bis$borough
+```
+
+La fonction `find()` permet de renvoyer tous les enregistements par défaut. Il faut donc la manipuler prudemment si on en a beaucoup. Il est possible d'indiquer dans celle-ci les restrictions et/ou projections que l'on souhaite faire.
+
+Pour effectuer une restriction, on utilise le paramètre `query` de la fonction `find()`. Cette requête doit être une chaîne de caractère, et dans le même format que dans le langage `JS` de la console Mongo.
+
+```{r}
+db$find(query = '{"borough": "Bronx"}', limit = 5)
+```
+
+La projection se fait avec le paramètre `fields`, recevant une chaîne de caractère, au format du langage console de Mongo. 
+
+```{r}
+db$find(fields = '{"_id": 0, "name": 1}', limit = 5)
+```
+
+Il est bien évidemment possible de combiner ces deux paramètres pour faire les deux opérations.
+
+```{r}
+db$find(
+  query = '{"borough": "Bronx"}',
+  fields = '{"_id": 0, "name": 1, "borough": 1, "address.street": 1}',
+  limit = 5
+)
+```
+
+On peut ajouter un tri sur le résultat.
+
+```{r}
+db$find(
+  query = '{"borough": "Bronx"}',
+  fields = '{"_id": 0, "name": 1, "borough": 1, "address.street": 1}',
+  sort = '{"name": -1}',
+  limit = 5
+)
+```
+
+
+### Traitement par document
+
+Comme indiqué précédemment, la fonction `iterate()` permet de traiter les documents un par un dans `R`. Dans ce cas, soit on utilise le curseur que l'on vide avec la fonction `one()`, jusqu'à ce qu'il retourne la valeur `NULL`. 
+
+```{r}
+it = db$iterate(limit = 5)
+while (!is.null(doc <- it$one())) {
+  print(sprintf("%s (%s) : %i grades", 
+                doc$name, doc$borough, length(doc$grades)))
+}
+```
+
+Soit on utilise la fonction `batch()` pour récupérer tous les éléments dans une liste.
+
+```{r}
+sapply(
+  db$iterate(limit = 5)$batch(),
+  function (e) {
+    return(c(Nom = e$name, Quartier = e$borough,
+             NbGrades = length(e$grades)))
+  }
+)
+```
+
+### Agrégat
+
+Les agrégats sont effectués avec la fonction `aggregate()`, dans laquelle on définit un `pipeline` sous forme de `list`, avec une syntaxe identique à celle de Mongo. 
+
+```{r}
+db$aggregate('[
+    { "$group": { "_id": "$borough", "nb": { "$sum": 1 }}}
+]')
+```
+
+On peut bien évidemment les agrégats aussi complexes que l'on souhaite, tout comme dans la console MongoDB.
+
+```{r eval=FALSE}
+db$aggregate('[
+  { "$unwind": "$grades" },
+  { "$group": { 
+    "_id": { "name": "$name", "id": "$restaurant_id" }, 
+    "nb": { "$sum": 1 }, 
+    "eval": { "$addToSet": "$grades.grade" }
+  }},
+  { "$sort": { "nb": -1 }},
+  { "$limit": 5 }
+]')
+```
+
+## A faire -- Données `restaurants`
+
+Refaire quelques demandes précédemment faites dans le [TP Mongo](intro-mongodb) directement en `R`.
+
+
+```{r, include = FALSE}
+trafic = mongo(
+collection = "trafic",
+db = "trafic",
+url = "mongodb://193.51.82.104:2343"
+)
+capteurs = mongo(
+collection = "capteurs",
+db = "trafic",
+url = "mongodb://193.51.82.104:2343"
+)
+
+# 1.
+trafic$find(limit = 1)
+trafic$count()
+capteurs$find(limit = 1)
+capteurs$count()
+
+
+
+# 5.
+tr1 = trafic$find(query = '{ "id": 1}')
+tr1bis = tr1 %>%
+  mutate(debit = as.numeric(debit),
+         jour = date(date),
+         annee = year(date),
+         mois = month(date),
+         jouran = yday(date),
+         joursem = wday(date),
+         we = ifelse(wday(date) %in% c(1, 7), "week-end", "semaine"),
+         heure = hour(date))
+tr1ter = tr1bis %>%
+  group_by(jour) %>%
+  summarise(debitmoy = mean(debit, na.rm = T))
+library(tidyverse)
+ggplot(tr1bis, aes(date, debit)) +
+  geom_line()
+ggplot(tr1ter, aes(jour, debitmoy)) +
+  geom_line()
+library(lubridate)
+ggplot(tr1ter %>% mutate(jouran = yday(jour), annee = year(jour)), 
+       aes(jouran, debitmoy, col = factor(annee))) +
+  geom_line()
+
+ggplot(tr1bis %>% 
+         group_by(heure) %>% 
+         summarise(debitmoy = mean(debit, na.rm = T)),
+       aes(heure, debitmoy)) +
+  geom_line()
+ggplot(tr1bis %>% 
+         group_by(heure, mois) %>% 
+         summarise(debitmoy = mean(debit, na.rm = T)),
+       aes(heure, debitmoy, col = factor(mois))) +
+  geom_line()
+ggplot(tr1bis %>% 
+         group_by(heure, joursem) %>% 
+         summarise(debitmoy = mean(debit, na.rm = T)),
+       aes(heure, debitmoy, col = factor(joursem))) +
+  geom_line()
+ggplot(tr1bis %>% 
+         group_by(heure, we) %>% 
+         summarise(debitmoy = mean(debit, na.rm = T)),
+       aes(heure, debitmoy, col = we)) +
+  geom_line()
+
+
+
+trafic$aggregate(
+'[
+  { "$group": { "_id": "$id", "nb": { "$sum": 1 }}},
+  { "$sort": { "nb": -1 }},
+  { "$limit": 10 } 
+]')
+
+```
+

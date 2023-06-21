@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>pendigits data - first analysis</title>
+
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<link href="libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="libs/highlightjs-1.1/highlight.js"></script>
+<!--
+    Font Awesome
+-->
+<script src="https://use.fontawesome.com/32d8325004.js"></script>
+<link rel="stylesheet" href="libs/font-awesome-4.7.0/css/font-awesome.min.css">
+
+<!--
+    CSS perso
+-->
+<style>
+    .contenu {
+        margin-bottom: 50px;
+    }
+
+    .contact-liens {
+        text-align: center;
+    }
+    .contact-liens:hover {
+        text-decoration: none;
+    }
+    .contact-icones {
+        height: 30px;
+    }
+
+    /* Espacement pour barre du haut et pied de page */
+    #header, .section.level1 {
+        margin-top: 60px;
+        margin-bottom: 60px;
+    }
+    /* Espacement pour table des matières */
+    #TOC {
+        margin-top: 100px;
+    }
+    
+    .footer {
+        position: fixed;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        left: 0;
+        background-color: #E6E6E6;
+    }
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="libs/bootstrap-journal.min.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-main">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">FX Jollois</a>
+    </div>
+    <div id="navbar-main" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Données <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+              <li><a href="accesdonnees.html">A télécharger</a></li>
+              <li><a href="donnees-integrees-r.html">Sous R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Enseignement <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">DUT 1ère année</li>
+            <li><a href="exploitation-donnees.html">Exploitation de données</a></li>
+            <li><a href="initiation-a-r.html">Initiation à R</a></li>
+            <li><a href="reporting.html">Reporting</a></li>
+            <li><a href="complements-r.html">Compléments sur R</a></li>
+            <li class="dropdown-header">DUT 2ème année</li>
+            <li><a href="prog-stat-r.html">Programmation statistique avec R</a></li>
+            <li class="dropdown-header">LP MDS Santé</li>
+            <li><a href="info-dec-sante.html">Informatique décisionnelle</a></li>
+            <li class="dropdown-header">DU Analyste Big Data</li>
+            <li><a href="initiation-r-du.html">Initiation à R</a></li>
+            <li><a href="connexion-r-mongodb.html">Connexion entre R et MongoDB</a></li>
+            <li class="dropdown-header">DU Dataviz</li>
+            <li><a href="analyse-donnees.html">Analyse de données</a></li>
+            <li><a href="visualisation-donnees.html">Visualisation de données - R</a></li>
+            <li><a href="visualisation-donnees-tableau.html">Visualisation de données - Tableau</a></li>
+            <li><a href="visualisation-donnees-d3.html">Visualisation de données - D3</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Master</li>
+            <li><a href="slides/cnam-classif-modeles.html">Classification et Modèles de mélange</a></li>
+            <li><a href="analyse-donnees-massives.html">Analyse de Données Massives</a></li>
+            <li class="dropdown-header">Iran</li>
+            <li><a href="stat-prog-R.html">Statistical Programming using R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Recherche <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="recherche.html">Sujets</a></li>
+            <li><a href="publications.html">Publications</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Réalisations <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="realisations.html">Détail</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://up5.fr/explore-data" target="_blank">explore-data</a></li>
+            <li><a href="http://fxjollois.github.io/cours-sql/" target="_blank">Appli web de cours pour SQL</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container-fluid -->
+</div>
+<div class="contenu">
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore"><code>pendigits</code> data - first analysis</h1>
+<h3 class="subtitle"><em>Statistical Programming using <code>R</code></em></h3>
+
+</div>
+
+
+<p>Here are the packages we use in this work.</p>
+<pre class="r"><code>library(reshape2)
+library(ggplot2)
+library(FactoMineR)</code></pre>
+<div id="data-files" class="section level2">
+<h2>Data files</h2>
+<p>Download the two following files :</p>
+<ul>
+<li><a href="donnees/pendigits.tra">pendigits.tra</a></li>
+<li><a href="donnees/pendigits.tes">pendigits.tes</a></li>
+</ul>
+<p>Data description can be found <a href="http://archive.ics.uci.edu/ml/datasets/Pen-Based+Recognition+of+Handwritten+Digits">here</a>: each line represent a draw of a digit between 0 and 9, with 8 points (<span class="math inline">\((x,y)\)</span> coordinates for each point) and the number drawn.</p>
+</div>
+<div id="importation" class="section level2">
+<h2>Importation</h2>
+<p>The data files are here easy to read:</p>
+<ul>
+<li>the names of the attributes are not present</li>
+<li>the values are separated by a comma <code>&quot;,&quot;</code></li>
+</ul>
+<pre class="r"><code>pen.tra = read.table(&quot;donnees/pendigits.tra&quot;, sep = &quot;,&quot;)
+pen.tes = read.table(&quot;donnees/pendigits.tes&quot;, sep = &quot;,&quot;)</code></pre>
+<p>Now, to collapse them together, we use the following code</p>
+<pre class="r"><code>pen = rbind(pen.tra, pen.tes)</code></pre>
+<p>At the end of the import process, we name the attributes according to what we know: the two first attributes are <span class="math inline">\((x_1, y_1)\)</span>, the third and the fourth <span class="math inline">\((x_2, y_2)\)</span>, and so on. The last attribute is the written digit. Then, we create the vector <code>&quot;X1&quot; &quot;Y1&quot; &quot;X2&quot; &quot;Y2&quot; ... &quot;X8&quot; &quot;Y8&quot; &quot;digit&quot;</code>.</p>
+<pre class="r"><code>names(pen) = c(paste0(c(&quot;X&quot;, &quot;Y&quot;), rep(1:8, each = 2)), &quot;digit&quot;)
+class(pen$digit)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<p><code>digit</code> variable is here a numeric attribute (<code>integer</code> more precisely). But, it is a <em>nominal</em> one in reality. So, we transform it into <code>factor</code>.</p>
+<pre class="r"><code>pen$digit = factor(pen$digit)
+class(pen$digit)</code></pre>
+<pre><code>## [1] &quot;factor&quot;</code></pre>
+<p>We now have the following value (only 6 first are presented here).</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">X1</th>
+<th align="right">Y1</th>
+<th align="right">X2</th>
+<th align="right">Y2</th>
+<th align="right">X3</th>
+<th align="right">Y3</th>
+<th align="right">X4</th>
+<th align="right">Y4</th>
+<th align="right">X5</th>
+<th align="right">Y5</th>
+<th align="right">X6</th>
+<th align="right">Y6</th>
+<th align="right">X7</th>
+<th align="right">Y7</th>
+<th align="right">X8</th>
+<th align="right">Y8</th>
+<th align="left">digit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">47</td>
+<td align="right">100</td>
+<td align="right">27</td>
+<td align="right">81</td>
+<td align="right">57</td>
+<td align="right">37</td>
+<td align="right">26</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">23</td>
+<td align="right">56</td>
+<td align="right">53</td>
+<td align="right">100</td>
+<td align="right">90</td>
+<td align="right">40</td>
+<td align="right">98</td>
+<td align="left">8</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">89</td>
+<td align="right">27</td>
+<td align="right">100</td>
+<td align="right">42</td>
+<td align="right">75</td>
+<td align="right">29</td>
+<td align="right">45</td>
+<td align="right">15</td>
+<td align="right">15</td>
+<td align="right">37</td>
+<td align="right">0</td>
+<td align="right">69</td>
+<td align="right">2</td>
+<td align="right">100</td>
+<td align="right">6</td>
+<td align="left">2</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">57</td>
+<td align="right">31</td>
+<td align="right">68</td>
+<td align="right">72</td>
+<td align="right">90</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td align="right">76</td>
+<td align="right">75</td>
+<td align="right">50</td>
+<td align="right">51</td>
+<td align="right">28</td>
+<td align="right">25</td>
+<td align="right">16</td>
+<td align="right">0</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">100</td>
+<td align="right">7</td>
+<td align="right">92</td>
+<td align="right">5</td>
+<td align="right">68</td>
+<td align="right">19</td>
+<td align="right">45</td>
+<td align="right">86</td>
+<td align="right">34</td>
+<td align="right">100</td>
+<td align="right">45</td>
+<td align="right">74</td>
+<td align="right">23</td>
+<td align="right">67</td>
+<td align="right">0</td>
+<td align="left">4</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">67</td>
+<td align="right">49</td>
+<td align="right">83</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td align="right">81</td>
+<td align="right">80</td>
+<td align="right">60</td>
+<td align="right">60</td>
+<td align="right">40</td>
+<td align="right">40</td>
+<td align="right">33</td>
+<td align="right">20</td>
+<td align="right">47</td>
+<td align="right">0</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="right">100</td>
+<td align="right">100</td>
+<td align="right">88</td>
+<td align="right">99</td>
+<td align="right">49</td>
+<td align="right">74</td>
+<td align="right">17</td>
+<td align="right">47</td>
+<td align="right">0</td>
+<td align="right">16</td>
+<td align="right">37</td>
+<td align="right">0</td>
+<td align="right">73</td>
+<td align="right">16</td>
+<td align="right">20</td>
+<td align="right">20</td>
+<td align="left">6</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="description" class="section level2">
+<h2>Description</h2>
+<div id="one-by-one" class="section level3">
+<h3>One by one</h3>
+<p>Our variable of interest is the digit reprensented. So, we start by describe this attribute.</p>
+<pre class="r"><code>table(pen$digit)</code></pre>
+<pre><code>## 
+##    0    1    2    3    4    5    6    7    8    9 
+## 1143 1143 1144 1055 1144 1055 1056 1142 1055 1055</code></pre>
+<p>Then, we reprensent the bar chart of the distribution of digits. We add a color by digit, because we use these colors later.</p>
+<pre class="r"><code>ggplot(pen, aes(digit, fill = digit)) + 
+    geom_bar() +
+    guides(fill = FALSE)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>We present here the mean, the median and the standard deviation of each coordinates.</p>
+<pre class="r"><code>tab = apply(pen[-17], 2, function(x) {
+    return (c(Mean = mean(x),
+              Median = median(x),
+              StdDev = sd(x)))
+})
+round(t(tab), 2)</code></pre>
+<pre><code>##     Mean Median StdDev
+## X1 38.81   32.0  34.26
+## Y1 85.12   89.0  16.22
+## X2 40.61   40.0  26.34
+## Y2 83.77   91.0  19.16
+## X3 49.77   53.0  34.10
+## Y3 65.57   71.0  27.00
+## X4 51.22   53.5  30.58
+## Y4 44.50   43.0  29.91
+## X5 56.87   60.0  34.14
+## Y5 33.70   33.0  27.25
+## X6 60.52   73.0  37.29
+## Y6 34.83   30.0  27.12
+## X7 55.02   53.0  22.34
+## Y7 34.94   27.0  33.16
+## X8 47.29   40.0  41.76
+## Y8 28.85    9.0  35.78</code></pre>
+<p>We also represent the distribution of each coordinate by a boxplot. For that, we can do a plot for each one.</p>
+<pre class="r"><code>for (j in 1:16)
+    boxplot(pen[,j])</code></pre>
+<p>But, at the end, it produces 16 graphics, hard to compare. So we can therefore reprensent in one graphic all <span class="math inline">\(x_j\)</span> distribution, and in other one all <span class="math inline">\(y_j\)</span> distribution. This operation can be done with the <code>melt()</code> function of the package <code>reshape2</code>, which transform the form of the data. Here the step by step procedure for <span class="math inline">\(x\)</span> coordinates</p>
+<pre class="r"><code>pen.X = pen[seq(1, 15, 2)]
+names(pen.X)</code></pre>
+<pre><code>## [1] &quot;X1&quot; &quot;X2&quot; &quot;X3&quot; &quot;X4&quot; &quot;X5&quot; &quot;X6&quot; &quot;X7&quot; &quot;X8&quot;</code></pre>
+<pre class="r"><code>pen.X.melt = melt(pen.X)</code></pre>
+<pre><code>## No id variables; using all as measure variables</code></pre>
+<pre class="r"><code>knitr::kable(head(pen.X.melt))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">variable</th>
+<th align="right">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">X1</td>
+<td align="right">47</td>
+</tr>
+<tr class="even">
+<td align="left">X1</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">X1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">X1</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">X1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">X1</td>
+<td align="right">100</td>
+</tr>
+</tbody>
+</table>
+<p>And the boxplots</p>
+<pre class="r"><code>ggplot(pen.X.melt, aes(variable, value)) +
+    geom_boxplot()</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Now, in one step for <span class="math inline">\(y\)</span> coordinates</p>
+<pre class="r"><code>ggplot(melt(pen[seq(2, 16, 2)]), aes(variable, value)) + geom_boxplot()</code></pre>
+<pre><code>## No id variables; using all as measure variables</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="with-respect-to-digit" class="section level3">
+<h3>With respect to <code>digit</code></h3>
+<p>First, we present the mean value of each coordinate for each digit. We can do this step with <code>apply()</code> (and <code>tapply()</code>) or with <code>aggregate()</code>.</p>
+<pre class="r"><code>apply(pen[-17], 2, tapply, pen$digit, mean)</code></pre>
+<pre class="r"><code>agg = aggregate(. ~ digit, pen, mean)</code></pre>
+<pre class="r"><code>knitr::kable(agg, digits = 2)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">digit</th>
+<th align="right">X1</th>
+<th align="right">Y1</th>
+<th align="right">X2</th>
+<th align="right">Y2</th>
+<th align="right">X3</th>
+<th align="right">Y3</th>
+<th align="right">X4</th>
+<th align="right">Y4</th>
+<th align="right">X5</th>
+<th align="right">Y5</th>
+<th align="right">X6</th>
+<th align="right">Y6</th>
+<th align="right">X7</th>
+<th align="right">Y7</th>
+<th align="right">X8</th>
+<th align="right">Y8</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="right">35.37</td>
+<td align="right">86.06</td>
+<td align="right">11.58</td>
+<td align="right">58.31</td>
+<td align="right">14.94</td>
+<td align="right">19.60</td>
+<td align="right">51.17</td>
+<td align="right">7.29</td>
+<td align="right">85.94</td>
+<td align="right">31.30</td>
+<td align="right">89.29</td>
+<td align="right">68.49</td>
+<td align="right">59.01</td>
+<td align="right">89.31</td>
+<td align="right">22.10</td>
+<td align="right">75.24</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="right">14.70</td>
+<td align="right">61.39</td>
+<td align="right">44.35</td>
+<td align="right">77.94</td>
+<td align="right">69.86</td>
+<td align="right">89.51</td>
+<td align="right">77.50</td>
+<td align="right">79.80</td>
+<td align="right">67.64</td>
+<td align="right">54.06</td>
+<td align="right">47.80</td>
+<td align="right">32.66</td>
+<td align="right">44.60</td>
+<td align="right">16.16</td>
+<td align="right">59.91</td>
+<td align="right">1.38</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="right">18.39</td>
+<td align="right">76.95</td>
+<td align="right">42.13</td>
+<td align="right">99.39</td>
+<td align="right">67.46</td>
+<td align="right">79.76</td>
+<td align="right">51.28</td>
+<td align="right">46.05</td>
+<td align="right">19.83</td>
+<td align="right">19.38</td>
+<td align="right">11.64</td>
+<td align="right">9.09</td>
+<td align="right">53.06</td>
+<td align="right">5.25</td>
+<td align="right">98.71</td>
+<td align="right">4.17</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="right">24.78</td>
+<td align="right">84.06</td>
+<td align="right">56.66</td>
+<td align="right">99.52</td>
+<td align="right">86.64</td>
+<td align="right">84.69</td>
+<td align="right">64.53</td>
+<td align="right">60.59</td>
+<td align="right">82.13</td>
+<td align="right">43.22</td>
+<td align="right">90.88</td>
+<td align="right">17.26</td>
+<td align="right">50.01</td>
+<td align="right">2.28</td>
+<td align="right">3.47</td>
+<td align="right">6.24</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="right">42.96</td>
+<td align="right">99.54</td>
+<td align="right">22.13</td>
+<td align="right">79.38</td>
+<td align="right">5.75</td>
+<td align="right">51.16</td>
+<td align="right">42.83</td>
+<td align="right">40.47</td>
+<td align="right">85.10</td>
+<td align="right">49.56</td>
+<td align="right">86.30</td>
+<td align="right">59.72</td>
+<td align="right">70.99</td>
+<td align="right">31.45</td>
+<td align="right">62.60</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="right">41.24</td>
+<td align="right">90.94</td>
+<td align="right">42.60</td>
+<td align="right">75.83</td>
+<td align="right">57.31</td>
+<td align="right">59.18</td>
+<td align="right">36.46</td>
+<td align="right">29.36</td>
+<td align="right">26.18</td>
+<td align="right">33.15</td>
+<td align="right">37.64</td>
+<td align="right">50.24</td>
+<td align="right">42.83</td>
+<td align="right">57.69</td>
+<td align="right">59.46</td>
+<td align="right">60.31</td>
+</tr>
+<tr class="odd">
+<td align="left">6</td>
+<td align="right">87.52</td>
+<td align="right">98.72</td>
+<td align="right">51.75</td>
+<td align="right">86.72</td>
+<td align="right">20.71</td>
+<td align="right">58.48</td>
+<td align="right">6.94</td>
+<td align="right">26.93</td>
+<td align="right">32.61</td>
+<td align="right">3.14</td>
+<td align="right">81.11</td>
+<td align="right">11.02</td>
+<td align="right">61.57</td>
+<td align="right">30.54</td>
+<td align="right">11.00</td>
+<td align="right">23.35</td>
+</tr>
+<tr class="even">
+<td align="left">7</td>
+<td align="right">3.50</td>
+<td align="right">91.01</td>
+<td align="right">45.37</td>
+<td align="right">98.25</td>
+<td align="right">78.85</td>
+<td align="right">80.76</td>
+<td align="right">71.27</td>
+<td align="right">47.47</td>
+<td align="right">52.73</td>
+<td align="right">14.93</td>
+<td align="right">33.60</td>
+<td align="right">18.47</td>
+<td align="right">39.51</td>
+<td align="right">33.80</td>
+<td align="right">81.14</td>
+<td align="right">34.31</td>
+</tr>
+<tr class="odd">
+<td align="left">8</td>
+<td align="right">56.95</td>
+<td align="right">82.08</td>
+<td align="right">39.83</td>
+<td align="right">79.62</td>
+<td align="right">51.81</td>
+<td align="right">51.93</td>
+<td align="right">50.56</td>
+<td align="right">24.22</td>
+<td align="right">35.25</td>
+<td align="right">17.07</td>
+<td align="right">39.93</td>
+<td align="right">36.90</td>
+<td align="right">67.78</td>
+<td align="right">68.49</td>
+<td align="right">49.00</td>
+<td align="right">81.40</td>
+</tr>
+<tr class="even">
+<td align="left">9</td>
+<td align="right">69.26</td>
+<td align="right">81.32</td>
+<td align="right">52.79</td>
+<td align="right">83.26</td>
+<td align="right">45.45</td>
+<td align="right">81.28</td>
+<td align="right">56.57</td>
+<td align="right">82.96</td>
+<td align="right">79.06</td>
+<td align="right">71.09</td>
+<td align="right">89.78</td>
+<td align="right">43.23</td>
+<td align="right">61.48</td>
+<td align="right">14.34</td>
+<td align="right">18.15</td>
+<td align="right">4.54</td>
+</tr>
+</tbody>
+</table>
+<p>For graphical representation, we have to produce a lot of boxplots. The most interesting ones in our case is a set of boxplot of <span class="math inline">\(x_j\)</span> coordinate for each digit (8 sets of 10 boxplots), and the same for each <span class="math inline">\(y_j\)</span>. This can be done due to the <code>melt()</code> function.</p>
+<pre class="r"><code>pen.melt = melt(pen, id.vars = 17)
+head(pen.melt)</code></pre>
+<pre><code>##   digit variable value
+## 1     8       X1    47
+## 2     2       X1     0
+## 3     1       X1     0
+## 4     4       X1     0
+## 5     1       X1     0
+## 6     6       X1   100</code></pre>
+<p>And now the production of graphic.</p>
+<pre class="r"><code>ggplot(pen.melt, aes(digit, value, color = digit)) + 
+    geom_boxplot() +
+    facet_wrap(~ variable)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>To go further, we can try to do a heatmap of <span class="math inline">\((x_j,y_j)\)</span> coordinates for each digit. But, it produces 8 heatmaps per digit. 80 graphics can be very too many to be usefull in this way of working. We will see later how we can take advantage of interactive possibility in <code>R</code> in data analysis.</p>
+</div>
+</div>
+<div id="representation-of-a-digit" class="section level2">
+<h2>Representation of a digit</h2>
+<p>We want to represent the first <code>&quot;0&quot;</code> drawn. This step is interesting for further analysis. We select the first 0 digit, and extract <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> coordinates. After we plot these with a line, and add the number of the point.</p>
+<pre class="r"><code>first.0 = subset(pen, digit == 0)[1,]
+x = unlist(first.0[seq(1,15, by = 2)])
+y = unlist(first.0[seq(2,16, by = 2)])
+par(mar = c(0, 0, 0, 0) + .1)
+plot(x, y, type = &quot;b&quot;, pch = &quot; &quot;, axes = FALSE, col = &quot;gray70&quot;)
+text(x, y, 1:8)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-19-1.png" width="192" /></p>
+</div>
+<div id="function" class="section level2">
+<h2>Function</h2>
+<p>Now, we have the basis of a function that can reproduc each digit. We want the following constraints for this one :</p>
+<ul>
+<li>Parameters:
+<ul>
+<li><code>v</code>: a vector with the 16 values of each point (if it is a <code>data.frame</code>, transform it as simple vector)</li>
+<li><code>n</code>: a numeric value (with <code>NULL</code> value by default), denoting the number to drawn (possibly not pass)</li>
+<li><code>point</code>: a boolean vector (with <code>FALSE</code> value by default), indicating if the point number has to be added to the graph</li>
+<li><code>add</code>: a boolean vector (with <code>FALSE</code> value by default), indicating if the plot is to added to the previous one</li>
+<li><code>color</code>: a specific color (with <code>&quot;black&quot;</code> value by default)</li>
+</ul></li>
+<li>Output:
+<ul>
+<li>line representing the drawn</li>
+<li>number drawn as title (if known)</li>
+<li>point number (if wanted)</li>
+</ul></li>
+</ul>
+<p>Here is the final function.</p>
+<pre class="r"><code>drawn &lt;- function(v, n = NULL, point = FALSE, add = FALSE, color = &quot;black&quot;) {
+    # Transformation of the data.frame if needed
+    if (is.data.frame(v))
+        v = unlist(v)
+    # extract x and y coordinates
+    x = v[seq(1, 15, by = 2)]
+    y = v[seq(2, 16, by = 2)]
+    # optimize space into graphics in reducing margin (sse ?par for more information)
+    opar = par(mar = c(0, 0, 2, 0) + .1)
+    if (!add) { # Create a graphic
+        plot(x, y, 
+             # Specify limits is a way to have always the same frame for plotting lines
+             xlim = c(-5, 105), ylim = c(-5, 105),
+             # Do not show axes
+             axes = FALSE,
+             # If point is TRUE, we add a space (with pch = &quot; &quot;) at each point
+             # If not, draw a line
+             type = ifelse(point, &quot;b&quot;, &quot;l&quot;), 
+             pch = &quot; &quot;, 
+             # Specify color (black by default)
+             col = color,
+             # Add a title (NULL by default)
+             main = n)
+        if (point) text(x, y, 1:8)
+    } else { # Add line to the plot
+        # lines() add lines to an existing plot (the last produce)
+        lines(x, y, 
+              # same comment than before
+              xlim = c(-5, 105), ylim = c(-5, 105),
+              type = ifelse(point, &quot;b&quot;, &quot;l&quot;), 
+              pch = &quot; &quot;, 
+              col = color)
+    }
+    par(opar)
+}</code></pre>
+<p>Now, here some use of this function</p>
+<pre class="r"><code>drawn(first.0)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-21-1.png" width="192" /></p>
+<pre class="r"><code>drawn(first.0, n = 0)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-21-2.png" width="192" /></p>
+<pre class="r"><code>drawn(first.0, point = TRUE)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-21-3.png" width="192" /></p>
+<pre class="r"><code>drawn(first.0)
+first.1 = subset(pen, digit == 1)[1,]
+drawn(first.1, add = TRUE, col = &quot;red&quot;)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-21-4.png" width="192" /></p>
+</div>
+<div id="first-drawn-of-each-digit" class="section level2">
+<h2>First drawn of each digit</h2>
+<p>For our curiosity, we can now drawn each first digit of the data. The <code>mfrow</code> parameter of the <code>par()</code> function permits us to separate the graphical window into 10 cells (with 2 rows and 5 columns).</p>
+<pre class="r"><code>par(mfrow = c(2, 5))
+for (i in 0:9) {
+    s = subset(pen, digit == i)[1,]
+    drawn(s[-16], n = i)
+}</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+</div>
+<div id="average-digit" class="section level2">
+<h2>Average digit</h2>
+<p>From the previous section, we now want to represent the <em>average</em> digit, <em>i.e.</em> a line produce by the average value for each coordinate. To see if there are some area that are not use for a particular digit, we represent also all the drawn in a very light gray.</p>
+<pre class="r"><code>par(mfrow = c(2, 5))
+for (i in 0:9) {
+    s = subset(pen, digit == i)
+    # Computing the average values
+    mean = apply(s[-17], 2, mean)
+    # Drawn the first drawn
+    drawn(s[1,1:16], col = &quot;gray90&quot;, n = i)
+    # Add all other drawn
+    for (j in 2:nrow(s)) 
+        drawn(s[j,1:16], col = &quot;gray90&quot;, add = TRUE)
+    # Last, add the average line
+    drawn(mean[-17], add = TRUE)
+}</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+</div>
+<div id="pca" class="section level2">
+<h2>PCA</h2>
+<p>A good way to represent many variables in one plot is the <em>Principal Component Analysis</em>. Then, we perform PCA on the data, and look at the quality of the projection on the first components.</p>
+<pre class="r"><code>res = PCA(pen, quali.sup = 17, graph = FALSE)
+eig = data.frame(comp = 1:16,
+                 setNames(res$eig, c(&quot;eigenvalue&quot;, &quot;percent&quot;, &quot;cum.percent&quot;)))
+ggplot(eig) +
+    geom_bar(aes(comp, percent), stat = &quot;identity&quot;) +
+    stat_summary(aes(comp, cum.percent, group = 1), 
+                 fun.y = sum, geom = &quot;line&quot;)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p>Now, we plot the first plan with a specific color for each digit. For that, we have to add the <code>digit</code> variable to the coordinates <code>data.frame</code> produce by <code>PCA()</code>.</p>
+<pre class="r"><code>res2 = data.frame(res$ind$coord, digit = pen$digit)
+ggplot(res2, aes(Dim.1, Dim.2, color = digit)) + 
+    geom_point()</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+</div>
+<div id="for-each-digit" class="section level2">
+<h2>For each digit</h2>
+<p>The above plot is hard to understand. So, we choose to represent each digit separately, to have a better idea on how digit are spread (or not) in the PCA projection.</p>
+<pre class="r"><code>ggplot(res2, aes(Dim.1, Dim.2, color = digit)) +
+    geom_point() +
+    facet_wrap(~ digit) +
+    guides(color = FALSE)</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<blockquote>
+<p>We conclude here that we surely need to clusters data separatly for each digit, to detect if there really are different ways to write a digit (and how).</p>
+</blockquote>
+</div>
+<div id="point-representation-with-ggplot" class="section level2">
+<h2>Point representation with <code>ggplot()</code></h2>
+<p>We can also represent digit drawn with the <code>ggplot()</code> function. We have to use the <code>melt()</code> function, and to be careful on how we do this.</p>
+<div id="for-the-first-0" class="section level3">
+<h3>For the first 0</h3>
+<pre class="r"><code>f0 = data.frame(x = unlist(first.0[seq(1, 15, 2)]),
+                y = unlist(first.0[seq(2, 16, 2)]))
+ggplot(f0, aes(x, y)) + 
+    geom_path() +
+    theme_void()</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-27-1.png" width="192" /></p>
+</div>
+<div id="for-the-average-digit-and-all-drawn." class="section level3">
+<h3>For the average digit, and all drawn.</h3>
+<div id="construct-the-data-for-all-drawn" class="section level4">
+<h4>Construct the data for all drawn</h4>
+<pre class="r"><code>pen$id = 1:nrow(pen)
+pen.melt = melt(pen, id.vars = c(&quot;id&quot;, &quot;digit&quot;))
+pen.melt$coord = substr(pen.melt$variable, 1, 1)
+pen.melt$point = substr(pen.melt$variable, 2, 2)
+pen.melt.X = subset(pen.melt, coord == &quot;X&quot;, -c(variable, coord))
+names(pen.melt.X) = c(&quot;id&quot;, &quot;digit&quot;, &quot;x&quot;, &quot;point&quot;)
+pen.melt.Y = subset(pen.melt, coord == &quot;Y&quot;, -c(variable, coord))
+names(pen.melt.Y) = c(&quot;id&quot;, &quot;digit&quot;, &quot;y&quot;, &quot;point&quot;)
+pen.merge = merge(pen.melt.X, pen.melt.Y)</code></pre>
+</div>
+<div id="construct-the-data-for-average" class="section level4">
+<h4>Construct the data for average</h4>
+<pre class="r"><code>agg.melt = melt(agg, id.vars = &quot;digit&quot;)
+agg.melt$coord = substr(agg.melt$variable, 1, 1)
+agg.melt$point = substr(agg.melt$variable, 2, 2)
+agg.melt.X = subset(agg.melt, coord == &quot;X&quot;, -c(variable, coord))
+names(agg.melt.X) = c(&quot;digit&quot;, &quot;x&quot;, &quot;point&quot;)
+agg.melt.Y = subset(agg.melt, coord == &quot;Y&quot;, -c(variable, coord))
+names(agg.melt.Y) = c(&quot;digit&quot;, &quot;y&quot;, &quot;point&quot;)
+agg.merge = merge(agg.melt.X, agg.melt.Y)</code></pre>
+</div>
+<div id="plot-it" class="section level4">
+<h4>Plot it</h4>
+<pre class="r"><code>ggplot(pen.merge, aes(x, y)) +
+    geom_path(aes(group = id), color = &quot;gray90&quot;) +
+    facet_wrap(~ digit) +
+    geom_path(data = agg.merge) +
+    theme_void()</code></pre>
+<p><img src="stat-prog-R-1-work_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+
+</div>
+<div class="footer">
+      Site créé avec <a href="http://www.r-project.org" target="_blank"><code>R</code></a> et la 
+      librairie  <a href="http://rmarkdown.rstudio.com/" target="_blank"><code>rmarkdown</code></a>.
+</div>
+<script>
+    $("#TOC").css("margin-top", "100px");
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

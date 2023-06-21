@@ -1,0 +1,391 @@
+---
+title: "Manipulation de données avec R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Présentation de R et de son environnement
+
+Le logiciel **R** est un langage dédié à la statistique. Celui-ci est interprété (i.e. exécuté à la volée). Pour simplifier son utilisation, il est possible d'écrire des scripts contenant plusieurs commandes à exécuter. Il a l'avantage d'être open source, et surtout d'être très utilisé par la communauté scientifique. Toute nouvelle méthode statistique a très rapidement une implémentation dans ce langage, ce qui n'est pas le cas pour d'autres langages.
+
+Pour simplifier le développement de programme R, il est nécessaire d'avoir une interface graphique (appelée aussi *GUI*). Celle offerte par R est très simpliste et beaucoup préfèrent utiliser **RStudio**, à juste titre. Cet outil permet de réellement fluidifier le travail avec ce langage.
+
+Enfin, R, dans l'esprit open source, offre la possibilité de charger des paquets (ou *packages* ou *library*) afin d'étendre ses possibilités. Il en existe un très grand nombre sur le site du **CRAN**, parfois redondants entre eux. Pour cette session, nous allons utiliser les paquets contenus dans `tidyverse`, qui est une collection de librairies très bien faites et adaptées pour la *Data Science*.
+
+Voici quelques liens intéressants pour ce cours:
+
+- [R](http://www.r-project.org)
+- [RStudio](http://www.rstudio.com)
+- [tidyverse](https://www.tidyverse.org/)
+
+## Eléments de langages
+
+Nous allons voir ici les différentes structures de données utilisées dans R, ainsi que les moyens de les créer et de les manipuler.
+
+### Type `vector`
+
+Tout est `vector` de base (au minimum), il n'existe pas de type *scalaire*. La fonction `class()` renvoie la classe de l'objet passé en paramètre. Les fonction`is.<type>()` permet de tester si l'objet en paramètre est du type demandé.
+
+```{r}
+a = 1
+print(a)
+a
+class(a)
+is.vector(a)
+```
+
+Si nous créons le vecteur `1 2 3 4 5` (grâce à la commande `1:5`), nous pouvons voir que les retours des fonctions `class()` et `is.vector()` sont les mêmes que pour la variable `a` ci-dessus.
+
+```{r}
+1:5
+class(1:5)
+is.vector(1:5)
+```
+
+Ci-dessous sont présentés différents moyens de créer des vecteurs.
+
+```{r}
+c(1, 3, 5)
+c("A", "b")
+c("a", 1:3)
+vector("numeric", 5)
+1:5
+5:1
+seq(1, 5)
+seq(1, 5, length = 9)
+seq(1, 5, by = .5)
+seq(1, 5, by = .75)
+rep(1:5, times = 3)
+rep(1:5, each = 2)
+rep(1:5, times = 3, each = 2)
+runif(10)
+rnorm(10)
+rnorm(10, 100, 20)
+```
+
+Pour accéder aux éléments d'un vecteur, nous utilisons les `[]`. Dedans, nous pouvons soit mettre des indices, soit un vecteur booléen de même taille que le vecteur initiale. Les fonctions `head()` et `tail()` permettent d'avoir les premières ou les dernières valeurs (6 par défaut, modifiable si besoin).
+
+```{r}
+x = rnorm(100)
+x[1]
+x[c(1, 5, 10)]
+x[x > 2]
+head(x)
+head(x, 10)
+tail(x)
+tail(x, 10)
+```
+
+
+### Type `list`
+
+Si nous souhaitons mettre ensemble des éléments de type différents, il existe aussi des `list` (nommées ou non, voire partiellement), créées via la fonction `list()`. Ci-dessous sont présentées différentes listes et comment on accède aux élément de celle-ci (avec des `[[]]` ou l'opérateur `$` suivi du nom du sous-objet.
+
+```{r}
+a = list(1:5, month.abb, pi)
+a
+class(a)
+b = list(b = 1:5, mois = month.abb, pi = pi)
+b
+c = list(1:5, mois = month.abb, pi = pi)
+c[[1]]
+c[[2]]
+c$mois
+d = list(d1 = c, d2 = head(x))
+d
+d$d1
+d$d2
+d$d1$mois
+```
+
+### Type `matrix` (et `array`)
+
+Si on souhaite créer des tableaux à 2 dimensions, il faut utiliser la fonction `matrix()`, qui renvoie un objet `matrix`. On utilise les `[,]` pour accéder aux cellules de la matrice, avec tout ce qui est pour les lignes avant la virgule, et pour les colonnes après.
+
+```{r}
+matrix(0, nrow = 2, ncol = 5)
+matrix(1:10, 2, 5)
+matrix(1:10, 2, 5, byrow = TRUE)
+m = matrix(runif(100), 20, 5)
+m
+dim(m)
+head(m)
+m[1,]
+m[1:3,]
+m[,1]
+m[,1:3]
+m[1,1]
+m[1:3,1]
+m[1,1:3]
+m[1:3,1:3]
+```
+
+Le type `array` est finalement une extension de `matrix` à plus de 2 dimensions. Nous ne verrons pas ce type pour le moment.
+
+```{r}
+class(m)
+is.array(m)
+```
+
+### Type `data.frame`
+
+En statistique, nous avons couramment besoin de tables d'individus (ou d'objets) décrits par des variables. En R, ce type de données est contenu, de base, dans des `data.frame`. Pour information, il existe un certain nombre de données déjà présentes dans R, dont vous pouvez obtenir la liste par la fonction `data()` exécutée dans la console. De plus, pour accéder à l'aide d'un jeu de données, vous pouvez exécuter soit `help(<jeu>)` ou `?<jeu>`. Ici, le jeu de données utilisé est `mtcars`.
+
+```{r}
+mtcars
+class(mtcars)
+head(mtcars)
+names(mtcars)
+rownames(mtcars)
+dim(mtcars)
+str(mtcars)
+```
+
+Pour accéder aux données, nous pouvons soit utiliser le même procédé que pour une `matrix`, soit des moyens plus spécifiques.
+
+```{r}
+mtcars[1,]
+mtcars[,1]
+mtcars[1]
+mtcars[,"mpg"]
+mtcars["mpg"]
+mtcars$mpg
+mtcars["Mazda RX4",]
+mtcars[1:5, c("mpg", "hp", "qsec")]
+mtcars[c("Mazda RX4", "Hornet Sportabout"), 1:3]
+mtcars[mtcars$mpg > 30,]
+```
+
+
+### Type `factor`
+
+Puisque R est un langage orienté statistique, il dispose d'un type particulier permettant de coder des variables qualitatives, le type `factor`. Comme nous pouvons le voir en transformant la variable en `numeric`, ce type code chaque modalité numériquement (en valeur entière de 1 à $n_{modalité}$) et garde la liste des modalités en plus (qu'on peut obtenir avec `levels()`). 
+
+```{r}
+class(iris$Species)
+head(iris$Species)
+levels(iris$Species)
+as.numeric(iris$Species)
+as.character(iris$Species)
+```
+
+
+### `tibble`
+
+Dans l'univers `tidyverse`, c'est l'utilisation du type [`tibble`](http://tibble.tidyverse.org/) qui est privilégié. Pour information, la fonction `tibble()` sert à transformer un objet dans cette classe, ou à en créer un nouveau (pas vu ici).
+
+```{r}
+library(tibble)
+mtt = as_tibble(mtcars)
+mtt
+class(mtt)
+head(mtt)
+```
+
+
+## Importation de données
+
+Le `tidyverse` inclut trois packages permettant l'importation de données externes, contenues dans des fichiers (ainsi que l'exportation). Nous allons ici importer des données classiques (150 *iris* de trois espèces différentes, décrits par 4 variable), disponibles dans trois formats : [texte délimité](../donnees/Iris.txt), [Excel](../donnees/Iris.xlsx) et [SAS](../donnees/Iris.sas7bdat). Les trois fonctions qu'on va utiliser renvoient un objet de type `tibble`.
+
+### Texte délimité
+
+Pour cela, nous utilisons le package [`readr`](http://readr.tidyverse.org/), qui améliore les fonctions déjà présentes. Les nouvelles fonctions sont plutôt performantes, et *comprennent* les données, ce qui permet de limiter les besoins de paramétrisation de celles-ci.
+
+```{r}
+library(readr)
+iris_txt = read_delim("../donnees/Iris.txt", delim = "\t")
+iris_txt
+```
+
+### Fichier Excel
+
+Le package [`readxl`](http://readxl.tidyverse.org/) permet donc de lire des fichiers Excel (quelque soit le format : `xlsx` ou `xls`). La fonction `read_excel()` détecte justement le format du fichier.
+
+```{r}
+library(readxl)
+iris_xlsx = read_excel("../donnees/Iris.xlsx")
+iris_xlsx
+```
+
+### Fichier SAS
+
+Enfin, pour importer des données SAS mais aussi SPSS et Stata, il existe le package [`haven`](http://haven.tidyverse.org/), avec la fonction `read_sas()`.
+
+```{r}
+library(haven)
+iris_sas = read_sas("../donnees/Iris.sas7bdat")
+iris_sas
+```
+
+
+## Manipulation de données
+
+Pour tout ce qui est manipulation de données, au sens `SQL`, nous disposons du package [`dplyr`](http://dplyr.tidyverse.org/) qui fournit toutes les fonctions utilisées ici. Bien qu'il y ait aussi des fonctions de base dans R, ce package est préférable.
+
+Vous remarquerez l'utilisation de l'opérateur `%>%` pour enchaîner les opérations. Celui-ci est fournit par le package [`magrittr`](http://magrittr.tidyverse.org/), lui aussi dans le `tidyverse`. Ce formalisme permet d'avoir un code plus lisible, car déroulant les étapes les unes après les autres, contrairement à la programmation classique dans R.
+
+```{r}
+library(dplyr)
+```
+
+
+### Restriction et projection
+
+Ici, les deux opérations consistent respectivement à sélectionner des lignes (*restriction*) ou des colonnes (*projection*).
+
+#### Restriction par filtre
+
+```{r}
+mtcars %>% filter(mpg > 30)
+mtcars %>% filter(mpg > 30 & qsec < 19)
+mtcars %>% filter(carb == 8)
+mtcars %>% filter(between(mpg, 30, 32))
+```
+
+#### Sélection de lignes par indices
+
+```{r}
+mtcars %>% slice(1:5)
+mtcars %>% slice(25:n()) # n() indique le nombre de lignes de la table
+mtcars %>% slice(seq(1, n(), by = 4))
+```
+
+#### Projection
+
+```{r}
+head(mtcars) %>% select(mpg)
+head(mtcars) %>% select(qsec, mpg, hp)
+head(mtcars) %>% select(5, 3, 9)
+head(mtcars) %>% select(starts_with("c")) # d'autres possibilités de ce type existent (voir ?select_helpers)
+```
+
+### Tri
+
+La fonction `arrange()` permet le tri sur une ou plusieurs variables, avec `desc()` pour indiquer un ordre décroissant.
+
+```{r}
+head(mtcars) %>% arrange(mpg)
+head(mtcars) %>% arrange(am, mpg)
+head(mtcars) %>% arrange(desc(mpg))
+```
+
+### Ajout de variables
+
+Comme vous avez pu le remarquer, dans les différents exemples ci-dessus, le nom des lignes est supprimé. Pour le récupérer, nous utilisons la fonction `rownames_to_column()`, qui permet de le transformer en variable.
+
+```{r}
+head(mtcars) %>% rownames_to_column(var = "car")
+```
+
+Pour ajouter une variable, il existe la fonction `mutate()`.
+
+```{r}
+head(mtcars) %>% mutate(ratio = wt / hp, zero = 0, wt = NULL, hp = NULL)
+head(mtcars) %>% mutate(n = row_number(), rang_mpg = min_rank(desc(mpg)))
+```
+
+Si l'on veut garder uniquement la variable nouvellement créée, on utilise `transmute()`.
+
+```{r}
+head(mtcars) %>% transmute(ratio = wt / hp)
+```
+
+
+### Calcul d'agrégat
+
+Pour résumer une ou plusieurs variables, nous utilisons la fonction `summarise()`.
+
+```{r}
+mtcars %>% summarise(
+  n = n(),
+  mpg_mean = mean(mpg),
+  nbtype_carb = n_distinct(carb)
+)
+```
+
+Et si l'on souhaite effecture par groupes déterminés par les modalités d'une variable, il existe la fonction `group_by()`.
+
+```{r}
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(
+  n = n(),
+  mpg_mean = mean(mpg),
+  nbtype_carb = n_distinct(carb)
+)
+```
+
+
+### Jointure
+
+Pour tester les méthodes, nous créons une nouvelle table `engine`, indiquant le type en fonction de la valeur de `cyl`. Vous remarquerez que par rapport à `mtcars`, il y a une valeur en moins (4) et une valeur en plus (12).
+
+```{r}
+engine = tibble(
+  cyl = c(6, 8, 12),
+  type = c("medium", "big", "very big")
+)
+```
+
+Nous pouvons maintenant utiliser les différentes fonctions de jointure disponibles.
+
+```{r}
+mtcars %>% inner_join(engine)
+mtcars %>% left_join(engine)
+mtcars %>% right_join(engine)
+mtcars %>% full_join(engine)
+mtcars %>% semi_join(engine)
+mtcars %>% anti_join(engine)
+```
+
+## A Faire
+
+La base de données `Gymnase2000` contient les informations d'un (petit) club de sport. Elle contient les tables suivantes (au format SAS ici) :
+
+- [Sports](../donnees/Gymnase 2000/Gymnase2000-sas/sports.sas7bdat) : sports pratiqués
+- [Sportifs](../donnees/Gymnase 2000/Gymnase2000-sas/sportifs.sas7bdat) : sportifs inscrits
+- [Gymnases](../donnees/Gymnase 2000/Gymnase2000-sas/gymnases.sas7bdat) : gymnases utilisés
+- [Séances](../donnees/Gymnase 2000/Gymnase2000-sas/seances.sas7bdat) : séances prévues (pour un sport, et entraînées chacune par un sportif)
+- [Jouer](../donnees/Gymnase 2000/Gymnase2000-sas/jouer.sas7bdat) : qui joue à quoi ?
+- [Arbitrer](../donnees/Gymnase 2000/Gymnase2000-sas/arbitrer.sas7bdat) : qui arbitre quoi ?
+- [Entrainer](../donnees/Gymnase 2000/Gymnase2000-sas/entrainer.sas7bdat) : qui entraîne quoi ?
+
+![Schéma de Gymnase2000](../donnees/Gymnase 2000/Gymnase2000.png)
+
+Vous devez d'abord importer les données dans R, puis répondre aux demandes suivantes :
+
+1. Joueurs de moins de 30 ans
+1. Gymnases d'au moins 500 $m^2$
+1. Gymnases avec des séances le mercredi
+1. Sports joués par les moins de 30 ans
+1. Sports avec séances de l'entraineur "BOUTAHAR"
+1. Gymnases avec des séances de "Hand ball"
+1. Sportifs artbitre et entraineur du même sport
+1. Par ville, nombre et surface moyenne des gymnases
+1. Quels sports sont pratiqués à "Stains" ?
+1. Quelle est le nombre et la surface moyenne des gymnases ?
+1. Idem, en détaillant pour chaque ville.
+1. Avec ces deux requêtes, faire une seule table résultat où le global sera indiqué avec le terme "Total", en lieu et place de la ville.
+1. Quelle est la moyenne d’âge des arbitres pour chaque sport, trié par ordre décroissant de la moyenne d'âge ?
+1. Dans quels gymnases peut-on jouer au hockey le mercredi après 15H ?
+1. Quels sportifs (Identifiant et nom) ne jouent aucun sport ?
+1. Quels gymnases n'ont pas de séances le dimanche ?
+1. Quels gymnases ne proposent que des séances de basket-ball ou de volley-ball?
+1. Quels sont les gymnases de "Stains" ou de "Montmorency" qui ont la plus grande surface?
+1. Quels entraineurs n'entrainent que du hand-ball ou du basket-ball (ou les deux) ?
+1. Quelle est la liste des conseillers des joueurs de basket-ball ?
+1. Pour chaque gymnase de "Stains" donner par jour d'ouverture les horaires des premières et dernières séances
+1. Quels sont les gymnases ayant strictement plus de 1 séance le mercredi ?
+1. Dans quels gymnases et quels jours y a-t-il au moins 4 séances de volley-ball (dans la journée) ?
+
+Questions subsidiaires :
+
+1. Sportifs (id, nom, prenom) avec 3 indicateurs : le nombre de sports qu'ils jouent (table Jouer), le nombre de sports qu'ils entraînent (table Entrainer), et le nombre de sports qu'ils arbitrent (table Arbitrer) ;
+2. Gymnases (id, nom, ville) avec, pour chaque jour de la semaine (un jour = une colonne du tableau résultat), le nombre de séances prévues.
+
+
+
+

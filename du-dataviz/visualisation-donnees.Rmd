@@ -1,0 +1,596 @@
+---
+title: Visualisation de données avec **R**
+author: DU Dataviz
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.align = "center", 
+                      warning = FALSE, 
+                      message = FALSE)
+```
+
+Dans ce document est présenté un certain nombre de commandes concernant des packages **R** utiles pour la visualisation de données. Voici comment les charger :
+
+```{r librairies}
+library(tidyverse)
+library(scales)
+library(leaflet)
+library(ggmap)
+library(geojsonio)
+library(maps)
+```
+
+Le but de la visualisation de données étant de représenter graphiquement des données brutes (ou quasi-brutes), il est souvent nécessaire de prendre en compte plusieurs variables. Nous devons donc aller plus loin que les graphiques de base (nuage de points, ligne, boîte à moustache, diagramme en barres ou circulaires, ...), pour les combiner par exemple.
+
+Avec le langage de base (package `graphics` notamment), il est possible de faire des graphiques évolués, mais avec beaucoup de paramétrages *à la main*.
+
+Voici ici un exemple de graphique avancé, représentant 4 variables (trois quantitatives et une qualitative), ainsi qu'une explication succincte des différentes fonctions utilisées, et quelques paramètres de celles-ci.
+
+```{r ex-graph}
+library(RColorBrewer)
+par(family = "serif", mar = c(5, 4, 2, 0)+.1)
+couleurs_am = brewer.pal(3, "Dark2")
+plot(mpg ~ hp, 
+     data = mtcars,
+     pch = 19,
+     cex = wt/3,
+     col = couleurs_am[mtcars$am+1],
+     main = "Consommation et autres",
+     sub = "Source : 1974 Motor Trend US magazine", font.sub = 3, cex.sub = .8,
+     xlab = "Puissance (en ch)",
+     ylab = "Consommation en Miles/Galon",
+     bty = "n", axes = FALSE)
+axis(1, lwd = 0, lwd.ticks = .5)
+at.y = axis(2, lwd = 0, lwd.ticks = .5, labels = FALSE)
+text(y = at.y, x = 35, labels = at.y, srt = 0, pos = 2, xpd = TRUE)
+l1 = legend("topright", legend = c("Automatique", "Manuelle"), 
+       col = couleurs_am, bty = "n", cex = .8, pch = 19,
+       text.width = 50, text.col = couleurs_am, 
+       title = "Boîte de vitesse", title.col = "black")
+legend(l1$rect$left, l1$rect$top-l1$rect$h-1, 
+       legend = range(mtcars$wt), title = "Poids  (1000 lbs)",
+       pch = 19, pt.cex = range(mtcars$wt)/3, bty = "n", cex = .8, col = gray(.5),
+       text.width = 50, adj = -.25)
+outliers_hp = subset(mtcars, subset = hp > 250)
+text(outliers_hp$hp, outliers_hp$mpg, row.names(outliers_hp), pos = c(3, 2), cex = .8, font = 4)
+outliers_mpg = subset(mtcars, subset = mpg > 30)
+text(outliers_mpg$hp, outliers_mpg$mpg, row.names(outliers_mpg), pos = 4, cex = .8, font = 4)
+```
+
+- La fonction `par()` permet de modifier les paramètres graphiques, tel que :
+    - `mar` pour les marges
+    - `family` pour la famille de police d'écriture
+    - certains paramètres ci-après sont définissables globalement dans la fonction `par()`, ou localement dans les fonctions suivantes
+- Les paramètres de la fonction `plot()`
+    - `pch` : symbole utilisé pour chaque point (ici `19` indique un rond plein)
+    - `cex` : taille du point (ici en fonction de la variable `wt`)
+    - `col` : couleur des points (ici en fonction de la variable  `am`)
+    - `main`, `sub`, `xlab`, `ylab` : resp. titre, sous-titre, intitulé en abscisse et intitulé en ordonnée
+    - `*.sub` : indication spécifique pour le sous-titre 
+    - `bty` : type de la boîte (ici `n` veut dire rien autour du graphique)
+    - `axes` : présence ou non des axes (non ici)
+- La fonction `axis()` qui permet d'ajouter un axe (`1` : en abscisse, et `2` : en ordonnée)
+    - si rien d'indiqué pour `at`, utilisation des `ticks` par défaut
+    - `lwd` : largeur de la ligne (ici non-présente)
+    - `lwd.ticks` : largeur des ticks (asse fine ici)
+    - renvoie les valeurs des ticks
+- La fonction `text()` permet d'écrire du texte sur le graphique
+    - le `x = 35` est choisi par expérience
+    - `srt` : angle du texte
+    - `pos` : ajustement du texte par rapport aux coordonnées indiquées
+    - `xpd` : permet d'écrire en dehors du graphique (dans les marges donc)
+- La fonction `legend()` permet d'ajouter une légende
+    - position : soit $(x,y)$, soit chaîne spécifique
+    - `legend` : texte des items
+    - `col`, `bty`, `cex`, `pch` : identique à précédemment
+    - `text.width` et `text.col` : largeur du texte des items et couleur(s)
+    - `title` et `title.col` : titre de la légende (et couleur du titre)
+    - renvoie une liste avec deux objets (`rect` qui contient des infos sur le rectangle occupé par la légende dans le graphique et `text` qui contient les coordonnées du texte des items)
+    - `pt.cex` : taille des symboles
+    - `adj`: ajustement du texte
+    
+## Librairie `ggplot2`
+
+Ce package reproduit la grammaire des graphiques (cf [*Grammar of Graphics*, Leland Wilkinson](http://www.springer.com/us/book/9780387245447)), avec le même formalisme. Vous pouvez trouver plus d'informations sur le [site officiel](http://had.co.nz/ggplot2/) et la [documentation](http://docs.ggplot2.org/current/). Finalement, cet [article](http://www.tandfonline.com/doi/abs/10.1198/jcgs.2009.07098) permet de bien comprendre la philosophie du package et de la grammaire.
+
+Le principe de cette grammaire est qu'un graphique est composé de couches :
+
+- les **données** à représenter, à partir desquelles nous définissons des attributs **esthétiques** (soit identique pour tous, soit fonction d'une des variables) :
+    - les axes $x$ et $y$,
+    - la couleur
+    - la taille
+    - le symbole
+- les attributs **géométriques** (point, ligne, ...)
+- les transformations **statistiques** (dénombrement, ajustement, ...)
+- les **échelles**
+- le système de **coordonnées** (linéaire, logarithmique, polaire, ...)
+- le découpage (ou non) en **facettes**
+
+Dans cette librairie, il y a deux fonctions principales :
+
+- `qplot` (ou `quickplot`) permettant de faire des graphiques rapidement
+- `ggplot` permettant d'initialiser un graphique auquel on va ajouter des couches successivement
+
+Dans ce TP, nous n'aborderons que la deuxième fonction, plus complète.
+
+### Fonction `ggplot()`
+
+La fonction `ggplot()` permet de faire plus de choses que `qplot()` mais nécessite un formalisme plus lourd, dont voici quelques détails :
+
+- `ggplot()` créé un graphique (et le renvoie, i.e. on peut stocker un graphique dans une variable pour l'afficher plus tard, éventuellement en lui ajoutant des couches)
+- `aes()` permet de définir les aspects esthétiques (`x` et `y` principalement, mais aussi `color`, `fill`, `size`, ...)
+- `geom_xxx()` indique la représentation à choisir (`xxx` étant remplacé par `histogram`, `boxplot`, ...)
+- `stat_xxx()` indique les transformations statistiques à utiliser, si besoin
+- `scale_xxx()` s'emploie pour des changements d'échelle
+- `coord_xxx()` s'utilise pour des modifications de systèmes de coordonnées
+- `facet_xxx()` découpe les données (et donc le graphique) en plusieurs facettes selon les variables fournie dans la formule
+- `theme_xxx()`, `labs()`, `xlab()`, `ylab()`, `ggtitle()`, ... pour des améliorations du graphique (annotation, couleurs, ...)
+
+Hormis la fonction `aes()`, qui s'utilise à l'intérieur des autres, toutes ces fonctions peuvent s'additionner pour compléter le graphique.
+
+Le fonctionnement de la fonction `ggplot()` est donc particulier, mais une fois compris, il est facile de créer chaque graphique statistique que l'on souhaite. 
+
+#### Fonctionnement général
+
+Dans la suite est présentée l'utilisation de différentes fonctions à travers des exemples concrets, afin de comprendre la philosophie de cette grammaire des graphiques.
+
+Par exemple, pour décrire une variable continue par un histogramme, nous pouvons utiliser le code suivant (nous utilisons les données `diamonds` du package `ggplot2`) :
+
+```{r ggplot1-hist}
+ggplot(data = diamonds, aes(x = carat)) +
+    geom_histogram()
+```
+
+Le premier paramètre de la fonction `ggplot()` est donc le dataframe sur lequel faire le graphique (ici `diamonds`). La fonction `aes()` permet de définir les aspects esthétiques (ici la variable `carat`). Cette fonction définit les paramètres globaux du graphiques. Ensuite, nous appliquons une transformation géométrique, en calculant donc un histogramme (avec 30 intervalles par défaut), grâce à la fonction `geom_histogram()`.
+
+#### Stockage dans une variable
+
+Un des gros intérêt de la fonction `ggplot()` est le stockage du résultat dans une variable. Pour l'afficher, on peut soit appeler la variable, soit utiliser la fonction `print()` explicitement (voir ci-dessous). 
+
+```{r ggplot2-var}
+g = ggplot(data = diamonds, aes(x = carat)) +
+    geom_histogram()
+g # ou print(g)
+```
+
+L'intérêt sera de pouvoir créer des graphiques et les stocker dans un fichier `RData`, pour les afficher plus tard et/ou les modifier.
+
+#### Personnalisation du graphique
+
+##### Thème général
+
+On peut améliorer le graphique de différentes manières. Tout d'abord, il existe différents thèmes généraux (cf `?theme_grey` - ou un autre - pour voir la liste). Voici le thème `classic` et le thème `light`:
+
+```{r ggplot3-theme}
+g + theme_classic()
+g + theme_light()
+```
+
+
+##### Labels
+
+Une autre personnalisation courante est la redéfinition des labels des axes (et des légendes, comme nous le verrons plus tard), qui peut être faite avec la fonction `labs()`.
+
+```{r ggplot4-labels}
+g + labs(x = "label en x", y = "label en y")
+```
+
+##### Plus d'options
+
+Il existe beaucoup d'autres possibilités, avec la fonction `theme()` (pas d'exemple ici car complexe).
+
+#### Aspect en fonction d'une variable
+
+L'avantage de cette grammaire est de définir les paramètres du graphiques en fonction des variables. Ceci est assez évident pour les coordonnées $x$ ou $y$, mais il est aussi possible de définir la couleur, la forme, la taille, ... en fonction de variables.
+
+Ci-dessous, nous créons un diagramme en barres (avec  `geom_bar()`) sur une constante (`x = ""`). Cela a pour le moment peut d'intérêt, sauf à montrer qu'il y a plus 50000 diamants dans le jeu de données.
+
+```{r ggplot5-bar}
+ggplot(diamonds, aes(x = "")) + 
+    geom_bar()
+```
+
+Dans le dataframe `diamonds`, nous disposons de la variable qualitative `cut`. Dans la suite, nous définissons une couleur en fonction de celle-ci (avec le paramètre esthétique `fill`). Ceci nous permet d'avoir un diagramme en barres empilées.
+
+```{r ggplot6-fill}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar()
+```
+
+#### Variable spécifique (`..xxx..`)
+
+Dans le diagramme ci-dessous est présenté le dénombrement de chaque modalité de la variable. Ceci peut ne pas être particulièrement parlant, on peut préférer vouloir avoir des proportions (valeurs entre 0 et 1). C'est une bonne occasion pour utiliser les variables spécifiques créées par les fonctions de type `geom_xxx()`, qui sont de type `..xxx..`. Ici, `geom_bar()` créée la variable `..count..` qui représente le nombre de lignes pour chaque modalité. Donc, en redéfinissant les coordonnées $y$ avec le calcul $\frac{..count..}{\sum ..count..}$, nous réajustons les valeurs entre 0 et 1 (le graphique reste bien évidemment le même finalement).
+
+```{r ggplot7-var}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(aes(y = ..count../sum(..count..)))
+```
+
+#### Changement d'échelle 
+
+Maintenant que nous avons des valeurs entre 0 et 1, il peut être intéressant de les passer à des valeurs en pourcentage (entre 0 et 100 donc, et avec le sigle `%`). C'est possible avec ce qu'on va appeler un changement d'échelle, réalisable avec les fonctions de type `scale_xxx_yyy()` (ou le `xxx` représente l'aspect esthétique à modifier et `yyy` le type de cet aspect). Dans notre cas, nous allons utiliser la fonction `percent()` du package `scales` pour afficher donc des valeurs en pourcentage, plutôt qu'en proportion.
+
+```{r ggplot8-scale}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    scale_y_continuous(labels = percent)
+```
+
+#### Changement de système de coordonnées
+
+Pour continuer le tour des différentes possibilités de cette grammaire, nous allons créer maintenant un diagramme circulaire. Celui-ci peut être vu comme un diagramme en barres empilées (comme ci-dessous), avec un changement de système de coordonnées. En effet, si on considère les données en coordonnées polaires, avec la variable $y$ définissant l'angle, nous obtenons ce que nous souhaitons. Ceci est réalisable avec les fonctions de type `coord_xxx()` (ici `coord_polar()` donc, en indiquant que l'angle `theta` dépend de $y$). Nous ajoutons l'option `width = 1` dans `geom_bar()` pour éviter d'avoir un trou au milieu du cercle.
+
+```{r ggplot9-coord}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), width = 1) +
+    scale_y_continuous(labels = percent) +
+    coord_polar(theta = "y")
+```
+
+Suite à ce qu'on a vu précédemment, on peut donc avoir un graphique circulaire propre avec le code suivant.
+
+```{r ggplot10-resume}
+ggplot(diamonds, aes(x = "", fill = cut)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), width = 1) +
+    scale_fill_brewer(palette = "Set2") +
+    scale_y_continuous(labels = percent) +
+    coord_polar(theta = "y") +
+    theme_minimal() +
+    theme(axis.title = element_blank()) +
+    labs(fill = "Variable cut")
+```
+
+
+#### Superposition de graphique (geom_point, geom_smooth)
+
+Grâce à la logique de construction des graphiques, via la grammaire, il est aisé de superposer différentes représentations, simplement en ajoutant les couches. Ci-dessous, nous dessinons le nuage de points (via `geom_point()`) entre les variables `carat` et `price`. Nous ajoutons ensuite des indicateurs de valeurs sur chaque axe (avec `geom_rug()`), et la droite de régression linéaire (via `geom_smooth()` avec l'option `method = "lm"`).
+
+```{r ggplot11-superpose}
+ggplot(diamonds, aes(x = carat, y = price)) +
+    geom_point() +
+    geom_rug() +
+    geom_smooth(method = "lm", se = FALSE)
+```
+
+
+#### Faceting
+
+Pour comparer des données, il est très intéressant de faire des graphiques de type [*small multiples*](http://www.juiceanalytics.com/writing/better-know-visualization-small-multiples). L'idée est de faire un même graphique, mais pour chaque modalité d'une variable. Pour faire cela facilement avec `ggplot2`, nous disposons de deux fonctions : `facet_wrap()` et `facet_grid()`.
+
+##### avec `facet_wrap()`
+
+Cette première fonction permet de s'affranchir de la réflexion du nombre de modalités dans la variable en question. Le programme choisit lui-même ce qu'il lui semble approprié. Ci-dessous, nous représentons le nuage de points entre `carat` et `price`, mais pour chaque valeur de `cut`.
+
+```{r ggplot12a-wrap}
+ggplot(diamonds, aes(carat, price)) +
+    geom_point() +
+    facet_wrap(facets = ~ cut)
+```
+
+Si le choix ne convient pas, nous pouvons forcer le nombre colonnes avec l'option `ncol` (ou le nombre de lignes avec `nrow`), comme ci-dessous.
+
+```{r ggplot12a-wrap2}
+ggplot(diamonds, aes(carat, price)) +
+    geom_point() +
+    facet_wrap(facets = ~cut, ncol = 2)
+```
+
+##### avec `facet_grid()`
+
+Mais il est utile de forcer soit une répartition sur une même ligne de ces différents graphiques, ou sur une même colonne. Dans ce cas, nous utilisons la fonction `facet_grid()`, qui permet de déterminer explicitement comment on veut répartir les différentes facettes.
+
+Ci-dessous, nous créons les boîtes à moustaches de `carat` pour chaque modalité de `color`, et ceci pour chaque modalité de `cut`. Tout est représenté sur une même ligne.
+
+```{r ggplot12b-grid-row}
+ggplot(diamonds, aes(color, carat)) +
+    geom_boxplot() +
+    facet_grid(facets = ~ cut)
+```
+
+Pour forcer la répartition en colonne, nous inversons la formule. Ici, nous représentons l'histogramme de `carat`, pour chaque valeur de `cut` (cela permet donc de bien les comparer). Comme les effectifs ne sont pas les mêmes entre les modalités, nous décidons de laisser libre l'axe des $y$ pour mieux visualiser les répartitions, grâce à l'option `scales`.
+
+```{r ggplot12b-grid-col}
+ggplot(diamonds, aes(x = carat)) +
+    geom_histogram() +
+    facet_grid(facets = cut ~ ., scales = "free_y")
+```
+
+Bien évidemment, il est possible de combiner les deux possibilités. Par exemple, ici, nous créons le nuage de point entre `carat` et `price`, pour chaque couple de modalités des variables `color` et `cut`.
+
+```{r ggplot12b-grid-both}
+ggplot(diamonds, aes(carat, price)) +
+    geom_point() +
+    geom_smooth(method = "lm", fullrange = T) +
+    facet_grid(facets = color ~ cut)
+```
+
+
+#### Effet du placement de data et aes()
+
+Dans le graphique ci-dessous, nous ne redéfinissons jamais `x` ou  `y`. Ceux-ci ayant été définis dans la fonction `ggplot()`, les fonctions ajoutées reprennent leur définition. Mais il est possible de les définir dans chaque fonction.
+
+Pour détailler ce comportement, voici trois commandes permettant de faire strictement le même graphique (le premier produit dans le paragraphe ci-dessous).
+
+```{r ggplot13-placement, eval=FALSE}
+ggplot(diamonds, aes(x = price)) + geom_histogram()
+ggplot(diamonds) + geom_histogram(mapping = aes(x = price))
+ggplot() + geom_histogram(data = diamonds, mapping = aes(x = price))
+```
+
+Voici ce qui diffère entre ces trois versions :
+
+- Dans la première, les données seront `diamonds` pour l'ensemble des commandes ajoutées, et $x$ sera la variable `price` (sauf spécification ultérieure) ;
+- Dans la seconde, on utilisera toujours `diamonds` comme données, mais $x$ n'est défini que pour l'histogramme. On devra définir $x$ pour les fonctions ultérieures si besoin ;
+- Dans la dernière, il n'y aucune spécification de base, et chaque fonction devra déterminée quelles données prendre, ainsi que les aspects esthétiques à utiliser dans celles-ci.
+
+Ce mécanisme est particulièrement intéressant lorsque nous souhaitons utiliser plusieurs jeux de données ensemble. Dans le graphique ci-dessous, nous allons afficher trois informations différentes :
+
+- les différentes valeurs de `price` en fonction de la variable `cut`, avec un aléa sur l'axe des $x$ (avec la fonction `geom_jitter()`) ;
+- les boîtes à moustaches ;
+- un indicateur de moyenne (avec la fonction `geom_point()`) et d'écart-type (avec `geom_errorbar()`). 
+
+Pour cela, nous calculons en premier lieu la moyenne et l'écart-type de `price` pour chaque modalité de `cut`, stocké dans `df`.
+
+```{r ggplot14-df}
+df = diamonds %>%
+    group_by(cut) %>%
+    summarise(
+        mean = mean(price, na.rm = T),
+        sd = sd(price, na.rm = T)
+    )
+```
+
+```{r ggplot14-kable, echo=FALSE}
+knitr::kable(df)
+```
+
+Nous avons donc le graphique ci-dessous, produit par un code très complet.
+
+```{r ggplot14-multipledf}
+ggplot(data = diamonds, aes(x = cut, y = price, color = cut)) +
+    scale_color_brewer(palette = "Set2") +
+    scale_fill_brewer(palette = "Set2") +
+    geom_jitter(alpha = .1) +
+    geom_boxplot(mapping = aes(fill = cut), 
+                 color = "gray40", width = .5,
+                 outlier.color = "gray70") +
+    geom_errorbar(data = df, 
+                  mapping = aes(y = mean, 
+                                ymin = mean - sd, 
+                                ymax = mean + sd), 
+                  col = "steelblue", width = .4, size = 1) +
+    geom_point(data = df, 
+               mapping = aes(y = mean), 
+               col = "steelblue", size = 2) +
+    theme_classic()
+```
+
+
+#### Exemple version `ggplot`
+
+Nous pouvons maintenant reprendre le graphique fait au début, pour le recréer avec la fonction `ggplot()`. Ici, tout est automatisé (couleur, légende, labels) et le code sera beaucoup plus robuste à de nouvelles données.
+
+```{r ggplot15-amelioration}
+ggplot(mtcars %>% rownames_to_column(), 
+       aes(x = hp, y = mpg, 
+           color = factor(am, labels = c("Automatique", "Manuelle")), 
+           size = wt, 
+           label = ifelse(hp <= 250 & mpg <=30, "", rowname))) + 
+  geom_point() + 
+  geom_text(size = 3, color = "black",
+            vjust = -.75, fontface = "bold",
+            hjust="inward") +
+  ggtitle("Consommation et autres") +
+  labs(x = "Puissance (en ch)", 
+       y = "Consommation en Miles/Galon",
+       color = "Transmission", 
+       size = "Poids (1000 lbs)") +
+  theme_classic()
+```
+
+
+### Applications
+
+A partir du jeu de données [`txhousing`](), répondre aux demandes suivantes :
+
+1. Distribution de la variable `median`
+1. Idem, en fonction de l'année
+1. Lien entre `median` et `sales`
+1. Idem, en fonction du mois et de l'année
+1. Evolution globale de `median` pour l'ensemble des villes
+1. Idem, par mois avec une couleur par année
+
+## Cartographie
+
+Un des aspects intéressant dans la visualisation de données est la représentation de cartes, soit avec des marqueurs locaux (i.e. des points représentant des positions géographiques, avec des attributs esthétiques dépendant d'une variable par exemple), soit avec des *couches* représentant des zones spécifiques (pays, région, ville, avec une couleur dépendant d'une variable aussi).
+
+### Avec la librairie `leaflet`
+
+La librairie [`leaflet`](https://rstudio.github.io/leaflet/) permet de créer des cartes dans R à partir de la librairie Javascript [Leaflet](http://leafletjs.com/).
+
+Voici un premier exemple simple de création de carte du monde
+
+```{r leaflet-carte}
+m = leaflet() %>% addTiles()
+m
+```
+
+Pour laquelle il est possible de choisir la zone d’intérêt, en indiquant les latitudes et longitudes min et max.
+
+```{r leaflet-bounds}
+m %>% fitBounds(0, 40, 5, 50)
+```
+
+Il est aussi possible de préciser les coordonnées géographiques du centre de la carte, ainsi que le niveau de zoom (entre 1 - monde - et 18 - pâté de maison).
+
+```{r leaflet-setView}
+m = m %>% setView(2.268224, 48.842275, zoom = 17)
+m
+```
+
+On peut y ajouter une *pop-up* assez facilement.
+
+```{r leaflet-popup}
+m %>% addPopups(2.268224, 48.842275, "IUT Paris Descartes")
+```
+
+Ou un marqueur, pour lequel le texte s'affichera lorsque nous cliquerons sur le marqueur.
+
+```{r leaflet-marker}
+m %>% addMarkers(2.268224, 48.842275, popup = "IUT Paris Descartes")
+```
+
+Voire des formes classiques (cercle, rectangle, polygone)
+
+```{r leaflet-forme}
+m %>% addCircles(2.268224, 48.842275, radius = 100) %>% 
+    addRectangles(2.27, 48.835, 2.28, 48.84)
+```
+
+A partir du jeu de données `ozone` du package `maps`, et contenant des informations géographiques, nous allons représenter ces informations sur une carte.
+
+```{r leaflet-position-data}
+DT::datatable(head(ozone))
+```
+
+Ici, nous faisons en sorte que la taille des cercles soient dépendantes de la variable `median`, mais nous devons ajuster *à la main* pour avoir des valeurs intéressantes pour la représentation.
+
+```{r leaflet-position-circles}
+leaflet(ozone) %>% addTiles() %>% 
+    addCircles(lng = ~x, lat = ~y, radius = ~median*100)
+```
+
+### Avec la librairie `ggmap`
+
+La librairie [`ggmap`](https://github.com/dkahle/ggmap) a pour but de simplifier la cartographie, à l'aide de carte provenant de Google Maps, OpenStreetMap ou autre au choix, en y ajoutant la possibilité de rajouter des couches avec `ggplot2`.
+
+Pour cela, il faut faire deux opérations :
+
+- la première pour récupérer les tuiles de représentation des cartes (avec `get_map`())
+- la seconde pour afficher ces tuiles (avec `ggmap()`), ce qui créé un objet 
+
+```{r ggmap}
+m = get_map("Paris, France")
+ggmap(m) 
+```
+
+La fonction `qmplot()` permet de rendre invisible l'étape de récupération des tuiles, et est l'équivalent de `qplot` par rapport à `ggmap()`.
+
+```{r qmplot}
+qmplot(x, y, data = ozone, color = median)
+```
+
+On peut aussi vouloir spécifier nous-même les différentes étapes, comme ci-dessous :
+
+- récupération des tuiles de la carte, en spécifiant les limites de la zone
+- affichage de la carte et ajout des représentations géographiques comme avec `ggplot()` vu précédemment.
+
+```{r ggmap-data}
+left = min(ozone$x) - .5
+bottom = min(ozone$y) - .5
+right = max(ozone$x) + .5
+top = max(ozone$y) + .5
+m = get_map(location = c(left, bottom, right, top), 
+            maptype = "toner-lite", color = "bw")
+ggmap(m) + geom_point(data = ozone, aes(x, y, color = median))
+```
+
+
+### Applications
+
+En utilisant les données `crime` du package `ggmap`, comment représenter le nombre et les types de crime par rapport à leur localisation ?
+
+
+## Mini-projet
+
+### Introduction 
+
+Nous disposons de données d'AirBnB pour Paris à la date du 2 septembre 2015 ( [données source](http://insideairbnb.com/get-the-data.html) ). Celles-ci ont été légèrement nettoyées et réduites pour obtenir les fichiers suivants :
+
+| Fichier | Contenu |
+|:-|:-|
+`airbnb-paris-2015-09-02-summary.csv           `| Résumé à quelques informations de base |
+`airbnb-paris-2015-09-02.csv                   `| Données plus complètes |
+`airbnb-paris-2015-09-02-neighbourhoods.geojson`| Représentation graphiques des arrondissement |
+
+On commence déjà par importer ces données dans R.
+
+```{r airbnb-data}
+airbnb.summ = read.table("http://fxjollois.github.io/donnees/airBnB-2015-09-02/airbnb-paris-2015-09-02-summary.csv", 
+                         sep = ",", header = T, 
+                         quote = "\"", comment.char = "",
+                         encoding = "UTF-8")
+airbnb.comp = read.table("http://fxjollois.github.io/donnees/airBnB-2015-09-02/airbnb-paris-2015-09-02.csv", 
+                         sep = ",", header = T, 
+                         quote = "\"", comment.char = "",
+                         encoding = "UTF-8")
+```
+
+Sur ces données, il est déjà possible de représenter chaque logement par un point, assez simplement
+
+```{r airbnb-point}
+ggplot(airbnb.summ, aes(x=longitude, y=latitude)) + geom_point()
+```
+
+La librairie [`geojsonio`](https://github.com/ropensci/geojsonio) permet de lire et d'écrire des données au format [GeoJSON](http://geojson.org/geojson-spec.html), permettant de représenter des objets géographiques dans un formalisme issue de `JSON`. Il est très utilisé pour représenter des zones, telles que des villes, des pays, ... 
+
+On importe donc les données des arrondissements. La fonction `fortify()` de `ggplot2` nous permet ici de passer à un format lisible pour `ggplot()`.
+
+```{r airbnb-geo}
+airbnb.neigh = geojson_read("http://fxjollois.github.io/donnees/airBnB-2015-09-02/airbnb-paris-2015-09-02-neighbourhoods.geojson", what = "sp")
+airbnb.neigh.for = fortify(airbnb.neigh)
+ggplot(airbnb.neigh.for, aes(long, lat, group=group)) +
+    geom_polygon(color = "white")  + theme_void()
+```
+
+Le problème dans notre cas est que les quartiers ne sont pas classés dans un ordre spécifique dans les données, et que l'objet `airbnb.neigh` ne comporte plus le nom du quartier, ce qui va nous empêcher de faire le lien avec les autres données. Le code suivant permet donc de récupérer l'ordre des quartiers et de le stocker dans un `data.frame`. On lit différemment le jeu de données.
+
+```{r airbnb-order}
+df = geojson_read("http://fxjollois.github.io/donnees/airBnB-2015-09-02/airbnb-paris-2015-09-02-neighbourhoods.geojson")
+airbnb.neigh.ord = data.frame(
+    id = as.character(0:19),
+    neighbourhood = sapply(df$features, function(f) return(f$properties$neighbourhood))
+)
+airbnb.neigh.ord
+```
+
+Il peut être intéressant de calculer le centre de chaque quartier, pour pouvoir l'ajouter sur la carte par la suite. Pour cela, nous prenons la moyenne entre la latitude (et resp. la longitude) minimale et maximale.
+
+```{r airbnb-center}
+airbnb.neigh.cen = airbnb.neigh.for %>% 
+  group_by(id) %>% 
+  summarise(
+    long = mean(range(long, na.rm = T)),
+    lat = mean(range(lat, na.rm = T))
+  ) %>%
+  inner_join(airbnb.neigh.ord)
+ggplot(airbnb.neigh.for, aes(long, lat, group=group)) +
+    geom_polygon(fill = "gray70", color = "gray50") +
+    geom_text(data = airbnb.neigh.cen, aes(label = neighbourhood, group=id)) + theme_void()
+```
+
+Au final, on peut faire une carte des arrondissements, en y ajoutant le nom du voisinage, les points des logements et une couleur pour chaque arrondissement dépendant de la variable `group` par exemple (on pourra utiliser ce schéma pour représenter des informations statistiques par exemple)
+
+```{r airbnb-tout}
+ggplot(airbnb.neigh.for) +
+    geom_polygon(aes(long, lat, group=group, fill=id), color="gray50") +
+    geom_point(data=airbnb.summ, aes(longitude, latitude), col="gray30", alpha=.25) +
+    geom_text(data=airbnb.neigh.cen, aes(long, lat, label=neighbourhood, group=id)) + 
+    theme_void() + theme(legend.position="none")
+```
+
+### Questions
+
+1. Représenter les logements sur la carte de Paris
+2. Représenter les quartiers sur la carte de Paris
+3. Représenter ces deux informations sur la carte de Paris, avec pour la première
+    - soit du point par point
+    - soit avec une *heatmap*
+4. Représenter le nombre de logements par quartier
+4. Idem pour le prix moyen
+

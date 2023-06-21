@@ -1,0 +1,61 @@
+---
+title: "TP3 - exemple d'interaction"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+# Interaction {data-orientation=columns}
+
+## col 1
+
+### Choix
+
+```{r}
+sliderInput("val", "Votre choix", min = 0, max = 100, value = 50)
+```
+
+## col 2
+
+### Résultat via `gauge`
+
+```{r}
+renderGauge({
+  gauge(input$val, 0, 100, symbol = "%", 
+        sector = gaugeSectors(success = c(80, 100), 
+                              warning = c(40, 79), 
+                              danger = c(0, 39),
+                              colors = c("green", "orange", "red")))
+})
+```
+
+### Résultat via `valueBox`
+
+```{r}
+renderValueBox({
+  couleur = ifelse(input$val < 40, 
+                   "red", 
+                   ifelse(input$val < 80, "orange", "green"))
+  icone = ifelse(input$val < 40, 
+                 "fa-thumbs-down", 
+                 ifelse(input$val < 80, "fa-exclamation", "fa-thumbs-up"))
+  valueBox(input$val, icon = icone, color = couleur)
+})
+```
+
+### Résultat via `table` 
+
+```{r}
+renderTable({
+  data.frame(
+    Valeur = input$val
+  )
+})
+```
+

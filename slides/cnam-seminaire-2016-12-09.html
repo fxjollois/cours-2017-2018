@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Co-clustering de données fonctionnelles</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Co-clustering de données fonctionnelles',
+                        subtitle: 'Application à des données de consommation électrique',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                      },
+
+      // Author information
+      presenters: [
+            {
+        name:  'FX Jollois' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style>
+  slide img {
+  	max-width: 100%;
+  }
+  </style>
+  <link href="libs/ioslides-13.5.1/fonts/fonts.css" rel="stylesheet" />
+  <link href="libs/ioslides-13.5.1/theme/css/default.css" rel="stylesheet" />
+  <link href="libs/ioslides-13.5.1/theme/css/phone.css" rel="stylesheet" />
+  <script src="libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+  <script src="libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+  <script src="libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+  <script src="libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+  <script src="libs/ioslides-13.5.1/js/hammer.js"></script>
+  <script src="libs/ioslides-13.5.1/js/slide-controller.js"></script>
+  <script src="libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+  </style>
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+            <p style="margin-top: 6px; margin-left: -2px;">CNAM - Décembre 2016</p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Plan</h2></hgroup><article  id="plan">
+
+<ol>
+<li>Contexte</li>
+<li>Classification ?
+
+<ol>
+<li>Introduction</li>
+<li>Modèle de mélange simple</li>
+<li>Algorithmes classiques</li>
+</ol></li>
+<li>Dans notre cas ?
+
+<ol>
+<li><em>Latent Block Model</em></li>
+<li>Algorithme <em>SEM-Gibbs</em></li>
+<li>Choix du modèle</li>
+</ol></li>
+<li>Application sur des données EDF</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Données</h2></hgroup><article  id="donnees">
+
+<p><strong>Données</strong> : séries temporelles, pour plusieurs individus et plusieurs unités temporelles (jours, semaine, mois, &#8230;), avec plusieurs mesures par unités.</p>
+
+<p><img src="cnam-seminaire-2016-12-09_files/figure-html/unnamed-chunk-2-1.png" width="720" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>But 1</h2></hgroup><article  id="but-1">
+
+<p>Trouver une partition optimale en lignes (sur les individus) et en colonnes (sur les unités de temps)</p>
+
+<p><img src="cnam-seminaire-2016-12-09_files/figure-html/unnamed-chunk-3-1.png" width="720" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>But 2</h2></hgroup><article  id="but-2">
+
+<p>Décrire la partition obtenue en terme de courbe moyenne pour mieux comprendre les différences entre les classes</p>
+
+<p><img src="cnam-seminaire-2016-12-09_files/figure-html/unnamed-chunk-4-1.png" width="720" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Classification</h2></hgroup><article  id="classification">
+
+<ul>
+<li>Réduction d&#39;un nuage de points d’un espace quelconque en un ensemble de représentants moins nombreux</li>
+<li>Représentation simplifiée des données initiales : Méthode de réduction des données</li>
+<li>Applications nombreuses</li>
+<li>Deux grandes familles de classification :
+
+<ul>
+<li>par partitionnement</li>
+<li>par hiérarchie</li>
+</ul></li>
+</ul>
+
+<p><em>Notation</em> : Soit \(x\) une matrice de données \(n \times d\) définie par \(x = {x^j_i ; i \in I; j \in J}\), où \(I\) est un ensemble de \(n\) objets (lignes, observations, instances, individus) et \(J\) est un ensemble de \(d\) variables (colonnes, attributs).</p>
+
+</article></slide><slide class=''><hgroup><h2>Partition</h2></hgroup><article  id="partition">
+
+<p><strong>Définition</strong> : Une partition de \(I\) en \(s\) classes (\(s\) est supposé connu) est un ensemble de parties non vides \(z_1,\dots,z_s\) vérifiant :</p>
+
+<ul>
+<li>\(\forall k, k&#39; = 1,\ldots,s , k \neq k&#39;, z_k \cap z_{k&#39;} = \emptyset\),</li>
+<li><p>\(\cup^s_{k = 1} z_k = I\)</p></li>
+<li>Nombre de partitions possibles très important
+
+<ul>
+<li>1701 partitions possibles de 8 objets répartis en 4 classes</li>
+</ul></li>
+<li>Meilleure partition : problème très complexe</li>
+<li><p>Partition optimale localement</p></li>
+</ul>
+
+<blockquote>
+<p>On se place ici dans le cadre de partitions dites non-recouvrantes : un individu appartient à une et une seule classe</p>
+</blockquote>
+
+</article></slide><slide class=''><hgroup><h2>Partitionnement</h2></hgroup><article  id="partitionnement">
+
+<ul>
+<li>Classification directe</li>
+<li>Algorithme typique
+
+<ol>
+<li>Initialisation : \(s\) points tirés au hasard pour les centres de gravité de chaque classe,</li>
+<li>Affectation : On affecte les points à la classe la plus proche,</li>
+<li>Représentation : On recalcule les nouveaux centres de gravité,</li>
+<li>On répète les étapes d’affectation et de représentation jusqu’à la convergence de l’algorithme (i. e. plus de changement de le partition).</li>
+</ol></li>
+<li>Résultats dépendant de l&#39;initialisation</li>
+<li>Nombre de classes devant être connu</li>
+<li>Complexité linéaire</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Modèles de mélange</h2></hgroup><article  id="modeles-de-melange">
+
+<ul>
+<li>Distribution de probabilité : mélange de \(s\) distributions associées aux classes</li>
+<li>Cas d’une variable continue, avec deux classes présentes</li>
+</ul>
+
+<p><img src="cnam-seminaire-2016-12-09_files/figure-html/ex-modele-1.png" width="768" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Densité de probabilité</h2></hgroup><article  id="densite-de-probabilite">
+
+<ul>
+<li>Tableau de données \(x\) considéré comme échantillon \((x_1, \ldots,x_n)\) i.i.d. de taille \(n\) d’une variable aléatoire avec la densité \(\varphi(x,\theta)\) définie par : \[
+\varphi(x_i;\theta) = \sum_{k=1}^s p_k \varphi_k (x_i;\alpha_k)
+\]</li>
+<li>\(\varphi_k(x_i, \alpha_k)\) : densité de probabilité de la classe \(k\)</li>
+<li>\(p_k\) : probabilité qu’un élément de l’échantillon suive la loi \(\varphi_k\) (proportions du mélange)
+
+<ul>
+<li>\(\forall k=1,\ldots,n, p_k \in ]0,1[\)</li>
+<li>\(\sum_{k=1}^s p_k = 1\)</li>
+</ul></li>
+<li>\(\theta = (p_1, \ldots ,p_s; \alpha_1, \ldots ,\alpha_s)\) : paramètre du modèle de mélange</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Vraissemblance</h2></hgroup><article  id="vraissemblance">
+
+<ul>
+<li>Problème statistique : estimer les proportions des composants ( les \((p_k)\)) et les paramètres (les \((\alpha_k)\))</li>
+<li>Utilisation de la log-vraisemblance : \[
+L(x_1,\ldots,x_n;\theta) = \sum_{i=1}^n \log \left( \sum_{k=1}^s p_k \varphi_k (x_i;\alpha_k) \right)
+\]</li>
+<li>Pour la classification, chaque \(x_i\) appartiendra à une classe \(k\), tel que \(z_{ik} = 1\) (et 0 sinon)</li>
+<li>Log-vraissemblance complétée (ou classifiante) : \[
+L_c(x_1,\ldots,x_n; z, \theta) = \sum_{i=1}^n \sum_{k=1}^s z_{ik} \log\left( p_k \varphi_k (x_i;\alpha_k) \right)
+\]</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Trois approches</h2></hgroup><article  id="trois-approches">
+
+<ul>
+<li>Approche <strong>Estimation</strong>
+
+<ul>
+<li>Estimation des paramètres du mélange</li>
+<li>Déduction de la partition, avec la méthode du maximum a posteriori <em>MAP</em></li>
+<li>Maximisation de la log-vraisemblance \(L(x; \theta)\)</li>
+<li>Utilisation de l&#39;algorithme <strong>EM</strong></li>
+</ul></li>
+<li>Approche <strong>Classification</strong>
+
+<ul>
+<li>Estimation conjointe des paramètres et de la partition</li>
+<li>Maximisation de la log-vraisemblance classifiante \(L_C(x; z, \theta)\)</li>
+<li>Utilisation de l&#39;algorithme <strong>CEM</strong></li>
+</ul></li>
+<li>Approche <strong>Stochastique</strong>
+
+<ul>
+<li>Tirage aléatoire de la partition</li>
+<li>Utilisation de l&#39;algorithme <strong>SEM</strong></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Algorithme <em>EM</em></h2></hgroup><article  id="algorithme-em">
+
+<ul>
+<li><strong>EM</strong> : <em>Estimation-Maximisation</em></li>
+<li>Algorithme :
+
+<ol>
+<li>Déterminer une situation initiale</li>
+<li><strong>Estimation</strong> des probabilités a posteriori \[
+t_{ik} = \frac{p_k \varphi_k (x_i;\alpha_k)}{\sum_{\ell=1}^s p_\ell \varphi_\ell (x_i;\alpha_\ell)}
+\]</li>
+<li><strong>Maximisation</strong> : calcul des paramètres du mélange \[
+\begin{aligned}
+    p_k &amp;= \frac{\sum_{i=1}^n t_{ik}}{n} \\
+    \alpha_k &amp;= \mbox{dépendant du modèle}
+\end{aligned}
+\]</li>
+<li>Itérer les étapes 2 et 3, jusqu&#39;à la convergence (évolution très faible de \(L\))</li>
+</ol></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Algorithme <em>CEM</em></h2></hgroup><article  id="algorithme-cem">
+
+<ul>
+<li><strong>CEM</strong> : <em>Classification EM</em></li>
+<li>Ajout d&#39;une étape de classification dans <strong>EM</strong>
+
+<ol>
+<li>Déterminer une situation initiale</li>
+<li><strong>Estimation</strong> des probabilités a posteriori \(t_{ik}\) (identique)</li>
+<li><strong>Classification</strong> des individus avec la méthode du <em>MAP</em> \[
+z_k = \{ i | t_{ik} = max_{\ell=1,\ldots,s} t_{i\ell} \}
+\]</li>
+<li><strong>Maximisation</strong> : calcul des paramètres du mélange \[
+\begin{aligned}
+    p_k &amp;= \frac{Card(z_k)}{n} \\
+    \alpha_k &amp;= \mbox{dépendant du modèle}
+\end{aligned}
+\]</li>
+<li>Itérer les étapes 2 à 4, jusqu&#39;à la convergence (évolution très faible de \(L_c\))</li>
+</ol></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Compléments</h2></hgroup><article  id="complements">
+
+<ul>
+<li>Résultats dépendant fortement de l&#39;initialisation
+
+<ul>
+<li>Lancement avec des initialisations différentes</li>
+<li>Récupération de la meilleure solution, selon \(L\) (ou \(L_c\))</li>
+<li>Initialisation de <strong>EM</strong> avec la meilleure solution de <strong>CEM</strong> (ou autre)</li>
+</ul></li>
+<li><strong>SEM</strong> :
+
+<ul>
+<li>modification de l&#39;étape de classification dans <strong>CEM</strong></li>
+<li><strong>Stochastique</strong> : affectation stochastique de la partition à partir des probabilités a posteriori</li>
+</ul></li>
+</ul>
+
+<blockquote>
+<p>Il est possible d&#39;utiliser un modèle de mélange dans le cadre de la classification simultanée des lignes et des colonnes</p>
+</blockquote>
+
+</article></slide><slide class=''><hgroup><h2>Comment faire dans notre cas ?</h2></hgroup><article  id="comment-faire-dans-notre-cas">
+
+<h3>Première idée : en 2 étapes</h3>
+
+<ol>
+<li>Partition en ligne des individus sur les séries complètes</li>
+<li>Découpage des séries résumées sur toutes les classes</li>
+</ol>
+
+<p><em>Problème</em> : on laisse de côté des détails potentiellement intéressants</p>
+
+<h3>Deuxième idée :</h3>
+
+<p>Classification simple des \(n\) * \(d\) séries</p>
+
+<p><em>Problème</em> : rien n&#39;assure que les classes soient cohérentes en terme d&#39;individus ou d&#39;unités de temps</p>
+
+</article></slide><slide class=''><hgroup><h2>Tout en une fois</h2></hgroup><article  id="tout-en-une-fois">
+
+<p>Utiliser la classification croisée (ou <em>co-clustering</em>) pour rechercher les deux partitions en même temps</p>
+
+<ul>
+<li><em>Latent Block Model</em> <span class="cite">(Govaert and Nadif 2013)</span> comme cadre global</li>
+<li><em>SEM-Gibbs</em> <span class="cite">(Govaert, Keribin, and Celeux 2010)</span> pour l&#39;estimation des paramètres</li>
+<li>Passage dans une base de fonctions</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Transformation en amont</h2></hgroup><article  id="transformation-en-amont">
+
+<p>Notons \(\mathbf{X}\) l&#39;ensemble à partitionner</p>
+
+<p>\[
+\mathbf{X} = \{x_{ij}(t)\}_{t \in [0, T]} \text{ avec } i=1,\ldots,n \text{ et } j=1,\ldots,p
+\] Chaque courbe \(x_{ij}(t)\) peut être exprimée comme une combinaison linéaire de fonctions de bases \(\{\phi\}_h\) (avec \(h=1,\ldots,m\))</p>
+
+<p>\[
+x_{ij}(t) = \sum_{h=1}^m a_{ijh} \phi_h(t)
+\]</p>
+
+<p>On a ainsi \(\mathbf{a}_{ij} = (a_{ijh})\) les coefficients de \(x_{ij}\). Nous nous baserons sur cette représentation dans la suite du travail.</p>
+
+</article></slide><slide class=''><hgroup><h2><em>Latent Block Model</em> pour données fonctionnelles</h2></hgroup><article  id="latent-block-model-pour-donnees-fonctionnelles">
+
+<p>Dans le cadre des données fonctionnelles, le modèle peut s&#39;écrire ainsi :</p>
+
+<p>\[
+\text{p}(\mathbf{\alpha};\theta) = \sum_{z \in Z} \sum_{w \in W} \text{p}(\mathbf{z};\theta) \text{p}(\mathbf{w};\theta)\text{p}(\mathbf{a}|\mathbf{z},\mathbf{w};\theta)
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Algorithme <em>SEM-Gibbs</em></h2></hgroup><article  id="algorithme-sem-gibbs">
+
+<p>A partir de paramètres initiaux et d&#39;une partition en colonnes initiale, il faut répéter les étapes suivantes un nombre d&#39;itérations prédéfinis.</p>
+
+<ul>
+<li>Etape <strong>SE</strong> : exécuter un petit nombre de fois les étapes suivantes
+
+<ul>
+<li>générer la partition en lignes, conditionnellement à la partition en colonnes</li>
+<li>générer la partition en colonnes, conditionnellement à la parition en lignes</li>
+</ul></li>
+<li>Etape <strong>M</strong>
+
+<ul>
+<li>calculer les paramètres du modèles, conditionnellement aux partitions en lignes et en colonnes</li>
+</ul></li>
+</ul>
+
+<p>Les partitions finales sont obtenues avec la méthode du <em>MAP</em> (<em>maximum a posteriori</em> - on affecte l&#39;objet à la classe à laquelle il a le plus de chance d&#39;appartenir).</p>
+
+</article></slide><slide class=''><hgroup><h2>Etape <em>SE</em></h2></hgroup><article  id="etape-se">
+
+</article></slide><slide class=''><hgroup><h2>Etape <em>M</em></h2></hgroup><article  id="etape-m">
+
+</article></slide><slide class=''><hgroup><h2>Choix du modèle</h2></hgroup><article  id="choix-du-modele">
+
+<p>ICL-BIC</p>
+
+<p>\[
+\text{ICL-BIC}(K, L) = \log \text{p}(\mathbf{x}, \hat{\mathbf{v}},\hat{\mathbf{w}}; \hat{\theta}) - \frac{K - 1}{2} \log n - \frac{L - 1}{2} \log p - \frac{K L \nu}{2} \log (np)
+\]</p>
+
+<p>Avec \(\nu = md + d + 1\) nombre de paramètres continues par bloc et</p>
+
+<p>\[
+\log \text{p}(\mathbf{x}, \hat{\mathbf{v}},\hat{\mathbf{w}}; \hat{\theta}) = \prod_{ik} \hat{z}_{ik} \log \alpha_k + \prod_{j\ell} \hat{w}_{j\ell} \log \beta_\ell +
+\sum_{ijk\ell} \hat{z}_{ik} \hat{w}_{j\ell} \log \text{p}(\mathbf{a}_{ij} ;
+\hat{\theta}_{k\ell})
+\]</p>
+
+<p>The value of K, L leading to the highest ICL-BIC have to be selected</p>
+
+</article></slide><slide class=''><hgroup><h2>References</h2></hgroup><article  id="references" class="unnumbered">
+
+<div id="refs" class="references">
+<div id="ref-govnad2013">
+<p>Govaert, and Nadif. 2013. <em>Co-Clustering</em>.</p></div>
+
+<div id="ref-govkercel2010">
+<p>Govaert, Keribin, and Celeux. 2010. “Estimation d’un Modèle à Blocs Latents Par L&#39;algorithme <em>SEM</em>.” <em>42èmes Journées de Statistique</em>.</p></div></div></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

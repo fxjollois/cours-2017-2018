@@ -1,0 +1,153 @@
+---
+title: "Interactive analysis"
+subtitle: Statistical Programming using `R`
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      results = 'markdown')
+library(markdown)
+inclure <- function(fichier) {
+    name = tail(strsplit(fichier, "/")[[1]], 1)
+    tags$div(
+        tags$ul(tags$li(tags$a(tags$code(name), href = fichier))),
+        tags$pre(tags$code(includeText(fichier)),
+             class = "r")
+    )
+}
+```
+
+We present in this section the `shiny` package, which allows us to create web application (local to a computer, local into an inside network, or online).
+
+```{r, echo=TRUE}
+library(shiny)
+```
+
+We see in the previous sessions that it is a diffuclt task to analysis deeply some datasets, when we produce a lot of tables and graphics. A good way to tackle this problem is to create a (simple) application, which allows us to interact with data and methods. 
+
+## Web application
+
+To create a web application with `shiny`, you have to create a specific folder with specifics files:
+
+- *one file app*: file named `app.R`
+- *two files app*: files names `server.R` and `ui.R` 
+
+I prefer the second choice to separate the *user interface* side (in `ui.R`) and the *server* side (in `server.R`). 
+
+Since we want an interactive application, we have to manage both sides of it:
+
+- **UI**: we explain here what is the format of our application (title, panels, ...), and the possible interactions
+    - **inputs**: parameters the user can define
+    - **outputs**: tables and graphics produce by the server
+- **Server**: we detail here how `R` produces the **outputs**, from data and **inputs** 
+
+In the following subsection are presented the contents of the two files. You can copy this to test inside **RStudio**.
+
+### First application
+
+We create a folder, names for instance `web-application`, with two files:
+
+```{r}
+inclure("stat-prog-R/web-application-1/ui.R")
+inclure("stat-prog-R/web-application-1/server.R")
+```
+
+In **RStudio**, when a file named `ui.R` or `server.R` or `app.R` is open, you get a button names *Run App*. If you click on them, you must have a new window with only the main title.
+
+The funtion `shinyUI()` define the **UI** section of an application. In this, we create a `fluidPage()`, which can contain many *panel*, as we see later.
+
+The function `shinyServer()` permits us to define a function taking `input` and `output` parameters defined in `ui.R`, to explain how **outputs** are created from data and **inputs**.
+
+If you want to run directly the application, write the following code into `R` console.
+
+```{r, eval=FALSE, echo=TRUE}
+runUrl("http://fxjollois.github.io/stat-prog-R/web-application-1.zip")
+```
+
+
+### Adding plot and table
+
+We add in the preceding application a plot and a table, without any interaction at this moment. So, we have to define the outputs in `ui.R`, with functions names `plotOutput()` for any plot, and `tableOutput()` for tables. These functions must have a parameter, which is the name of the output. 
+
+Now, in `server.R`, we define the plot and the table to produce. We use `iris` dataset, with functions `renderPlot()` for any plot, and `renderTable()` for tables.
+
+To enhance the presentation of the application, we use a `sidebarLayout` which divides the window into two sections:
+
+- `sidebarPanel()`: usually all the controls (interactions)
+- `mainPanel()`: the outputs generated from choice made by users
+
+And in the `server.R`, we compute *PCA* on the data before the definition of the server operation.
+
+```{r}
+inclure("stat-prog-R/web-application-2/ui.R")
+inclure("stat-prog-R/web-application-2/server.R")
+```
+
+If you want to run directly the application, write the following code into `R` console.
+
+```{r, eval=FALSE, echo=TRUE}
+runUrl("http://fxjollois.github.io/stat-prog-R/web-application-2.zip")
+```
+
+### Adding some interaction
+
+Now, we add interactions in the application, then the user (you or someone else if you publish your app) can interact with data. First, we add two inputs into `ui.R`:
+
+- One drop down list to chose the statistic computing in the table, with `selectInput()` function ;
+- Two groups of radio buttons to chose the dimension to plot, with `radioButtons()`.
+
+These two functions take at least three parameters:
+
+- a name, to be use in `server.R`
+- a title, placed above the drop down menu
+- a list of possible choices
+
+For `radioButtons()`, we add the parameter `inline=TRUE` to have all the button on one line.
+
+Second, we use theses inputs as object of `input` parameter in the server function, to use the user choice in the produced outputs. The value inside these inputs are *characters*.
+
+```{r}
+inclure("stat-prog-R/web-application-3/ui.R")
+inclure("stat-prog-R/web-application-3/server.R")
+```
+
+If you want to run directly the application, write the following code into `R` console.
+
+```{r, eval=FALSE, echo=TRUE}
+runUrl("http://fxjollois.github.io/stat-prog-R/web-application-3.zip")
+```
+
+### Add updates and dependencies
+
+At the end, we add in our application three upgrades:
+
+1. we update possible choices in the radio buttons according to the number of dimensions of our PCA result
+    - `ui.R`: the only choice is `0` at the beginning of the application
+    - `server.R`: we indicate the new choices (between 1 and the number of dimension in PCA) in a `observe()` function, with `updateRadioButtons()`
+2. we add dependency between `dimY` and `dimX` inputs, to change `dimY` value according to a new value of `dimX`
+    - `server.R`: we modify the selected value in `dimY` (with `updateRadioButtons()`) to the first value different from `dimX`
+3. we create a *reactive* object to get the subset of PCA dimensions
+    - `server.R`: 
+        - create a function with `reactive()` returning the subset with the two choosen dimensions
+        - get the data by using the created function in the `renderPlot()`
+
+We add some controls in the outputs to avoid error during the execution of the application.
+
+```{r}
+inclure("stat-prog-R/web-application-4/ui.R")
+inclure("stat-prog-R/web-application-4/server.R")
+```
+
+If you want to run directly the application, write the following code into `R` console.
+
+```{r, eval=FALSE, echo=TRUE}
+runUrl("http://fxjollois.github.io/stat-prog-R/web-application-4.zip")
+```
+
+### User interface
+
+We can modify the user interface in many different ways with `shiny` package. It exists also some other packages allowing us to personnalize applications (`shinydashboard`, `shinythemes`, ...)
+
+## Some work
+
+Use the `shiny` package to create an application able to help us in the clustering process of our data.

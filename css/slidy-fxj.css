@@ -1,0 +1,109 @@
+h1 {
+  color: slategrey;
+}
+
+div.titlepage h1.title {
+  font-size: 200%;
+}
+
+div.slide {
+  width: 80%;
+  margin: 0 auto;
+}
+
+div.section h1 {
+  margin-top: 25px;
+}
+
+div.dark {
+  background-color: slategrey;
+  color: white;
+}
+
+div.dark h1 {
+  color: white;
+  text-align: center;
+  width: 100%;
+}
+
+a:visited { color: darkslategrey }
+a:link { color: darkslategrey }
+a:hover { color: slategrey; text-decoration: none }
+a:active { color: slategrey; text-decoration: nonde }
+
+.toolbar a:link,
+.toolbar a:visited {
+  color: darkslategrey;
+}
+.toolbar a:active,
+.toolbar a:hover {
+  color: slategrey;
+  text-decoration: none;
+}
+
+strong {
+  color: darkred;
+}
+
+.centering {
+  margin: 0 auto;
+}
+
+.left50 {
+  float: left;
+  width: 50%;
+}
+
+.right50 {
+  float: right;
+  width: 50%;
+}
+
+.small {
+  font-size: .9em;
+}
+
+/*
+
+slide img {
+  max-width: 768px;
+  max-height: 350px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body slides > slide {
+  font-family: arial;
+}
+
+
+
+aside.gdbar {
+  background: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #3e8ac7), color-stop(100%, #3e8ac7)) no-repeat;
+  background: linear-gradient(left, #3e8ac7, #3e8ac7) no-repeat;
+}
+
+slides > slide:not(.nobackground):before {
+  background-size: 50px 50px;
+  padding-left: 50px;
+  height: 50px;
+  bottom: 5px;
+}
+
+slides > slide > hgroup + article p {
+  font-family: verdana;
+  font-weight: 300;
+  color: #ffffff;
+}
+
+.title-slide hgroup p {
+  font-family: monospace;
+  font-weight: 300;
+}
+
+div.notes {
+  color: #000000;
+}
+
+*/

@@ -1,0 +1,256 @@
+---
+title: "CAH - TD"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA)
+```
+
+Dans ce TD, nous aborderons la réalisation de la CAH sous R. Vous devez exécuter l'ensemble des commandes réalisées ici (et les comprendre), afin de pouvoir les reproduire.
+
+Nous allons utiliser d'autres packages (inclus dans le chargement du package `tidyverse`) pour réaliser les graphiques et autres tableaux, ainsi que la librairie `FactoMineR` pour la réalisation des analyses factorielles.
+
+```{r package}
+library(tidyverse)
+library(FactoMineR)
+```
+
+## Réalisation d'une CAH
+
+### Calcul de la distance
+
+Avant de calculer l'arbre hiérarchique, il nous faut calculer les distances entre les individus. Pour cela, nous utilisons la fonction `dist()`, qui renvoie la matrice de distance. Par défaut, la distance utilisée est la distance euclidienne. Le paramètre `method` permet de choisir celle-ci (`"manhattan"` pour la distance $L_1$ par exemple).
+
+```{r}
+df = head(faithful)
+d = dist(df)
+d
+```
+
+### Calcul de l'arbre
+
+La fonction `hclust()` permet de calculer le dendrogramme à partir de la matrice de distance. Par défaut, la méthode utilisée est le lien complet. C'est le paramètre `method` qui permet de définir le critère d'agrégation que l'on veut (par exemple `single` pour lien simple ou `ward.D2` pour le critère de Ward).
+
+```{r}
+a = hclust(d)
+a
+```
+
+### Représentation de l'arbre
+
+Pour visualiser l'abre, on utilise la fonction `plot()`.
+
+```{r}
+plot(a)
+```
+
+On peut choisir de faire démarrer les feuilles sur la même ligne avec le paramètre `hang`, comme ci-dessous.
+
+```{r}
+plot(a, hang = -1)
+```
+
+### Découpage de l'arbre
+
+Si l'on veut la partition obtenue en découpant l'arbre en $K$ classes, on doit utiliser la fonction `cutree()`, en indiquant le nombre de classes voulu avec le paramètre `k`.
+
+```{r}
+z = cutree(a, k = 2)
+z
+```
+
+On peut aussi définir une valeur de découpe avec le paramètre `h`.
+
+```{r}
+z = cutree(a, h = 25)
+z
+```
+
+### Description des classes
+
+Une partition peut être vue comme une nouvelle variable qualitative de notre jeu de données. Nous pouvons donc calculer des caractéristiques statistiques des autres variables (qui ont servi à faire la CAH ou non) pour décrire les variables.
+
+Dans notre cas, nous allons calculer les moyennes des deux variables pour chaque classe.
+
+```{r}
+df %>%
+  mutate(classe = z) %>%
+  group_by(classe) %>%
+  summarise(
+    nb_individus = n(),
+    waiting = mean(waiting),
+    eruptions = mean(eruptions)
+  )
+```
+
+
+### Représentation des classes
+
+Une fois le nombre de classes (ou la hauteur) choisi, on peut afficher les classes sur le dendrogramme à l'aide de la fonction `rect.hclust()`.
+
+```{r}
+par(mfrow = c(1, 2))
+plot(a)
+rect.hclust(a, k = 2)
+plot(a)
+rect.hclust(a, h = 25)
+```
+
+Il est aussi d'usage de représenter les individus avec une couleur par classe. Ici, puisque nous avons uniquement 2 variables, nous allons nous contenter de faire le nuage de points avec donc une couleur en fonction de la classe.
+
+Avec la fonction `plot()` de base :
+
+```{r}
+plot(df, col = rainbow(2)[z], pch = 19)
+```
+
+Avec `ggplot()` :
+
+```{r}
+df %>%
+  mutate(classe = z) %>%
+  ggplot(aes(waiting, eruptions, col = factor(z))) +
+  geom_point(size = 4) +
+  theme_classic()
+```
+
+Toutefois, si nous avions eu plus de variables, deux possibilités s'offrent à nous :
+
+- représenter l'ensemble des nuages de points possibles (possible si nombre de variables peu importants) ,
+- représenter la partition sur les premiers axes d'une ACP.
+
+### Application sur les données complètes
+
+Nous allons appliquer la CAH sur les données `faithful` complètes. Puisque les deux variables présentes n'ont pas la même distribution, nous allons normaliser les variables avant le calcul de la distance. Sans cette étape, la variable `waiting` prendrait toute l'importance.
+
+Nous allons tester deux distances (euclidienne - par défaut, et manhattan), ainsi que trois méthodes (lien complet - par défaut, lien simple et critère de Ward).
+
+Le code ci-dessus permet donc de créer les 6 arbres voulus.
+
+```{r}
+faithful_scale = scale(faithful)
+d_euc = dist(faithful_scale)
+a_euc_complet = hclust(d_euc)
+a_euc_simple = hclust(d_euc, method = "single")
+a_euc_ward = hclust(d_euc, method = "ward.D2")
+d_man = dist(faithful_scale, method = "manhattan")
+a_man_complet = hclust(d_man)
+a_man_simple = hclust(d_man, method = "single")
+a_man_ward = hclust(d_man, method = "ward.D2")
+```
+
+Et ce code permet de les visualiser.
+
+```{r}
+par(mfrow = c(2, 3), mar = c(2, 2, 2, 0) + .1)
+plot(a_euc_complet, labels = FALSE, main = "euclidien - complet")
+plot(a_euc_simple, labels = FALSE, main = "euclidien - simple")
+plot(a_euc_ward, labels = FALSE, main = "euclidien - ward")
+plot(a_man_complet, labels = FALSE, main = "manhattan - complet")
+plot(a_man_simple, labels = FALSE, main = "manhattan - simple")
+plot(a_man_ward, labels = FALSE, main = "manhattan - ward")
+```
+
+Pour récupérer les 6 partitions, nous utilisons donc la fonction `cutree()` comme ci-dessous.
+
+```{r}
+z_euc_complet = cutree(a_euc_complet, k = 2)
+z_euc_simple = cutree(a_euc_simple, k = 2)
+z_euc_ward = cutree(a_euc_ward, k = 2)
+z_man_complet = cutree(a_man_complet, k = 2)
+z_man_simple = cutree(a_man_simple, k = 2)
+z_man_ward = cutree(a_man_ward, k = 2)
+```
+
+Bien que les arbres soient tous différents, les 6 partitions semblent toutes identiques ici. Ce phénomène est assez rare toutefois.
+
+```{r}
+coul = c("orange", "steelblue")
+par(mfrow = c(2, 3), mar = c(2, 2, 2, 0) + .1)
+plot(faithful, col = coul[z_euc_complet], 
+     pch = 19, main = "euclidien - complet")
+plot(faithful, col = coul[z_euc_simple], 
+     pch = 19, main = "euclidien - simple")
+plot(faithful, col = coul[z_euc_ward], 
+     pch = 19, main = "euclidien - ward")
+plot(faithful, col = coul[z_man_complet], 
+     pch = 19, main = "manhattan - complet")
+plot(faithful, col = coul[z_man_simple], 
+     pch = 19, main = "manhattan - simple")
+plot(faithful, col = coul[z_man_ward], 
+     pch = 19, main = "manhattan - ward")
+```
+
+## Application sur les résultats d'une méthode factorielle
+
+Comme déjà évoqué dans les précédents cours et TD, il est possible de réaliser une classification sur les axes factorielles obtenus avec soit une ACP, soit une ACM.
+
+Dans le cadre d'une CAH sur une ACP, l'idée est de pouvoir limiter le *bruit* dans les données, en ne sélectionnant que les axes les plus informatifs.
+
+Dans le cadre d'une CAH sur une ACM, l'idée est ici de pouvoir réaliser effectivement une classification, car nous n'avons pas à notre disposition (dans R de base) d'outils pour calculer des distances entre individus décrits par des variables qualitatives.
+
+On peut aussi réaliser une CAH sur les résultats d'une AFC faite sur des données quantitatives positives.
+
+### Sur une ACP
+
+En appliquant une ACP sur les données `faithful`, on s'aperçoit que le premier axe explique à lui seul 95% de l'information. Nous allons donc réaliser la CAH uniquement sur cet axe. Dans ce cas, nous utilisons très généralement le critère de Ward sur les distances euclidiennes.
+
+```{r}
+par(mar = c(2, 2, 2, 0) + .1, mfrow = c(1, 2))
+acp = PCA(faithful, graph = F)
+a_acp = hclust(dist(acp$ind$coord[,1]), "ward.D2")
+z_acp = cutree(a_acp, 2)
+plot(a_acp, labels = FALSE, hang = -1, main = "Sur 1er axe ACP")
+plot(faithful, col = coul[z_acp], pch = 19)
+```
+
+### Sur une ACM
+
+Ici, pour avoir un maximum d'information, nous choissisons de garder 6 axes, ce qui représente plus de 80% de l'information (81.7% exactement).
+
+```{r}
+par(mar = c(2, 2, 2, 0) + .1, mfrow = c(1, 2))
+data(poison)
+acm = MCA(poison[,5:15], graph = FALSE, ncp = 6)
+a_acm = hclust(dist(acm$ind$coord[,1:6]), "ward.D2")
+z_acm = cutree(a_acm, 2)
+plot(a_acm, labels = FALSE, hang = -1, main = "Sur ACM")
+plot(acm$ind$coord, col = coul[z_acm], pch = 19)
+```
+
+
+## A faire
+
+La [banque mondiale](http://www.banquemondiale.org) fournit un grand nombre de données, dont des indicateurs de gouvernance au niveau mondial (voir [ici](https://data.worldbank.org/data-catalog/worldwide-governance-indicators)). Le code ci-dessous importe les données du fichier [`WGI_Data.csv`](WGI_Data.csv) (que vous devez donc télécharger) pour les importer. Les informations concernant la définition des indicateurs et leur source se trouvent dans le fichier [`WGI_Definition and Source.csv`](WGI_Definition and Source.csv).
+
+```{r wgi}
+wgi.m = read_csv("WGI_Data.csv", quote = '"') %>%
+  mutate_at("Value", funs(as.numeric))
+wgi = wgi.m %>% 
+  select(`Country Name`, `Series Code`, Value) %>% 
+  spread(`Series Code`, Value) %>%
+  rename_at(vars(ends_with("EST")), funs(sub(".EST", "", .)))
+```
+
+
+```{r wgikable, echo=FALSE}
+knitr::kable(head(wgi), digits = 2)
+```
+
+Vous devez donc réaliser les étapes suivantes :
+
+- Réaliser la CAH, avec la distance euclidienne et comme critère d'agrégation :
+    - lien complet
+    - lien simple
+    - critère de Ward
+- Visualiser les arbres hiérarchiques et choisir un nombre de classes
+- Décrire les classes ainsi obtenues pour chaque critère
+- Réaliser une ACP pour visualiser les partitions obtenues sur le premier plan factoriel
+- Comparer les partitions obtenues
+- Réaliser une CAH (avec distance euclienne et critère de Ward) sur les premiers axes de l'ACP
+    - déterminer le nombre de classes idéal
+    - comparer la partition avec les autres
+

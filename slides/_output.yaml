@@ -1,0 +1,6 @@
+ioslides_presentation:
+  widescreen: true
+  self_contained: false
+  lib_dir: libs
+  include:
+    in_header: include/in_header.html

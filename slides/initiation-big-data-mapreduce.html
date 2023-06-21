@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Map-Reduce</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Map-Reduce',
+                        subtitle: 'Initiation au Big Data',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                      },
+
+      // Author information
+      presenters: [
+            {
+        name:  'FX Jollois' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style>
+  slide img {
+  	max-width: 100%;
+  }
+  </style>
+  <link href="libs/ioslides-13.5.1/fonts/fonts.css" rel="stylesheet" />
+  <link href="libs/ioslides-13.5.1/theme/css/default.css" rel="stylesheet" />
+  <link href="libs/ioslides-13.5.1/theme/css/phone.css" rel="stylesheet" />
+  <script src="libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+  <script src="libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+  <script src="libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+  <script src="libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+  <script src="libs/ioslides-13.5.1/js/hammer.js"></script>
+  <script src="libs/ioslides-13.5.1/js/slide-controller.js"></script>
+  <script src="libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+  </style>
+
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Présentation de MapReduce</h2></hgroup><article  id="presentation-de-mapreduce">
+
+<ul>
+<li>Framework développé par Google</li>
+<li>Permet l&#39;écriture simple de programmes sur des clusters informatiques (possiblement très gros)</li>
+<li>Idée de base de la parallélisation des tâches : diviser pour régner</li>
+<li>2 étapes donc :
+
+<ol>
+<li>Etape 1 (<strong>Map</strong>) :
+
+<ul>
+<li>Diviser le travail à faire en plusieurs tâches</li>
+<li>Réaliser les tâches en parallèle</li>
+</ul></li>
+<li>Etape 2 (<strong>Reduce</strong>) :
+
+<ul>
+<li>Récupérer les différents résultats</li>
+<li>Regrouper ceux-ci pour obtenir le résultat final</li>
+</ul></li>
+</ol></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Paradigme de MapReduce</h2></hgroup><article  id="paradigme-de-mapreduce">
+
+<p>Le framework MapReduce est constitué de :</p>
+
+<ul>
+<li>un seul <em>JobTracker</em>, qui sera le chef d&#39;orchestre :
+
+<ul>
+<li>programmation (<em>scheduling</em>) des jobs aux musiciens</li>
+<li>gestion des défaillances de ceux-ci</li>
+</ul></li>
+<li>un <em>TaskTracker</em> par noeud du cluster, qui sera un musicien :
+
+<ul>
+<li>exécution des tâches demandés par le chef</li>
+</ul></li>
+</ul>
+
+<p>Le travail se fait exclusivement sur des paires \(&lt;key, value&gt;\)</p>
+
+<ul>
+<li>Entrées : ensemble de paires \(&lt;key, value&gt;\)</li>
+<li>Sorties d&#39;un job : paires \(&lt;key, value&gt;\)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Schéma de MapReduce</h2></hgroup><article  id="schema-de-mapreduce">
+
+<p><img src="Mapreduce.png" style="margin: 0 auto;" width="673"></p>
+
+<div class="footnote">
+Source : <a href="http://commons.wikimedia.org/wiki/File:Mapreduce.png" target="_blank">http://commons.wikimedia.org/wiki/File:Mapreduce.png</a></div>
+
+</article></slide><slide class=''><hgroup><h2>Etapes Map et Reduce</h2></hgroup><article  id="etapes-map-et-reduce">
+
+<p>Comme indiqué, cela s&#39;articule autour de deux grandes étapes (<strong>Map</strong> et <strong>Reduce</strong>) :</p>
+
+<ul>
+<li>Etape <strong>Map</strong> :
+
+<ul>
+<li>réalisé dans chaque noeud du cluster</li>
+<li>souvent un seul des deux paramètres intéressant</li>
+<li>calcule une liste de couples \(&lt;key, value&gt;\)</li>
+</ul></li>
+<li>Etape <strong>Reduce</strong> :
+
+<ul>
+<li>traitement sur les valeurs (\(value\)) pour chaque \(key\)</li>
+<li>travail possible en parallèle</li>
+<li>tous les couples avec le même \(key\) arrivent au même <em>worker</em></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Exemple basique : comptage de mots</h2></hgroup><article  id="exemple-basique-comptage-de-mots">
+
+<p>Deux fonctions à écrire : <code>map(key, value)</code> et <code>reduce(key, value)</code></p>
+
+<pre class = 'prettyprint lang-{js}'>map(string key, string value) {
+    // key: document name
+    // value: document contents
+    for each word w in value 
+        emit &lt;w, 1&gt;
+}
+
+reduce(string key, list value) {
+    // key: word
+    // value: list of each word appareance
+    sum = 0
+    for each v in value
+        sum = sum + v
+    emit &lt;key, sum&gt;
+}</pre>
+
+<div class="footnote">
+Ceci n&#39;est pas un exemple littéral, mais une adaptation pour illustration</div>
+
+</article></slide><slide class=''><hgroup><h2>Exemple basique : comptage de mots</h2></hgroup><article  id="exemple-basique-comptage-de-mots-1">
+
+<p><img src="example-mapreduce-wordcount.png" width=100%></p>
+
+<div class="footnote">
+Source : <a href="http://blog.trifork.com/wp-content/uploads/2009/08/" target="_blank">http://blog.trifork.com/wp-content/uploads/2009/08/</a></div>
+
+</article></slide><slide class=''><hgroup><h2>Algorithme plus détaillé de MapReduce</h2></hgroup><article  id="algorithme-plus-detaille-de-mapreduce">
+
+<ul>
+<li>Lecture des entrées dans le système de fichier distribué, découpages en blocs de taille identique, et assignation de chaque bloc à un <em>worker</em></li>
+<li>Application de la fonction <code>map()</code> dans chaque <em>worker</em></li>
+<li>Distribution des résultats de <code>map()</code> (étape <strong>Shuffle</strong>) en fonction des clés</li>
+<li>Application de la fonction <code>reduce()</code> (en parallèle ou non, selon les besoins)</li>
+<li>Ecriture de la sortie dans le système de fichier distribué (généralement)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Caractéristiques</h2></hgroup><article  id="caracteristiques">
+
+<ul>
+<li>Modèle de programmation simple :
+
+<ul>
+<li>deux fonctions à écrire (<code>map()</code> et <code>reduce()</code>)</li>
+<li>indépendant du système de stockage</li>
+<li>adaptatif à tout type de données</li>
+</ul></li>
+<li>Ajout possible d&#39;une fonction <code>combine()</code> des résultats de <code>map()</code> pour les couples avec même clé</li>
+<li>Système gérant seul le découpage, l&#39;allocation et l&#39;exécution</li>
+<li>Tolérance aux défaillances (redémarrage de tâches, réaffectation)</li>
+<li>Parallélisation invisible à l&#39;utilisateur</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Quelques critiques</h2></hgroup><article  id="quelques-critiques">
+
+<ul>
+<li>Pas de garantie d&#39;être rapide : attention à l&#39;étape <em>shuffle</em> qui peut prendre du temps, et qui n&#39;est pas adaptable par l&#39;utilisateur</li>
+<li>Coût de communication pouvant être important</li>
+<li>Pas adapté à des problèmes où les données peuvent tenir en mémoire ou à un petit cluster</li>
+<li>Pas de support de langage haut niveau, tel que SQL</li>
+<li>Est une réelle nouveauté ?
+
+<ul>
+<li>Proche d&#39;autres implémentations, tel que <em>Clusterpoint</em> ou <em>MongoDB</em></li>
+<li>Facilement applicable avec PL/SQL sous <em>Oracle</em></li>
+</ul></li>
+<li>Pas optimisé au niveau des entres/sorties, et donc pas forcément adapté à un problème de <em>Machine Learning</em> dans lequel on doit régulièrement lire le même jeu de données plusieurs fois</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Implémentations</h2></hgroup><article  id="implementations">
+
+<p>Toutes <em>open source</em> et <em>forkable</em> sur GitHub</p>
+
+<ul>
+<li><strong>Hadoop</strong> <a href='http://hadoop.apache.org/' title=''>site web</a>
+
+<ul>
+<li>Framework basé sur le système de fichiers distribués <em>HDFS</em></li>
+</ul></li>
+<li><strong>CouchDB</strong> <a href='http://couchdb.apache.org/' title=''>site web</a>
+
+<ul>
+<li>BD <em>NoSQL</em>, basée sur JSON et JavaScript</li>
+</ul></li>
+<li><strong>InfiniSpan</strong> <a href='http://infinispan.org/' title=''>site web</a>
+
+<ul>
+<li>BD <em>NoSQL</em></li>
+</ul></li>
+<li><strong>MongoDB</strong> <a href='http://www.mongodb.org/' title=''>site web</a>
+
+<ul>
+<li>BD <em>NoSQL</em>, basée sur JSON et JavaScript</li>
+</ul></li>
+<li><strong>Riak</strong> <a href='http://basho.com/riak/' title=''>site web</a>
+
+<ul>
+<li>BD <em>NoSQL</em></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>D&#39;autres voies encore</h2></hgroup><article  id="dautres-voies-encore">
+
+<ul>
+<li><strong>Spark</strong> <a href='http://spark.apache.org' title=''>lien</a>
+
+<ul>
+<li>projet Apache</li>
+<li>Framework pour le calcul sur cluster informatique</li>
+</ul></li>
+<li><strong>Distributed R</strong> <a href='https://github.com/vertica/DistributedR' title=''>lien</a>
+
+<ul>
+<li>projet GitHub, mais développé par HP Vertica</li>
+<li>extension permettant de réaliser des programmes bénéficiant de la parallélisation</li>
+</ul></li>
+<li><strong>BID Data Project</strong> <a href='http://bid2.berkeley.edu/bid-data-project/' title=''>lien</a>
+
+<ul>
+<li>projet issu de Berkely, et sur GitHub</li>
+<li>dédié Machine Learning</li>
+</ul></li>
+<li>sous <strong>Python</strong> <a href='https://wiki.python.org/moin/ParallelProcessing' title=''>lien</a>
+
+<ul>
+<li>existence de plusieurs librairies permettant le travail sur plusieurs processeurs</li>
+</ul></li>
+<li><strong>Flink</strong> <a href='http://flink.incubator.apache.org/' title=''>lien</a>
+
+<ul>
+<li>projet Apache en incubation</li>
+</ul></li>
+<li><strong>H2O</strong> <a href='http://0xdata.com/h2o/' title=''>lien</a>
+
+<ul>
+<li>disponible sous GitHub, développé par 0xdata</li>
+<li>dédié Machine Learning, et interfaçable avec R</li>
+</ul></li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

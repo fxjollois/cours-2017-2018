@@ -1,0 +1,191 @@
+---
+title: "Using mixture models"
+subtitle: Statistical Programming using `R`
+---
+
+For mixture models clustering, we use the following packages:
+
+```{r, message=FALSE}
+library(mclust)
+library(Rmixmod)
+
+# We also need  
+library(ggplot2)
+```
+
+## Package `mclust`
+
+### Direct clustering
+
+In this package, the function `mclustBIC()` computes the $EM$ algorithm for many values of number of clusters (with `G` parameter, between 1 and 9 by default) and models (with `modelNames` parameter, all available models by default). It uses $BIC$ criterion to choose the best model.
+
+```{r}
+mBIC = mclustBIC(iris[-5])
+summary(mBIC)
+plot(mBIC)
+```
+
+Now, we apply `Mclust()` function to get the results of the best model.
+
+```{r}
+mBIC1 = Mclust(iris[-5], x = mBIC)
+summary(mBIC1, parameters = TRUE)
+table(mBIC1$classification)
+t(mBIC1$parameters$mean)
+plot(mBIC1, what = "classification")
+plot(mBIC1, what = "uncertainty")
+plot(mBIC1, what = "density")
+table(iris$Species, mBIC1$classification)
+```
+
+We see that the same model with 3 clusters is the second choice.
+
+```{r}
+mBIC2 = Mclust(iris[-5], G = 3, modelNames = "VEV")
+table(mBIC2$classification)
+t(mBIC2$parameters$mean)
+plot(mBIC2, what = "classification")
+table(iris$Species, mBIC2$classification)
+```
+
+
+If you prefer use the $ICL$ criterion, you can apply the `mclustICL()` function.
+
+```{r}
+mICL = mclustICL(iris[-5])
+summary(mICL)
+plot(mICL)
+```
+
+Now, we apply `Mclust()` function to get the results of the best model. But, we have to indicate *manually* the number of clusters and the model to use in the `Mclust()` function.
+
+```{r}
+mICL1 = Mclust(iris[-5], 
+               G = 2,
+               modelNames = "VEV")
+summary(mICL1, parameters = TRUE)
+table(mICL1$classification)
+t(mICL1$parameters$mean)
+plot(mICL1, what = "classification")
+table(iris$Species, mICL1$classification)
+```
+
+We can also compute some other criteria, such as $AIC$ and $AIC3$.
+
+```{r}
+G = attr(mBIC, "G")
+modelNames = attr(mBIC, "modelNames")
+d = attr(mBIC, "d")
+criterion = data.frame(G = rep(G, length(modelNames)),
+                       model = rep(modelNames, each = length(G)),
+                       AIC = NA,
+                       AIC3 = NA,
+                       stringsAsFactors = FALSE)
+for (i in 1:nrow(criterion)) {
+    m = Mclust(iris[-5], G = criterion$G[i], 
+               modelNames = criterion$model[i])
+    p = nMclustParams(criterion$model[i], d, criterion$G[i])
+    criterion[i, "AIC"] = -2 * m$loglik + 2 * p
+    criterion[i, "AIC3"] = -2 * m$loglik + 3 * p
+}
+head(criterion[order(criterion$AIC),], 3)
+ggplot(criterion, aes(G, AIC, color = model)) +
+    geom_line() +
+    scale_x_discrete(limits = G)
+head(criterion[order(criterion$AIC3),], 3)
+ggplot(criterion, aes(G, AIC3, color = model)) +
+    geom_line() +
+    scale_x_discrete(limits = G)
+```
+
+
+### Hierarchical clustering
+
+This package also contains the `hc()` function, computing a model-based hierarchical clustering. You have to specify the model to use.
+
+```{r}
+hm = hc(iris[-5], "VVV")
+hm2 = hclass(hm, 2)
+clPairs(iris[-5], cl = hm2)
+table(iris$Species, hm2)
+hm3 = hclass(hm, 3)
+clPairs(iris[-5], cl = hm3)
+table(iris$Species, hm3)
+```
+
+
+## Package `Rmixmod`
+
+In this package, the function `mixmodCluster()` apply the $EM$ algorithm (initialized by $smallEM$), with many values of number of clusters (with `nbCluster`parameter, without default value) and models (with `models` parameter, `"Gaussian_pk_Lk_C"` by default). It uses by default the $BIC$ criterion.
+
+```{r}
+mixmodBIC = mixmodCluster(iris[-5], 1:9)
+mixmodBIC
+summary(mixmodBIC)
+plot(mixmodBIC)
+hist(mixmodBIC)
+```
+
+
+If you want to use $ICL$ criterion, or even $NEC$, you have to specify it with the `criterion` parameter.
+
+```{r}
+mixmodICL = mixmodCluster(iris[-5], 1:9, criterion = "ICL")
+mixmodICL
+summary(mixmodICL)
+plot(mixmodICL)
+hist(mixmodICL)
+```
+
+If you want to test more models, you can use the `mixmodGaussianModel()` function to list them.
+
+```{r}
+mixmodGaussianModel()
+mixmodGaussianModel(family = "general")
+mixmodGaussianModel(family = "spherical", 
+                    free.proportions = FALSE)
+```
+
+Then, we test all the gaussian models. We also change the initialization strategy. By default, `mixmodCluster()` use a $smallEM$, from 50 random starts. We decide here to test $EM$ with 20 random initialization.
+
+```{r}
+mixmodAll = mixmodCluster(
+    iris[-5], 1:9,
+    criterion = c("BIC", "ICL", "NEC"),
+    models = mixmodGaussianModel(),
+    strategy = mixmodStrategy(algo = "EM",
+                              initMethod = "random",
+                              nbTry = 20))
+
+temp = sapply(attr(mixmodAll, "results"), function(mod) {
+    K = attr(mod, "nbCluster")
+    BIC = attr(mod, "criterionValue")[1]
+    ICL = attr(mod, "criterionValue")[2]
+    NEC = attr(mod, "criterionValue")[3]
+    model = attr(mod, "model")
+    return (c(K = K, model = model, BIC = BIC, ICL = ICL, NEC = NEC))
+})
+mixmodCriterion = transform(
+    data.frame(t(temp), stringsAsFactors = FALSE),
+    BIC = as.numeric(BIC),
+    ICL = as.numeric(ICL),
+    NEC = as.numeric(ICL))
+
+ggplot(mixmodCriterion, aes(K, model, fill = BIC)) + geom_bin2d()
+ggplot(mixmodCriterion, aes(K, BIC, color = model)) + 
+    stat_summary(aes(group = model), fun.y = mean, geom = "line")
+ggplot(mixmodCriterion, aes(K, model, fill = ICL)) + geom_bin2d()
+ggplot(mixmodCriterion, aes(K, ICL, color = model)) + 
+    stat_summary(aes(group = model), fun.y = mean, geom = "line")
+ggplot(mixmodCriterion, aes(K, model, fill = NEC)) + geom_bin2d()
+ggplot(mixmodCriterion, aes(K, NEC, color = model)) + 
+    stat_summary(aes(group = model), fun.y = mean, geom = "line")
+```
+
+
+## Some work
+
+Finally, we want to use these methods to search a good number of clusters for each digit in the `pendigits` data.
+
+
+

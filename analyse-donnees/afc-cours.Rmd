@@ -1,0 +1,328 @@
+---
+title: Analyse Factorielle des Correspondances (AFC)
+subtitle: DUT STID 2AFA
+author: FX Jollois
+output: 
+    slidy_presentation:
+        footer: "AFC - STID2A2"
+        css: ../css/slidy-fxj.css
+        self_contained: false
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center")
+library(formattable)
+library(tibble)
+library(tidyr)
+library(dplyr)
+
+affTable <- function (tab, nrow = 8, ncol = 8, digits = 2) {
+  formattable(
+    round(tab, digits), 
+    list(
+      area(1:nrow, 1:ncol) ~ color_tile("lightsalmon","lightblue")
+    )
+  )
+}
+```
+
+#  Que veut-on faire ?
+
+- Décrire et/ou résumer l'information contenue dans les données 
+    - Sans formuler d'hypothèses au préalable 
+- Tableau individu $\times$ variable
+    - On connaît : **ACP**
+- Table de contingence
+    - **AFC**
+- Plus largement sur un tableau de nombres non négatifs
+
+**Idée principale** : Utiliser les principes de l'ACP en utilisant une autre métrique
+
+# Table de contingence
+
+Croisement de deux variables qualitatives, représentant les effectifs de chaque couple de modalité
+
+```{r, class.output="centering"}
+formattable(as.data.frame(apply(Titanic, c(1,4), sum)),
+            table.attr = "class=\"table table-condensed centering\"")
+```
+
+Ici, nous représentons les passagers du Titanic répartis sur leur classe (1ère, 2nde, 3ème et équipage) et leur surie ou non (*i.e.* 178 passagers en 3ème classe ont survécu au naufrage).
+
+# Problème et objectifs
+
+Visualiser les liens entre les deux variables
+
+- Utiliser la représentation simultanée des deux variables pour analyser les liens entre les modalités des deux variables
+- Détection de modalités atypiques 
+- Visualiser les ressemblances entre les modalités d'une même variable
+
+**Objectifs similaires à l'ACP**
+
+# Pourquoi pas une ACP directement ?
+
+Tableau analysé :
+
+- Individus : modalités de la variable en lignes
+- Variables : madalités de la variable en colonnes
+
+Comparaison des distributions en **fréquences absolues**
+
+- Importance beaucoup trop importante d'une modalité très (trop) présente en lignes
+- On est plutôt intéressé par les **profils**
+
+# Quelques notations
+
+- $\mathbf{X}$ et $\mathbf{Y}$ : deux variables qualitatives à respectivement $p$ et $q$ modalités
+- $\mathbf{T} = (t_{ij})$, avec $i=1,\ldots,p$ et $j=1,\ldots,q$ : 
+    - nombre d'individus ayant la modalité $i$ pour $X$ et $j$ pour $Y$
+    - $\sum_{i=1}^p \sum_{j=1}^q t_{ij} = n$
+- Marge en ligne : $(t_{i.}) = \sum_{j=1}^q t_{ij}$ (effectifs des modalités de $X$)
+- Marge en colonne : $(t_{.j}) = \sum_{i=1}^p t_{ij}$ (effectifs des modalités de $Y$)
+- $\mathbf{D}_X$ et $\mathbf{D}_Y$ matrice diagonale contenant les marges en lignes et en colonnes sur la diagonale
+- Profils lignes : $\frac{t_{ij}}{t_{i.}} = P(Y=j | X=i)$, donné par $\mathbf{D}_X^{-1}\mathbf{T}$
+- Profils colonnes : $\frac{t_{ij}}{t_{.j}} = P(X=i | Y=j)$, donné par $\mathbf{T}\mathbf{D}_Y^{-1}$
+
+# Indépendance
+
+Rappel de l'Indépendance : $P(AB) = P(A)P(B)$
+
+$\chi^2$ : Mesure de l'écart à l'indépendance 
+		$$ \chi^2 (X,Y) = n \sum_{i=1}^p \sum_{j=1}^q \frac{\left( f_{ij} - f_{i.} f_{.j} \right)^2}{f_{i.} f_{.j}}$$
+
+- Si les variables sont indépendantes, $\chi^2 (X,Y) = 0$
+    - cela voudra dire que $f_{ij} = f_{i.}f_{.j}$ pour chaque couple de modalités
+- On a aussi $\chi^2(X,Y) \le n \times \mbox{inf}(p-1,q-1)$. Si $\chi^2(X,Y)$ est égal respectivement à $n(p-1)$ ou $n(q-1)$, cela voudra dire que $X$ (resp. $Y$) est fonctionnellement liée à $Y$ (resp. $X$).
+- Contribution d'une cellule $ij$ : $\frac{\left( f_{ij} - f_{i.} f_{.j} \right)^2}{f_{i.} f_{.j}}$
+
+
+# Distance
+
+**Idée** : Les profils lignes et les profils colonnes sont deux nuages de points sur lesquels on pourra appliquer une ACP
+
+Distance entre 2 modalités de $X$ : 
+
+$$ 
+  d_{\chi^2}^2(i,i') = \sum_{j=1}^q \frac{n}{t_{.j}} \left( \frac{t_{ij}}{t_{i.}} - \frac{t_{i'j}}{t_{i'.}} \right)^2 
+$$
+
+Cela revient à utiliser la métrique $n\mathbf{D}_Y^{-1}$ sur les profils lignes, ce qu'on appelle la **métrique du $\chi^2$**.
+
+Idem pour les colonnes.
+
+# Inertie
+
+Inertie du nuage des profils lignes, par rapport au centre de gravité de ce nuage $g_\ell = (f_{.j})$ :
+
+$$ 
+  I_{g_\ell} = \sum_{i=1}^p \frac{t_{i.}}{n} d_{\chi^2}^2 (i, g_\ell) = \chi^2 (X,Y) 
+$$
+
+Idem pour les colonnes. 
+
+### Avantage de cette métrique
+
+Regroupement de modalités ne modifiant pas l'inertie et donc la valeur du $\chi^2$, ni même les distances. C'est l'**équivalence distributionnelle**.
+
+# ACP sur les profils
+
+Deux possibilités totalement symétriques :
+
+Info | Profil lignes | Profil colonnes
+-|-|-
+Données $Z$					| $D_X^{-1}T$      | $D_Y^{-1}T'$
+Métrique $M$				| $nD_Y^{-1}$      | $nD_X^{-1}$
+Poids $D$						| $D_X/n$          | $D_Y/n$
+Centre 							| $Z'D1$            
+Variance-covariance | $V = Z'DZ - gg'$ 
+
+- Calcul **identiques à l'ACP** avec ces définitions
+- Deux analyses conduisant aux mêmes valeurs propres 
+- Facteurs principaux de l'une = composantes principales de l'autre.
+
+
+# Interprétation
+
+### Choix du nombre d'axes
+
+- Pproblème plus compliqué que dans l'ACP 
+- Critère de Kaiser s'applique mal
+- Règle du coude toujours valide
+
+### Coordonnées de points
+
+- Principal résultat
+- Représentation en 2 (ou plus) dimensions des modalités des deux variables
+
+Les deux nuages de points, et donc les deux ensembles de modalités (de $X$ et de $Y$) peuvent être représentés **sur le même graphique**.
+
+Le cercle de corrélations n'a aucun intérêt ici.
+
+# Interpretation
+
+### Contributions
+
+- De même que pour l'ACP
+- Contribution de la modalité $i$ de $X$ = $\frac{t_{i.}}{n} \frac{(a_{ki}^2}{\lambda_k}$
+- Contributions fortes (supérieures à $1/p$)
+- Idem les modalités $j$ de $Y$.
+
+### Qualité de représentation
+
+Idem que pour l'ACP et que pour les contributions.
+
+
+# Plus loin
+
+**Modalités supplémentaires** ne participant pas au calcul, mais pouvant être représentés sur les graphiques :
+
+- Lignes et/ou colonnes supplémentaires : modalités de $X$ ou de $Y$ qu'on ne veut pas inclure dans le calcul de l'AFC
+
+**Regroupement de modalités** 
+
+- à considérer si une modalité est trop peu présente
+    - elle *tire* le nuage vers elle
+
+Travail *envisageable* sur un jeu de données Individus x Variables, sous quelques conditions :
+
+- Variables de mêmes unités ;
+- Somme en lignes et en colonnes ayant un sens ;
+- Recherche sur les profils (de consommation par exemple).
+
+
+# Exemple simple 
+
+Nous utilisons les données `occupationalStatus`, qui nous donne la répartition d'hommes britaniques suivant le statut professionnel de leur père (en ligne) et le leur (en colonne). Les statuts sont codés de 1 à 8, et nous n'avons aucune information sur ceux-ci.
+
+```{r donnees}
+o = occupationalStatus %>% 
+  data.frame() %>%
+  mutate(origin = paste0("orig=", origin), 
+         destination = paste0("dest=", destination)) %>% 
+  spread(destination, Freq) %>%
+  remove_rownames() %>%
+  column_to_rownames("origin")
+affTable(as.data.frame(addmargins(as.matrix(o))))
+```
+
+# Proportions globales
+
+```{r prop}
+p = 100 * prop.table(o)
+affTable(as.data.frame(addmargins(as.matrix(p))))
+```
+
+# Profils lignes
+
+```{r profil-lig}
+pl = as.data.frame(100 * prop.table(as.matrix(o), margin = 1))
+affTable(as.data.frame(addmargins(as.matrix(pl), 2)))
+```
+
+# Profils colonnes
+
+```{r profil-col}
+pc = as.data.frame(100 * prop.table(as.matrix(o), margin = 2))
+affTable(as.data.frame(addmargins(as.matrix(pc), 1)))
+```
+
+
+```{r ca}
+library(FactoMineR)
+ca = CA(o, graph = FALSE)
+```
+
+# Part de la variance expliquée
+
+```{r eigentab}
+formattable(round(setNames(data.frame(ca$eig), c("Valeur propre", "Variance (%)", "Cumulée (%)")), 2), row.names = TRUE)
+```
+
+```{r eigenfig, fig.height=3}
+par(mar = c(2, 2, 1, 1) + .5)
+barplot(ca$eig[,2])
+```
+
+2 axes suffisent à représenter `r round(ca$eig[2,3], 1)`% de l'information présente dans les données.
+
+# Représentation graphique
+
+```{r graphs}
+par(mfrow = c(1, 2))
+plot(ca, invisible = "col")
+plot(ca, invisible = "row")
+```
+
+# Représentation conjointe
+
+```{r}
+plot(ca)
+```
+
+
+# Lignes importants
+
+### Contribution
+
+```{r rowcontrib}
+rowcontrib = setNames(as.data.frame(addmargins(ca$row$contrib, 1)),
+                      paste("contrib", 1:5))
+affTable(rowcontrib, ncol = 5)
+```
+
+# Lignes importants
+
+### Qualité de représentation
+
+```{r rowcos2}
+rowcos2 = setNames(as.data.frame(addmargins(ca$row$cos2, 2)), 
+                   c(paste("qualité", 1:5), "Somme"))
+affTable(rowcos2, ncol = 5)
+```
+
+
+# Colonnes importantes 
+
+### Contribution
+
+```{r colcontrib}
+colcontrib = setNames(as.data.frame(addmargins(ca$col$contrib, 1)),
+                      paste("contrib", 1:5))
+affTable(colcontrib, ncol = 5)
+```
+
+# Colonnes importantes 
+
+### Qualité de représentation
+
+```{r colcos2}
+colcos2 = setNames(as.data.frame(addmargins(ca$col$cos2, 2)), 
+                   c(paste("qualité", 1:5), "Somme"))
+affTable(colcos2, ncol = 5)
+```
+
+
+# Lien avec le $\chi^2$
+
+Il y a clairement un lien entre les deux variables.
+
+```{r}
+t = chisq.test(o)
+t
+```
+
+# Résidus 
+
+Différence entre observé et estimé.
+
+```{r}
+affTable(as.data.frame(t$residuals))
+```
+
+
+
+
+
+
+
+

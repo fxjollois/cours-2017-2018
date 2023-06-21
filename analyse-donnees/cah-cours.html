@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="FX Jollois" />
+  <meta name="copyright" content="CAH - STID2A2"/>
+  <title>Classification Ascendante Hiérarchique (CAH)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link href="cah-cours_files/slidy-2/styles/slidy.css" rel="stylesheet" />
+  <script src="cah-cours_files/slidy-2/scripts/slidy.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="..\css\slidy-fxj.css" />
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Classification Ascendante Hiérarchique (CAH)</h1>
+  <h1 class="subtitle">DUT STID 2AFA</h1>
+  <p class="author">
+FX Jollois
+  </p>
+</div>
+<div id="que-veut-on-faire" class="slide section level1">
+<h1>Que veut-on faire ?</h1>
+<ul>
+<li>Répartir les individus (ou objets) dans des groupes distincts</li>
+<li>Obtenir des groupes homogènes
+<ul>
+<li>deux individus proches dans une même classe</li>
+<li>deux individus éloignés dans des classes différentes</li>
+</ul></li>
+<li>Déterminer le nombre de classes adapté
+<ul>
+<li>trop faible : peu informatif</li>
+<li>trop élevé : trop spécifique et peu exploitable</li>
+</ul></li>
+</ul>
+</div>
+<div id="exemple-donnees-faithful-dans-r" class="slide section level1">
+<h1>Exemple : données <code>faithful</code> dans R</h1>
+<p><img src="cah-cours_files/figure-slidy/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="objectif-sur-lexemple" class="slide section level1">
+<h1>Objectif sur l’exemple</h1>
+<p><img src="cah-cours_files/figure-slidy/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="probleme-et-histoire" class="slide section level1">
+<h1>Problème et histoire</h1>
+<ul>
+<li><strong>Comment</strong> trouver ces groupes de manière <strong>automatique</strong> ?</li>
+<li>Première classification connue : <strong>Aristote</strong>
+<ul>
+<li>Classification des animaux (<em>Parties des Animaux</em>)</li>
+<li>utilisée jusqu’au milieu du XVIIème siècle</li>
+</ul></li>
+<li><strong>Lamarck</strong>, <strong>Buffon</strong> ou bien <strong>von Linn</strong> : nouvelles classifications
+<ul>
+<li>Travaux de Lamarck à l’origine des travaux de Darwin et de la théorie de l’évolution</li>
+</ul></li>
+<li>Au milieu du XXème siècle, premiers pas de la classification phylogénétique par <strong>Hennig</strong>, utilisée encore de nos jours</li>
+<li>Toutes basées sur une approche hiérarchique et <em>manuelle</em></li>
+</ul>
+</div>
+<div id="notions" class="slide section level1">
+<h1>Notions</h1>
+<ul>
+<li><span class="math inline">\(X = \{x_1,\ldots,x_n\}\)</span> ensemble des objets à classer</li>
+<li><strong>Partie</strong> de <span class="math inline">\(X\)</span> : sous-ensemble <span class="math inline">\(A = \{a_1,\ldots,a_p\}\)</span>
+<ul>
+<li>chaque <span class="math inline">\(a_j \in X, \forall j=1,\ldots,p\)</span></li>
+<li>Si on compte l’ensemble vide et l’ensemble tout entier, il existe <span class="math inline">\(2^n\)</span> parties de <span class="math inline">\(X\)</span></li>
+</ul></li>
+<li>Ensemble des parties muni de la relation d’ordre partiel (<span class="math inline">\(A \subseteq B \Leftrightarrow(x \in A \Rightarrow x \in B)\)</span>)
+<ul>
+<li>Deux parties d’un ensemble sont
+<ul>
+<li>soit chevauchantes (non égales et d’intersection non nulle),</li>
+<li>soit disjointes (sans élément commun),</li>
+<li>soit incluses l’une dans l’autre,</li>
+<li>soit identiques.</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="partition" class="slide section level1">
+<h1>Partition</h1>
+<ul>
+<li><strong>Partition</strong> <span class="math inline">\(Z = \{z_1,\ldots,z_K\}\)</span> : sous-ensemble de parties <span class="math inline">\(z_k\)</span>
+<ul>
+<li>2 à 2 disjointes : <span class="math inline">\(k \neq k&#39; \Rightarrow z_k \cap z_{k&#39;} = \emptyset\)</span></li>
+<li>Union = ensemble : <span class="math inline">\(\cup_{k = 1}^K z_k = X\)</span></li>
+</ul></li>
+<li>Complexité de la classification automatique due en grande partie au nombre de partitions possible de <span class="math inline">\(n\)</span> éléments
+<ul>
+<li>Nombre de Bell : <span class="math display">\[
+B_n = \frac{1}{e} \sum_{k=1}^\infty \frac{k^n}{k!}
+\]</span></li>
+<li>Pour <span class="math inline">\(n=4\)</span> objets, 15 partitions différences</li>
+<li>Pour <span class="math inline">\(n=30\)</span> objets, nombre de partitions possibles = <span class="math inline">\(8.47 \times 10^{23}\)</span></li>
+</ul></li>
+</ul>
+<blockquote>
+<p>Nécessité de définir des critères de bonne classification et d’avoir des algorithmes performants, et optimisant la recherche d’une partition</p>
+</blockquote>
+</div>
+<div id="hierachie" class="slide section level1">
+<h1>Hiérachie</h1>
+<ul>
+<li>Classification hiérarchique : ensemble de classes, appelé <strong>hiérarchie</strong>
+<ul>
+<li>Arbre binaire : <strong>dendrogramme</strong></li>
+</ul></li>
+<li>Hiérarchie de classes : ensemble de parties de <span class="math inline">\(X\)</span> ayant les propriétés suivantes :
+<ul>
+<li>Partie vide <span class="math inline">\(\emptyset\)</span> incluse</li>
+<li>Parties réduites à un seul élément (<span class="math inline">\({x_i} \forall i=1,\ldots,n\)</span>) incluses</li>
+<li>Ensemble <span class="math inline">\(X\)</span> inclus</li>
+<li>Pour chaque couple de classes <span class="math inline">\((z, z&#39;)\)</span>
+<ul>
+<li>soit <span class="math inline">\(z \subseteq z&#39;\)</span>,</li>
+<li>soit <span class="math inline">\(z&#39; \subseteq z\)</span>,</li>
+<li>soit <span class="math inline">\(z \cap z&#39; = \emptyset\)</span></li>
+</ul></li>
+</ul></li>
+<li>Hiérarchie <strong>valuée</strong> : pour toute classe <span class="math inline">\(z_k\)</span>, association d’une valeur <span class="math inline">\(f(x_k)\)</span> vérifiant
+<ul>
+<li>si <span class="math inline">\(x_k \subseteq x_{k&#39;}\)</span>, alors <span class="math inline">\(f(x_k) \leq f(x_{k&#39;})\)</span>.</li>
+</ul></li>
+</ul>
+</div>
+<div id="exemple-simple" class="slide section level1">
+<h1>Exemple simple</h1>
+<p>Considérons <span class="math inline">\(X=\{a,b,c,d,e\}\)</span>.</p>
+<ul>
+<li>Ensemble des parties de <span class="math inline">\(X\)</span> : <span class="math display">\[\emptyset\]</span> <span class="math display">\[\{a\}, \{b\}, \{c\}, \{d\}, \{e\}\]</span> <span class="math display">\[\{ab\}, \{ac\}, \{ad\}, \{ae\}, \{bc\}, \{bd\}, \{be\}, \{cd\}, \{ce\}, \{de\}\]</span> <span class="math display">\[\{abc\}, \{abd\}, \{abe\}, \{acd\}, \{ace\}, \{ade\}, \{bcd\}, \{bce\}, \{bde\}, \{cde\}\]</span> <span class="math display">\[\{abcd\}, \{abce\}, \{acde\}, \{bcde\}\]</span> <span class="math display">\[X=\{abcde\}\]</span></li>
+<li>Exemple de partition <span class="math display">\[\{abc\}, \{de\}\]</span></li>
+<li>Exemple de hiérarchie de classes <span class="math display">\[\{a\}, \{b\}, \{c\}, \{d\}, \{e\}, \{ab\}, \{cd\}, \{cde\}, \{abcde\}\]</span></li>
+</ul>
+<p><img src="cah-cours_files/figure-slidy/unnamed-chunk-4-1.png" width="240" style="display: block; margin: auto;" /></p>
+</div>
+<div id="inertie-intraclasse-et-interclasse" class="slide section level1">
+<h1>Inertie intraclasse et interclasse</h1>
+<ul>
+<li><strong>Inertie</strong> totale <span class="math inline">\(I\)</span> d’une population : moyenne des carrés des distances des individus au barycentre <span class="math display">\[
+I = \frac{1}{n} \sum_{i=1}^n {(x_i - g)}^2
+\]</span></li>
+<li>Avec une partition en <span class="math inline">\(K\)</span> classes
+<ul>
+<li>Inertie <strong>intraclasse</strong> <span class="math inline">\(W\)</span> : somme des inerties <span class="math inline">\(W_k\)</span> de chaque classe <span class="math display">\[
+W = \frac{1}{n} \sum_{k=1}^K W_k \mbox{ avec } W_k = \sum_{i \in z_k} {(x_i - g_k)}^2
+\]</span>
+<ul>
+<li>Classe homogène : inertie faible</li>
+</ul></li>
+<li>Inertie <strong>interclasse</strong> <span class="math inline">\(B\)</span> : inerties des centres des classes pondérés par le nombre d’individus par class <span class="math display">\[
+B = \frac{1}{n} \sum_{k=1}^K n_k {(g_k - g)}^2
+\]</span>
+<ul>
+<li>Plus <span class="math inline">\(B\)</span> grand, plus les classes seront séparées</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="objectif" class="slide section level1">
+<h1>Objectif</h1>
+<ul>
+<li>Bonne classification : inertie intraclasse <span class="math inline">\(W\)</span> petite et inertie interclasse <span class="math inline">\(B\)</span> grande</li>
+<li>Formule de Huygens : ces deux valeurs sont liées <span class="math display">\[
+I = B + W
+\]</span></li>
+<li>Optimisation des deux critéres équivalente</li>
+<li>Partition en <span class="math inline">\(K+1\)</span> classes : inertie interclasse <span class="math inline">\(B\)</span> plus élevée (et donc une inertie intraclasse <span class="math inline">\(W\)</span> plus faible) qu’une partition en <span class="math inline">\(K\)</span> classes</li>
+</ul>
+<h4 id="avec-comme-seul-critere-linertie">Avec comme seul critère l’inertie :</h4>
+<ul>
+<li><strong>Meilleure partition</strong> : partition en <span class="math inline">\(n\)</span> classes (chaque individu dans sa propre classe)</li>
+<li><strong>Pire partition</strong> : partition en 1 classe (tous les individus dans la même classe).</li>
+</ul>
+</div>
+<div id="qualite-dune-partition" class="slide section level1">
+<h1>Qualité d’une partition</h1>
+<ul>
+<li>Nombre optimum de classes : sujet complexe et difficile</li>
+<li>Classes <em>naturelles</em> souvent loin d’être évidente</li>
+<li>Utilisation d’analyses factorielles pas toujours d’une grande aide</li>
+<li>Utilisation de critères de choix (principalement graphique)
+<ul>
+<li>Aide au choix</li>
+<li>Différents nombres de classes intéressants parfois</li>
+<li>Discussion avec le <em>métier</em> importante pour cette étape</li>
+</ul></li>
+<li>Vu ici : <span class="math inline">\(R^2\)</span>, <span class="math inline">\(CCC\)</span> et <span class="math inline">\(PseudoF\)</span>
+<ul>
+<li>Car présents sous SAS et facilement obtenable sous R</li>
+<li>(mais beaucoup d’autres existent)</li>
+</ul></li>
+</ul>
+</div>
+<div id="critere-r2" class="slide section level1">
+<h1>Critère <span class="math inline">\(R^2\)</span></h1>
+<ul>
+<li>Proportion de l’inertie explique par les classes <span class="math display">\[
+  R^2 = B / I
+\]</span></li>
+<li>Plus il est proche de 1, meilleure est la classification</li>
+<li>Un bon critère est de prendre <span class="math inline">\(k+1\)</span> classes lorsque le passage entre <span class="math inline">\(K\)</span> et <span class="math inline">\(K+1\)</span> reprèsente le dernier saut important.</li>
+</ul>
+</div>
+<div id="critere-ccc" class="slide section level1">
+<h1>Critère <span class="math inline">\(CCC\)</span></h1>
+<ul>
+<li><em>Cubic Clustering Criterion</em> indique si la classification est
+<ul>
+<li>Bonne (<span class="math inline">\(CCC &gt; 2\)</span>),</li>
+<li>A vérifier (entre 0 et 2)</li>
+<li>Susceptible d’être affectée par des outliers (<span class="math inline">\(CCC &lt; 0\)</span>)</li>
+<li>Si <span class="math inline">\(CCC\)</span> très légèrement négatif : présence de petites classes</li>
+</ul></li>
+<li>Bonne partition en <span class="math inline">\(K+1\)</span> classes : creuxà <span class="math inline">\(K\)</span> classes et pic à <span class="math inline">\(K+1\)</span> classes, suivi par une évolution lente du <span class="math inline">\(CCC\)</span>.</li>
+</ul>
+</div>
+<div id="critere-pseudof" class="slide section level1">
+<h1>Critère <span class="math inline">\(PseudoF\)</span></h1>
+<ul>
+<li>Séparation entre toutes les classes <span class="math display">\[
+PseudoF = \frac{ \frac{R^2}{K - 1} }{ \frac{1 - R^2}{n - K} }
+\]</span></li>
+<li>Nombre de classes <span class="math inline">\(K\)</span> pour <span class="math inline">\(Pseudo F\)</span> maximal</li>
+</ul>
+</div>
+<div id="iris" class="slide section level1">
+<h1>Iris</h1>
+<p><img src="cah-cours_files/figure-slidy/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="classification-hierarchique" class="slide section level1">
+<h1>Classification hiérarchique</h1>
+<ul>
+<li>Recherche d’une hiérarchie valuée</li>
+<li>Partition compatible avec cette hiérachie : partition dont les classes sont des éléments (disjoints)
+<ul>
+<li>Coupure de l’arbre selon une horizontale</li>
+</ul></li>
+<li>Basée sur la notion de <strong>dissimilarité</strong>/<strong>distance</strong> entre individus
+<ul>
+<li>Application <span class="math inline">\(d\)</span> : indice de distance si
+<ul>
+<li><span class="math inline">\(d(i,j) = d(j,i)\)</span></li>
+<li><span class="math inline">\(d(i,j) = 0 \Leftrightarrow i = j\)</span> (dissimilarité si uniquement <span class="math inline">\(\Leftarrow\)</span>)</li>
+</ul></li>
+</ul></li>
+<li>Données quantitatives : distance euclidienne (ou <span class="math inline">\(L_2\)</span>) <span class="math inline">\(d^2(x_i,x_{i&#39;}) = \sum_{j=1}^d (x_i^j - x_{i&#39;}^j)^2\)</span></li>
+<li>Données binaires : distance <span class="math inline">\(L_1\)</span> (de manhattan) <span class="math inline">\(d_{L_1}(x_i,x_{i&#39;}) = \sum_{j=1}^d |x_i^j - x_{i&#39;}^j|\)</span></li>
+</ul>
+</div>
+<div id="distance-entre-parties" class="slide section level1">
+<h1>Distance entre parties</h1>
+<ul>
+<li>Indice de distance entre éléments de <span class="math inline">\(H\)</span> : <span class="math inline">\(d(A,B)\)</span>
+<ul>
+<li>Niveau d’agrégation de <span class="math inline">\(A\)</span> et de <span class="math inline">\(B\)</span></li>
+<li>Indice de la plus petite partie de <span class="math inline">\(H\)</span> contenant <span class="math inline">\(A\)</span> et <span class="math inline">\(B\)</span></li>
+</ul></li>
+<li>Propriété ultramétrique : <span class="math display">\[ d(a,b) \leq \sup\{d(a,c);d(b,c)\} \ \forall a, b, c \]</span></li>
+</ul>
+<p>Recherche de d’une classification hiérarchique = recherche d’une ultram�trique.</p>
+<blockquote>
+<p>Connaissant une métrique sur <span class="math inline">\(X\)</span>, en déduire une ultramétrique aussi proche que possible de la métrique de départ</p>
+</blockquote>
+</div>
+<div id="classification-ascendante-hierachique-cah" class="slide section level1">
+<h1>Classification Ascendante Hiérachique (CAH)</h1>
+<p><strong>Algorithme</strong></p>
+<ol style="list-style-type: decimal">
+<li>Chaque élément dans sa propre classe</li>
+<li>Calculer les distances entre chaque élément</li>
+<li>Regrouper les deux éléments les plus proches, et recalculer les distances entre cette nouvelle classe et les autres</li>
+<li>Recommencer l’étape précédente jusqu’à n’avoir plus qu’une seule classe avec tous les éléments</li>
+</ol>
+<p><strong>Problème</strong></p>
+<ul>
+<li>Distance entre éléments (cf plus haut)</li>
+<li>Distance entre classes (cf ci-après)</li>
+</ul>
+</div>
+<div id="distance-entre-deux-classes-criteres-dagregation" class="slide section level1">
+<h1>Distance entre deux classes : critères d’agrégation</h1>
+<ul>
+<li><strong>Lien complet</strong> : distance maximale entre deux points de chaque classe
+<ul>
+<li>très sensible aux outliers et assez peu utilisée</li>
+<li>critère du saut maximum, critère du diamètre, <em>complete linkage</em> <span class="math display">\[ d(z_a, z_b) = \max(d(x_i,x_{i&#39;})), x_i \in a, x_{i&#39;} \in b \]</span></li>
+</ul></li>
+<li><strong>Lien simple</strong> : distance minimale entre deux points de chaque classe
+<ul>
+<li>sensible à l’effet de chaîne (parfois inconvénient, parfois avantage)</li>
+<li>critère du saut minimum, <em>single linkage</em> <span class="math display">\[ d(z_a, z_b) = \min(d(x_i,x_{i&#39;})), x_i \in a, x_{i&#39;} \in b \]</span></li>
+</ul></li>
+<li><strong>Lien moyen</strong> : distance moyenne entre les points de chaque classe
+<ul>
+<li>intermédiaire entre complet et simple, moins sensible au bruit</li>
+<li>critèrre du saut moyen, <em>average linkage</em> <span class="math display">\[ d(z_a, z_b) = \frac{1}{\#z_a \#z_b} \sum_{x_i \in a, x_{i&#39;} \in b} d(x_i,x_{i&#39;})  \]</span></li>
+</ul></li>
+</ul>
+</div>
+<div id="distance-entre-deux-classes-criteres-dagregation-1" class="slide section level1">
+<h1>Distance entre deux classes : critères d’agrégation</h1>
+<ul>
+<li><strong>Méthode des centroïdes</strong> : distance entre les barycentres (ou centroïdes) des deux classes
+<ul>
+<li>plus robuste mais moins précise</li>
+<li>plus simple à calculer <span class="math display">\[ d(z_a, z_b) = d^2(g_a, g_b) \]</span></li>
+</ul></li>
+<li><strong>Critère de Ward</strong> : baisse d’inertie interclasse obtenue en fusionnant ces deux classes
+<ul>
+<li>version pondérée de la méthode des centroïdes</li>
+<li>fusion de deux classes occasionnant obligatoirement une baisse de l’inertie interclasse <span class="math display">\[ d(z_a, z_b) = \frac{d^2(g_a, g_b)}{\frac{1}{\#z_a} + \frac{1}{\#z_b}} \]</span></li>
+<li>calcul récursif possible <span class="math display">\[ d(z_a, z_b) = \frac{(\#z_{a_1} + \#z_b) d(a_i, b) + (\#z_{a_2} + \#z_b) d(a_2, b) - \#z_b d(a_1, a_2) }{\#z_{a_1} + \#z_{a_2} + \#z_b} \]</span></li>
+<li>classes sphériques et de même effectifs</li>
+<li>la plus utilisée en CAH</li>
+</ul></li>
+</ul>
+</div>
+<div id="exemple-simple-1" class="slide section level1">
+<h1>Exemple simple</h1>
+<p>Les données</p>
+<p><img src="cah-cours_files/figure-slidy/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>La matrice de distance initiale</p>
+<pre><code>##    1  2  3  4
+## 2 25         
+## 3  5 20      
+## 4 17  8 12   
+## 5  6 31 11 23</code></pre>
+<p>L’arbre obtenu (lien complet)</p>
+<p><img src="cah-cours_files/figure-slidy/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>L’ultramétrique obtenu</p>
+<pre><code>##    1  2  3  4
+## 2 31         
+## 3  5 31      
+## 4 31  8 31   
+## 5 11 31 11 31</code></pre>
+</div>
+<div id="iris-1" class="slide section level1">
+<h1>Iris</h1>
+<p><img src="cah-cours_files/figure-slidy/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+---
+title: Initiation à `R` - suite
+subtitle: DU Analyste Big Data
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Manipulation de listes
+
+Il existe un type `list` en `R`, permettant de représenter un ensemble d'objets complexes, éventuellement avec des schémas différents et pouvant contenir eux-mêmes toutes sortes d'objets (`vector`, `matrix`, `data.frame`, `list`, ...).
+
+```{r}
+l = list(a = "chaîne", 
+         b = 12, 
+         c = 1:10, 
+         d = head(mtcars), 
+         e = list(x = 1:10, y = log(1:10)))
+length(l)
+names(l)
+l[1]
+l[[1]]
+l$a
+l[1:2]
+l[c("a", "c")]
+l[sapply(l, length) == 1]
+```
+
+### `lapply` et autres
+
+La fonction `lapply()` permet d'exécuter une fonction (passée en deuxième paramètre) à chaque élément d'une liste (passée en premier paramètre), ou un vecteur. Il existe aussi les fonctions `sapply()` et `vapply()`, qui sont similaires mais qui cherchent à simplifier le résultat (la deuxième permet de spécifier le nom des retours de la fonctions, si ceux-ci sont multiples). 
+
+```{r}
+lapply(l, class)
+sapply(l, class)
+```
+
+
+### Fonction particulière
+
+On a parfois (voire souvent) besoin d'utiliser une fonction spécifique dans les fonctions comme `lapply()`. On peut soit la définir avant et l'utiliser comme une autre.
+
+```{r}
+infoElement <- function(e) {
+    return(c(classe = class(e), longueur = length(e)))
+}
+lapply(l, infoElement)
+sapply(l, infoElement)
+vapply(l, infoElement, c(CLASSE = "", LONG = ""))
+```
+
+### Fonction anonyme
+
+Mais puisqu'on ne l'utilise généralement que dans cette fonction, il est possible de la déclarer directement dans la fonction `lapply()`. On parle alors de *fonction anonyme* (comme en *JavaScript* par exemple).
+
+```{r}
+sapply(l, function(e) {
+    return(c(classe = class(e), longueur = length(e)))
+})
+```
+
+### Fonctionnement *invisible*
+
+On a parfois besoin d'appliquer une fonction qui ne retourne rien à une liste, par exemple pour afficher l'élément ou une partie de celui-ci. Dans l'exemple ci-dessous, on remarque que le code affiche bien chaque élément, mais renvoie aussi une liste contenant les éléments (qui est donc identique à la liste passée en paramètre). Ce comportement est dû au fait que la fonction ne renvoie pas de résultat.
+
+```{r}
+lapply(l, function (e) { print(e); })
+```
+
+Dans ce type de cas, si on veut éviter ce comportement, on peut utiliser la fonction `invisibile()`. Ceci va rendre invisible l'exécution du code et on ne verra donc pas la liste retournée par `lapply()`.
+
+```{r}
+invisible(lapply(l, function (e) { print(e); }))
+```
+
+
+### Fonctions autres
+
+#### Recherche
+
+Il est possible de faire une recherche dans une liste (ou un vecteur) avec les fonctions `Find()` et `Position()`. Celles-ci renvoient le premier élément trouvé (ou le dernier car il est possible de partir de la droite). La fonction passée en premier paramètre doit renvoyer les valeurs `TRUE` ou `FALSE`.
+
+On cherche par exemple ici le premier (ou dernier) élément de type `vector` dans la liste précédemment créée. 
+
+```{r}
+Find(is.vector, l)
+Find(is.vector, l, right = TRUE)
+Position(is.vector, l)
+Position(is.vector, l, right = TRUE)
+```
+
+#### Filtre
+
+Pour récupérer tous les éléments d'une liste respectant une condition (grâce à la fonction passée en paramètre donc), on dispose de la fonction `Filter()`. Nous récupérons ici tous les éléments de la liste qui sont de type `vector`.
+
+```{r}
+Filter(is.vector, l)
+```
+
+#### Réduction
+
+On peut opérer une opération de réduction d'une liste à l'aide d'une fonction binaire (à deux paramètres donc). 
+```{r}
+Reduce(function(a, b) return(a + b), 1:5, 0)
+```
+
+Pour fonctionner correctement, la fonction doit retourner un objet utilisable dans la fonction. Dans l'exemple ci-dessous, nous transformons `mtcars` en une liste de `r nrow(mtcars)` éléments, chacune étant une liste nommée des caractéristiques de la voiture (avec en plus le nom de celle-ci).
+
+```{r}
+mt = lapply(1:nrow(mtcars), function(i) {
+        return(c(nom = rownames(mtcars)[i], as.list(mtcars[i,])))
+    })
+unlist(mt[[1]]) # unlist() utilisé pour améliorer l'affichage 
+```
+
+Imaginons qu'on souhaite faire la somme des consommations, il nous faut créer une liste initiale avec la valeur `0` pour l'élément `mpg`. Ensuite, on additionne les deux valeurs qu'on stocke dans `a` (qui aura pour première valeur `init`) et on retourne celle-ci.
+
+```{r}
+init = list(mpg = 0)
+Reduce(function(a, b) { a$mpg = a$mpg + b$mpg; return(a)}, mt, init)
+```
+
+
+## A faire
+
+A partir des données présentes dans le fichier [`world-liste.RData`](http://fxjollois.github.io/donnees/World/world-liste.Rdata), répondre aux questions suivantes. Ces données concernent les pays dans le monde (à la fin du siècle dernier), et sont représentées sous forme de liste dans l'objet `Country.liste`.
+
+1. Donner le nombre de pays représentés
+1. Trouver les informations concernant la `France`
+1. Lister les pays du continent `Antarctica`
+1. Calculer la population mondiale
+1. Afficher quelques informations pour chaque pays (un pays par ligne) :
+    - si l'année d'indépendance (`IndepYear`) est `NA`, alors on affichera
+    
+    `pays (continent)`
+    
+    - sinon, on affichera :
+    
+    `pays (continent - indépendance en XXXX)`
+1. Créer une nouvelle liste avec le de ratio de la population des villes du pays (voir `City`) sur la population du pays (`Population`)
+1. Identifier (donner leur nom) les pays ayant un ratio supérieur à `1` avec la nouvelle liste créée

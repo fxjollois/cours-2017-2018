@@ -1,0 +1,21 @@
+---
+title: "AFC - TP"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA)
+```
+
+## Catégories socio-professionnelles dans les départements français
+
+Nous disposons sur cette [page](https://www.insee.fr/fr/statistiques/1893185) de la répartition de la population active de 25 à 54 ans selon la catégorie socioprofessionnelle et la position vis à vis de l'emploi, par commune et département (de 1968 à 2014). Vous pouvez récupérer directement le [fichier](pop-act2554-csp-cd-6814.xls) (au format *Excel*).
+
+Vous devez réaliser les étapes suivantes :
+
+- Importer les données dans le logiciel R (voir par exemple la librairie `readxl`)
+- Réaliser une AFC sur le croisement entre la catégorie socioprofessionnelle et le département, pour 1968 et pour 1974
+- A l'aide des outils à votre disposition (tableaux et graphiques), 
+    - Décrire la situation pour chaque année, 
+    - Comparer les deux situations
+    

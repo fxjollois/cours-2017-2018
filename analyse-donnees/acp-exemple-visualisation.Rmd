@@ -1,0 +1,125 @@
+---
+title: "ACP - exemple en visualisation de données"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center")
+```
+
+## Données
+
+```{r import}
+pen.tra = read.table("../donnees/pendigits.tra", sep = ",")
+pen.tes = read.table("../donnees/pendigits.tes", sep = ",")
+pen = rbind(pen.tra, pen.tes)
+names(pen) = c(paste(c("X", "Y"), rep(1:8, each = 2), sep = ""), "chiffre")
+```
+
+Nous allons utiliser ici des données un peu particulière, disponibles [ici](https://archive.ics.uci.edu/ml/datasets/Pen-Based+Recognition+of+Handwritten+Digits). Elles représentent `r nrow(pen)` écritures d'un chiffre (entre 0 et 9), chaque tracé étant représenté par 8 points (coordonnées $(x,y)$, homogénéisées entre 0 et 100) et donc le chiffre écrit (voir les exemples ci-dessous pour plus de compréhension).
+
+```{r head}
+knitr::kable(head(pen))
+```
+
+
+## Tracé d'un chiffre
+
+Puisque les données s'y prêtent très bien, nous allons représenter les tracés du premier exemple de chaque chiffre. On remarque que le 5 et le 7 sont peu reconnaissables.
+
+```{r trace}
+traceChiffre <- function(v, titre = "", indice = F, couleur = "gray20", nouveau = T) {
+  vv = as.vector(as.matrix(v))
+  x = vv[seq(1, 15, by = 2)]
+  y = vv[seq(2, 16, by = 2)]
+  if (nouveau) {
+    plot(x, y, col = couleur,
+         type = "l", xlim = c(0, 100), ylim = c(0, 100), 
+         axes = F, main = titre)
+    if (indice)
+      text(x, y, labels = 1:8, cex = 0.9, font = 2)
+  } else {
+    lines(x, y, col = couleur)
+  }
+}
+# traceChiffre(pen[1,], "Exemple : ici un 8", indice = T)
+# traceChiffre(pen[2,], nouveau = F)
+```
+
+```{r exemples}
+par(mfrow = c(2, 5), mar = c(0, 0, 2, 0) + 0.1)
+for (c in 0:9) {
+  ex = pen[pen$chiffre == c,1:16][1,]
+  traceChiffre(ex, c, indice = T)
+}
+```
+
+
+Comme il n'est pas envisageable de le faire pour chaque exemple, et pour visualiser un peu mieux, nous allons représenter le chiffre moyen (i.e. les coordonnées moyennes de chaque point, pour chaque chiffre - voir ci-dessous). Ici, on remarque des effets étonnants sur certains chiffres (5 et 7 encore, ainsi que 8 et 9).
+
+```{r moyens}
+cmoy = apply(pen[,1:16], 2, tapply, pen$chiffre, mean)
+par(mfrow = c(2, 5), mar = c(0, 0, 2, 0) + 0.1)
+for (i in 1:10) 
+  traceChiffre(cmoy[i,], i-1)
+```
+
+
+## Visualisation via l'ACP
+
+### ACP centrée
+
+Une méthode directement applicable ici et bien utile est l'Analyse en Composantes Principales (ou ACP), qui permet de projeter un espace à $d$ dimensions dans un sous-espace de moindre dimensions (idéalement 2 ou 3), en minimisant la perte d'informations (i.e. l'inertie). Nous utilisons ici le package FactoMineR (cf [site web](http://factominer.free.fr/)). On remarque que certains chiffres sont concentrés dans un zone restreinte, alors que d'autres sont plus volatiles.
+
+```{r centree}
+library(FactoMineR)
+acp.centree = PCA(pen, quali.sup = 17, graph = F, scale.unit = FALSE)
+plot(acp.centree$ind$coord[,1:2], 
+     pch = 19, cex = 0.75, font.sub = 3, cex.sub = 0.8,
+     col = rainbow(10)[pen$chiffre + 1], xlim = c(-150, 100), ylim = c(-150, 120),
+     main = paste(round(acp.centree$eig[2,3], 1), "% d'inertie expliquée"),
+     xlab = paste(round(acp.centree$eig[1,2], 1), "%"),
+     ylab = paste(round(acp.centree$eig[2,2], 1), "%"))
+legend("bottom", ncol = 10, pch = 19, col = rainbow(10), legend = 0:9, cex = 0.8)
+```
+
+Pour mieux voir ce qu'il se passe pour chaque chiffre, nous allons représenter les points de chaque chiffre séparément (cf ci-dessous). On remarque visuellement que le 2, le 3 et le 6 (ainsi que le 4 et le 9) sont localisés dans une zone assez restreinte. Par contre, le 5, le 7 et le 8 sont clairement très éparpillés, avec même deux groupes distincts pour le 5. On est donc en droit de se demande s'il existe des classes pour chaque chiffre.
+
+```{r centree2}
+par(mfrow = c(2, 5), mar = c(0, 0, 2, 0) + 0.1)
+for (c in 0:9) {
+  plot(acp.centree$ind$coord[pen$chiffre == c,1:2], 
+       pch = 19, cex = 0.5, xaxt = "n", yaxt = "n",
+       col = rainbow(10)[c + 1], xlim = c(-150, 100), ylim = c(-150, 120),
+       main = c)
+}
+```
+
+
+### ACP normée
+
+Sur cet exemple, nous pouvons aussi appliquer une ACP  normée, *i.e* sur les données réduites.
+
+```{r normee}
+acp.normee = PCA(pen, quali.sup = 17, graph = F)
+plot(acp.normee$ind$coord[,1:2], 
+     pch = 19, cex = 0.75, font.sub = 3, cex.sub = 0.8,
+     col = rainbow(10)[pen$chiffre + 1], xlim = c(-5, 4), ylim = c(-4.5, 4.5),
+     main = paste(round(acp.normee$eig[2,3], 1), "% d'inertie expliquée"),
+     xlab = paste(round(acp.normee$eig[1,2], 1), "%"),
+     ylab = paste(round(acp.normee$eig[2,2], 1), "%"))
+legend("bottom", ncol = 10, pch = 19, col = rainbow(10), legend = 0:9, cex = 0.8)
+```
+
+Si on utilise la même technique que précédemment, nous avons sensiblement les mêmes conclusions sur la répartition des tracés de chaque chiffre.
+
+```{r normee2}
+par(mfrow = c(2, 5), mar = c(0, 0, 2, 0) + 0.1)
+for (c in 0:9) {
+  plot(acp.normee$ind$coord[pen$chiffre == c,1:2], 
+       pch = 19, cex = 0.5, xaxt = "n", yaxt = "n",
+       col = rainbow(10)[c + 1], xlim = c(-5, 4), ylim = c(-4.5, 4.5),
+       main = c)
+}
+```
+

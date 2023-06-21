@@ -1,0 +1,94 @@
+---
+title: "ACP - avec calcul matriciel"
+output: 
+  html_notebook
+---
+
+A TERMINER
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+L'intérêt de **`R`** réside, entre autres, dans sa possibilité à réaliser des calculs à partir de matrices et/ou de vecteurs. Nous pouvons ainsi d?composer le calcul de l'ACP directement.
+
+```{r, echo=FALSE}
+X = read.table(text = "Etudiant & Math & Phys & Fran & Angl
+jean &  6.00 &  6.00 &  5.00 &  5.50
+alan &  8.00 &  8.00 &  8.00 &  8.00
+anni &  6.00 &  7.00 & 11.00 &  9.50
+moni & 14.50 & 14.50 & 15.50 & 15.00
+didi & 14.00 & 14.00 & 12.00 & 12.50
+andr & 11.00 & 10.00 &  5.50 &  7.00
+pier &  5.50 &  7.00 & 14.00 & 11.50
+brig & 13.00 & 12.50 &  8.50 &  9.50
+evel &  9.00 &  9.50 & 12.50 & 12.00", sep = "&", header = T, row.names = 1)
+knitr::kable(X, row.names = T)
+```
+
+
+```{r}
+Ip = diag(ncol(X))
+Un = rep(1, nrow(X))
+D = diag(nrow(X)) * 1/nrow(X)
+Mc = Ip
+Mr = diag(1 / apply(X, 2, sd))
+```
+
+
+```{r}
+g = t(X) %*% D %*% Un
+print(g)
+print(apply(X, 2, mean))
+```
+
+
+```{r}
+Y = X - Un %*% t(g)
+print(Y)
+print(scale(X, scale = FALSE))
+```
+
+
+```{r}
+V = t(X) %*% D %*% as.matrix(X) - g %*% t(g)
+print(V)
+print(t(Y) %*% D %*% as.matrix(Y))
+print(cov(X) * (nrow(X) - 1) / nrow(X))
+```
+
+```{r}
+R = Mr %*% V %*% Mr * (nrow(X) / (nrow(X) - 1))
+print(R)
+print(cor(X))
+```
+
+```{r}
+Z = as.matrix(Y) %*% Mr
+print(Z)
+print(scale(X))
+```
+
+
+```{r}
+Inertie = sum(diag(Mr %*% V %*% Mr)) * (nrow(X) / (nrow(X) - 1))
+print(Inertie)
+print(sum(diag(R)))
+```
+
+```{r}
+vp = eigen(R)
+print(vp)
+print(sum(vp$values))
+print(sum(vp$values[1:2]) / sum(vp$values))
+```
+
+
+```{r}
+coord = Z %*% Mr %*% vp$vectors
+print(coord)
+plot(coord, xlim = c(-1, 1), ylim = c(-1, 1), pch = "")
+text(coord, labels = rownames(X))
+```
+
+

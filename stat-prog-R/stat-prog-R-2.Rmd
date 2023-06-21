@@ -1,0 +1,201 @@
+---
+title: Hierarchical Clustering
+subtitle: Statistical Programming using `R`
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+```{r}
+library(reshape2)
+library(ggplot2)
+library(FactoMineR)
+```
+
+## HAC
+
+### Package `stat`
+
+#### Distances
+
+To compute the distance, we use the `dist()` function in the same package.
+
+```{r}
+dist(iris[1:5, -5]) # euclidean by default
+dist(iris[1:5, -5], "manhattan")
+dist(iris[1:5, -5], "minkowski", p = 3)
+```
+
+#### HAC
+
+We use the `hclust()` function, in the package `stats` (already installed and loaded in each `R` session), to achieve a Hierarchical Ascendent Clustering. 
+
+
+```{r}
+d = dist(iris[-5]) 
+h = hclust(d) # complete by default
+h
+plot(h)
+plot(h, hang = - 1, labels = FALSE)
+```
+
+#### Identify clusters
+
+To identify interactively clusters, we can use the `identify()` function
+
+```{r, eval = FALSE}
+plot(h)
+zz.int = identify(h)
+zz.int
+sapply(zz.int, length)
+z.int = Reduce(function(a, b) return(a + (b * (max(a) + 1))), 
+               lapply(zz.int, function(c) return (1:nrow(iris) %in% c)))
+table(z.int)
+```
+
+#### Define specific number of clusters
+
+When we choose a specific number of clusters
+
+```{r}
+plot(h)
+rect.hclust(h, 3)
+z = cutree(h, 3)
+table(z)
+```
+
+
+#### Example 
+
+But, in most of cases, the *Ward* criterion is a better choice. For that, we have to use the `ward.D2` method in `hclust()`.
+
+```{r}
+hward = hclust(dist(iris[-5]), "ward.D2")
+par(mar = c(2, 2, 2, 0) + .1)
+plot(hward, hang = -1, labels = FALSE, 
+     main = "Ward criterion", xlab = "", ylab = "")
+rect.hclust(hward, 3)
+```
+
+
+```{r}
+zward = cutree(hward, k = 3)
+table(zward)
+zward2 = cutree(hward, h = 10)
+table(zward2)
+identical(zward, zward2)
+```
+
+
+### Package `cluster`
+
+This package is already installed with `R`.
+
+```{r}
+library(cluster)
+```
+
+#### Agglomerative nesting
+
+`agnes()` function compute a hierarchical clustering directly from `data.frame` (see `?agnes` for more details).
+
+```{r}
+hagnes = agnes(iris[-5]) # euclidean metric and average method by default
+hagnes
+plot(hagnes)
+zagnes = cutree(as.hclust(hagnes), 3)
+table(zagnes, zward)
+```
+
+#### Divisive clustering
+
+For descedant clustering, we can use `diana()` function on a `data.frame` (see `?diana` for more details).
+
+```{r}
+ddiana = diana(iris[-5]) # euclidean metric
+plot(ddiana)
+zdiana = cutree(as.hclust(ddiana), 3)
+table(zdiana, zward)
+```
+
+
+## Number of clusters
+
+The package `NbClust` simplify the search of an interesting number of clusters
+
+```{r}
+library(NbClust)
+```
+
+The `Nbclust()` function performs the clustering process and computes a maximum of 30 indices, which can help us to determine a number of clusters. 
+
+For hierarchical clustering :
+
+- the default distance is `euclidean`, with the same choice than for `dist()` function
+- the available methods are the same as for `hclust()`
+
+```{r}
+nb = NbClust(iris[-5], method = "ward.D2")
+```
+
+We can explore the results for more details
+
+```{r}
+t(nb$Best.nc)
+par(mfrow = c(4, 7), mar = c(1, 1, 2, 0) + .1)
+for (i in 1:ncol(nb$All.index)) {
+    plot(rownames(nb$All.index), nb$All.index[,i], type = "l",
+         main = colnames(nb$All.index)[i], axes = FALSE)
+    axis(1, at = rownames(nb$All.index), labels = rownames(nb$All.index), 
+         lwd = 0, padj = -2)
+    best = nb$Best.nc[1,i]
+    if (best != 0)
+        points(best[1], nb$All.index[as.character(best),i], col = "red")
+}
+```
+
+We get also the best partition
+
+```{r}
+nb$Best.partition
+table(nb$Best.partition)
+```
+
+
+## Clusters validation and representation
+
+Some statistics on original attributes
+
+```{r}
+table(iris$Species, nb$Best.partition)
+apply(iris[-5], 2, tapply, nb$Best.partition, mean)
+```
+
+Some graphics to help us to analyse clusters
+
+```{r}
+pairs(iris[-5], col = rainbow(3)[nb$Best.partition], pch = 19)
+dres = data.frame(iris[-5], cluster = factor(nb$Best.partition))
+dres.melt = melt(dres, id.vars = "cluster")
+ggplot(dres.melt, aes(cluster, value, fill = cluster)) + 
+    geom_boxplot() + 
+    facet_wrap(~ variable, scales = "free")
+```
+
+And, we can use the PCA projection to visualize clusters
+
+```{r}
+pca = PCA(iris, quali.sup = 5, graph = FALSE)
+res.pca = data.frame(pca$ind$coord, cluster = factor(nb$Best.partition))
+ggplot(res.pca, aes(Dim.1, Dim.2, color = cluster)) + 
+    geom_point() +
+    stat_ellipse()
+```
+
+
+## Some work
+
+From the previous `pendigits` data, we conclude there are possibly different ways to write each digit. Use hierarchical clustering to find, for each digit, a number of types of writing, and represent them.
+

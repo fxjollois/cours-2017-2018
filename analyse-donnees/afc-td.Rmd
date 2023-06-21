@@ -1,0 +1,285 @@
+---
+title: "AFC - TD"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA)
+```
+
+Dans ce TD, nous aborderons la réalisation de l'AFC sous R. Vous devez exécuter l'ensemble des commandes réalisées ici (et les comprendre), afin de pouvoir les reproduire.
+
+En plus des packages présentés ci-dessous, nous devrons utiliser d'autres packages (inclus dans le chargement du package `tidyverse`) pour réaliser les graphiques et autres tableaux.
+
+```{r package}
+library(tidyverse)
+# library(stringr)
+library(formattable)
+```
+
+## Package `FactoMiner`
+
+Nous utilisons encore le package [`FactoMineR`](http://factominer.free.fr/) pour réaliser les calculs de l'AFC.
+
+### Données `children`
+
+Nous allons utiliser le jeu de données [`children`](https://rdrr.io/cran/FactoMineR/man/children.html). Celui-ci représente la table de contingence entre les raisons avancées pour ne pas faire d'enfants en lignes, et le niveau d'éducation de la personne répondant en colonnes.
+
+```{r data}
+library(FactoMineR)
+data(children)
+```
+
+```{r, echo=FALSE}
+formattable(children)
+```
+
+
+### Calcul de l'AFC
+
+On utilise la fonction `CA()`, dont voici les options principales
+
+- `ncp` : nombre de composantes à retenir (5 par défaut)
+- `graph` : affiche ou non les deux graphiques (oui par défaut)
+
+Ici, nous ne voulons pas les graphiques tout de suite.
+
+```{r acp}
+afc = CA(children[,1:5], graph = FALSE)
+```
+
+L'objet renvoyé est une liste avec toutes les informations importantes.
+
+```{r names}
+names(afc)
+```
+
+Le contenu de cet objet est plutôt bien détaillé (mais en anglais) lorsqu'on l'affiche.
+
+```{r print}
+afc
+```
+
+
+### Variance expliquée
+
+L'objet `eig` est une `matrix`, contenant pour chaque composante :
+
+- la valeur propre
+- le pourcentage de variance expliquée
+- le pourcentage cumulé de variance expliquée
+
+```{r eigen}
+afc$eig
+```
+
+On peut donc produire le graphique de la variance expliquée, par composante. Remarquez que le graphique des valeurs propres donnent exactement le même graphique, à l'échelle des ordonnées près (*à tester*).
+
+```{r eigonplot1}
+barplot(afc$eig[,2])
+```
+
+On peut aussi montrer la variance expliquée cumulée.
+
+```{r eigenplot2}
+plot(afc$eig[,3])
+```
+
+*A faire* : représenter dans un même graphique les deux informations comme ci-dessous par exemple.
+
+```{r eigenplot3, echo=FALSE}
+b = barplot(afc$eig[,2], ylim = c(0, 110),
+            xlab = "Composantes", ylab = "% variance expliquée")
+lines(c(b), afc$eig[,3], type = "b")
+```
+
+ou
+
+```{r eigenplot4, echo=FALSE}
+df = transform(data.frame(afc$eig, row.names = NULL), comp = 1:nrow(afc$eig))
+ggplot(df) +
+  geom_col(aes(factor(comp), percentage.of.variance)) +
+  geom_line(aes(comp, cumulative.percentage.of.variance)) +
+  labs(x = "Composantes", y = "% variance expliquée") +
+  theme_minimal()
+```
+
+
+### Représentation graphique
+
+#### Toutes les modalités
+
+Par défaut, lorsqu'on utilise la fonction `plot()` sur l'objet obtenu, on obtient le *premier plan factoriel*, avec les 2 premières composantes.
+
+```{r plot}
+plot(afc)
+```
+
+Si on veut choisir les composantes à représenter, nous utilisons le paramètre `axes`.
+
+```{r plot13}
+plot(afc, axes = c(1, 3))
+```
+
+#### Lignes uniquement
+
+Pour n'avoir que les modalités en lignes, il faut rendre invisibles les colonnes. Ce sont toujours les 2 premières composantes par défaut (et la syntaxe est la même pour changer les composantes).
+
+```{r plotrow}
+plot(afc, invisible = "col")
+```
+
+
+#### Colonnes uniquement
+
+Et pour n'avoir que les modalités en colonnes, il faut rendre invisibles les lignes.
+
+```{r plotcol}
+plot(afc, invisible = "row")
+```
+
+### Contributions et qualité de représentation
+
+Il est possible d'obtenir la contribution de chaque ligne dans l'objet `contrib`, lui-même dans l'objet `row` du résultat de la fonction. Idem pour les colonnes (sous-objet `contrib` dans l'objet `col`).
+
+Pour la qualité de représentation, celle-ci est stockée dans le sous-objet `cos2` (de `row` pour les lignes et de `col` pour les colonnes).
+
+Ici, vu le nombre de modalités, il est possible de toutes les afficher pour mieux analyser.
+
+```{r axe1}
+round(afc$row$contrib)
+round(afc$row$cos2, 2)
+```
+
+Il faut faire de même pour les colonnes (*à tester*).
+
+### Interprétation
+
+#### Nombre de composantes
+
+Si nous regardons la variance cumulée, nous remarquons qu'avec 2 composantes, nous expliquons 77% de l'information, et 89% avec 3 axes.
+
+```{r}
+```
+
+#### Axe 1
+
+Le premier axe est très lié aux modalités suivantes (selon leur contribution) :
+
+- en lignes : `unemployment` (à gauche), `economic` (à droite), ainsi que `future` et `work` dans une moindre mesure
+- en colonnes : `high_school_diploma`, `university` (oute deux à droite) et `unqualified` (à gauche)
+
+Il semble donc indiquer que les personnes sans emploi sont plus inquiètes par le chômage, au contraire des personnes diplômés (au moins le bac) qui s'inquiètent plus au niveau économie globale.
+
+#### Axe 2
+
+Cet axe est à prendre avec beaucoup de distance. En effet, vu le peu d'informations qu'il apporte, dans le cadre de l'AFC, il faut être méfiant envers une interprétation trop poussée de cet axe.
+
+Si on devait tout de même l'interpréter, voici les modalités importantes :
+
+- en lignes : `comfort` et `to_live` (en haut) et `future` (en bas)
+- en colonnes : `university` (en haut) et `high_school_diploma` (en bas)
+
+Ici, nous pourrions dire, avec la plus grande des mesures, que les personnes à haut niveau de qualification indique que la perte de confort est une cause importante pour ne pas avoir d'enfant.
+
+
+## FactoInvestigate
+
+En plus du package `FactoMineR`, il existe le package [`FactoInvestigate`](http://factominer.free.fr/reporting/index_fr.html) qui permet de créer un rapport automatique pour l'interprétation d'un résultat d'une fonction de `FactoMineR` (ici, de `CA()` donc). 
+
+Voila comment lancer la création du rapport.
+
+```{r investigate, eval=FALSE}
+library(FactoInvestigate)
+Investigate(afc, file = "Investigate-AFC.Rmd")
+```
+
+Une fois que la fonction a fini, elle affiche la page html créée dans un navigateur. Vous trouverez ici le [fichier produit](Investigate-AFC.html).
+
+## Package `Factoshiny`
+
+Dans le même état d'esprit, le package [`Factoshiny`](http://factominer.free.fr/graphs/factoshiny-fr.html) permet lui de lancer une application dans un navigateur web pour réaliser une analyse des résultats, ainsi que pour exporter des graphiques et récupérer des tableaux. Voici comment lancer l'application :
+
+```{r shiny, eval=FALSE}
+library(Factoshiny)
+CAshiny(afc)
+```
+
+## A faire
+
+Merci de produire un document `Rmarkdown` contenant l'ensemble du code et des commentaires.
+
+### Suite sur `children`
+
+- Définir comme éléments supplémentaires les lignes 15 à 18, et les colonnes 6 à 8
+- Analyser les différences entre les deux AFC
+
+### Commerces de Paris
+
+La mairie de Paris met à disposition, sur son site [Open Data](http://opendata.paris.fr), l'ensemble des [commerces de Paris](https://opendata.paris.fr/explore/dataset/commercesparis/), en 2014. Les données sont disponibles dans le fichier [`commercesparis.csv`](commercesparis.csv). Les informations sur les variables sont disponibles sur le site.
+
+```{r}
+# importation des données
+commerces = read.table("commercesparis.csv", 
+                       header = T, sep = ";", quote = '"',
+                       fileEncoding = "UTF-8")
+
+# retrait du commerce sans activité
+commerces = subset(commerces, CODE.ACTIVITE != "") 
+```
+
+En regardant la liste des activités (ici les 20 premières), nous remarquons que nous pouvons sûrement regroupés celles-ci en groupes, à partir des deux premières lettres.
+
+```{r}
+# 
+activite = subset(commerces, select = c(CODE.ACTIVITE, LIBELLE.ACTIVITE))
+activite = unique(activite[order(activite$CODE.ACTIVITE),])
+head(activite, 20)
+```
+
+De ce fait, on va arriver à 18 groupes, avec certains groupes très présents (`CH`, `AF`), et d'autres très peu représentés (`GM`, `AE`).
+
+```{r}
+table(substr(commerces$CODE.ACTIVITE, 1, 2))
+```
+
+Pour leur attribuer un nom, nous allons créer un `data.frame`, que nous joindrons à la table d'origine pour ensuite pouvoir l'utiliser.
+
+```{r}
+act = read.table(text = "CODE;ACTIVITE
+AA;Locaux non utilisés
+AB;Commerces de gros
+AC;Imprimerie, Service annexe, Studio reportage
+AD;Activité de santé
+AE;Lieu de spectacle
+AF;Chose en boutique
+CA;Alimentaire
+CB;Mode
+CC;Pharmacie et produits de santé
+CD;Equipements
+CE;Ventes diverses
+CF;Bricolage, jardinage
+CG;Automobile, moto
+CH;Restauration
+CI;Hôtelerie
+GM;Grand magasin
+SA;Services diverses
+SB;Banques
+", sep = ";", header = T
+)
+commerces = merge(
+  transform(commerces,
+          CODE = substr(CODE.ACTIVITE, 1, 2)),
+  act
+)
+```
+
+
+Vous devez donc réaliser les étapes suivantes :
+
+- Créer la table de contingence entre les arrondissements et le code d'activité nouvellement créé
+- Décrire rapidement les données
+- Réaliser une AFC
+- Produire les graphiques nécessaires à l'interprétation
+- Que peut-on dire globalement ?
+

@@ -1,0 +1,5641 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="FX Jollois" />
+  <meta name="copyright" content="AFCM - STID2A2"/>
+  <title>Analyse Factorielle des Correspondances Multiples (AFCM ou ACM)</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link href="acm-cours_files/slidy-2/styles/slidy.css" rel="stylesheet" />
+  <script src="acm-cours_files/slidy-2/scripts/slidy.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="..\css\slidy-fxj.css" />
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Analyse Factorielle des Correspondances Multiples (AFCM ou ACM)</h1>
+  <h1 class="subtitle">DUT STID 2AFA</h1>
+  <p class="author">
+FX Jollois
+  </p>
+</div>
+<div id="que-veut-on-faire" class="slide section level1">
+<h1>Que veut-on faire ?</h1>
+<ul>
+<li>Décrire et/ou résumer l’information contenue dans les données
+<ul>
+<li>Sans formuler d’hypothèses au préalable</li>
+</ul></li>
+<li>Tableau individus <span class="math inline">\(\times\)</span> variables <strong>continues</strong>
+<ul>
+<li>On connaît : <strong>ACP</strong></li>
+</ul></li>
+<li>Table de contingence de deux variables
+<ul>
+<li>On connaît : <strong>AFC</strong></li>
+</ul></li>
+<li>Tableau individus <span class="math inline">\(\times\)</span> variables <strong>qualitatives</strong>
+<ul>
+<li><strong>ACM</strong></li>
+</ul></li>
+</ul>
+<h2 id="probleme-et-objectifs">Problème et objectifs</h2>
+<ul>
+<li>Visualiser les ressemblances entre les modalités d’une même variable</li>
+<li>Exploiter les ressources de la représentation simultanée pour analyser les liens entre plusieurs variables</li>
+</ul>
+</div>
+<div id="tableau-disjonctif-complet" class="slide section level1 columns-2">
+<h1>Tableau disjonctif complet</h1>
+<p>Transformation de la table des modalités pour n’avoir que des indicatrices <strong>binaires</strong></p>
+<table class="table" style="width: auto !important; float: left; margin-right: 10px;">
+<thead>
+<tr>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+vars
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+a
+</th>
+<th style="text-align:left;">
+b
+</th>
+<th style="text-align:left;">
+c
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table" style="width: auto !important; float: right; margin-left: 10px;">
+<thead>
+<tr>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+a
+</div>
+</th>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+b
+</div>
+</th>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="4">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+c
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:right;">
+a1
+</th>
+<th style="text-align:right;">
+a2
+</th>
+<th style="text-align:right;">
+a3
+</th>
+<th style="text-align:right;">
+b1
+</th>
+<th style="text-align:right;">
+b2
+</th>
+<th style="text-align:right;">
+c1
+</th>
+<th style="text-align:right;">
+c2
+</th>
+<th style="text-align:right;">
+c3
+</th>
+<th style="text-align:right;">
+c4
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tableau-de-burt" class="slide section level1">
+<h1>Tableau de Burt</h1>
+<p>Décompte des <strong>présences conjointes</strong> des modalités des variables</p>
+<table class="table" style="width: auto !important; float: left; margin-right: 10px;">
+<thead>
+<tr>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+a
+</div>
+</th>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+b
+</div>
+</th>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="4">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+c
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:right;">
+a1
+</th>
+<th style="text-align:right;">
+a2
+</th>
+<th style="text-align:right;">
+a3
+</th>
+<th style="text-align:right;">
+b1
+</th>
+<th style="text-align:right;">
+b2
+</th>
+<th style="text-align:right;">
+c1
+</th>
+<th style="text-align:right;">
+c2
+</th>
+<th style="text-align:right;">
+c3
+</th>
+<th style="text-align:right;">
+c4
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<table class="table" style="width: auto !important; float: right; margin-left: 10px;">
+<thead>
+<tr>
+<th style="border-bottom:hidden" colspan="2">
+</th>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+a
+</div>
+</th>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+b
+</div>
+</th>
+<th style="text-align:center; border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;" colspan="4">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+c
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+a1
+</th>
+<th style="text-align:right;">
+a2
+</th>
+<th style="text-align:right;">
+a3
+</th>
+<th style="text-align:right;">
+b1
+</th>
+<th style="text-align:right;">
+b2
+</th>
+<th style="text-align:right;">
+c1
+</th>
+<th style="text-align:right;">
+c2
+</th>
+<th style="text-align:right;">
+c3
+</th>
+<th style="text-align:right;">
+c4
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;vertical-align: middle !important;" rowspan="3">
+a
+</td>
+<td style="text-align:left;">
+a1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+a2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+a3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;vertical-align: middle !important;" rowspan="2">
+b
+</td>
+<td style="text-align:left;">
+b1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+b2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;vertical-align: middle !important;" rowspan="4">
+c
+</td>
+<td style="text-align:left;">
+c1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+c2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+c3
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+c4
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="principe" class="slide section level1">
+<h1>Principe</h1>
+<p>Utiliser le tableau disjonctif complet comme une table de contingence particulière</p>
+<ul>
+<li>Totaux en ligne, identiques et égaux au nombre de variables</li>
+<li>Totaux en colonne, correspondant au nombre d’individus ayant chaque modalité</li>
+<li>Réalisation de l’ACP avec la métrique du <span class="math inline">\(\chi^2\)</span> comme pour l’AFC</li>
+</ul>
+<p>Utiliser le tableau de Burt</p>
+<ul>
+<li>Réalisation de l’AFC directement sur ce tableau</li>
+</ul>
+<p>Dans tous les cas</p>
+<blockquote>
+<p><strong>Interprétation longue et délicate</strong></p>
+</blockquote>
+</div>
+<div id="informations" class="slide section level1">
+<h1>Informations</h1>
+<ul>
+<li>Nombre de valeurs propres = <span class="math inline">\(m - p\)</span>
+<ul>
+<li><span class="math inline">\(m\)</span> : nombre de modalités</li>
+<li><span class="math inline">\(p\)</span> : nombre de variables</li>
+</ul></li>
+<li>Somme des valeurs propres = <span class="math inline">\((m - p) / p\)</span></li>
+<li>Caractéristique de l’ACM :
+<ul>
+<li>faible part de variance expliquée sur les premiers axes</li>
+</ul></li>
+<li>Choix du nombre de valeurs propres :
+<ul>
+<li>au moins 5</li>
+<li>généralement la moitié des axes</li>
+<li>recherche d’un palier important de la part de variance expliquée</li>
+</ul></li>
+</ul>
+</div>
+<div id="modalites-rares" class="slide section level1">
+<h1>Modalités rares</h1>
+<p>Modalités avec un effectif faible : <span class="math inline">\(&lt; 2\%\)</span> (par exemple)</p>
+<ul>
+<li><strong>Problème</strong> :
+<ul>
+<li>poids importants dans le calcul</li>
+<li>axes fortement influencés par elles</li>
+<li>analyse faussée</li>
+</ul></li>
+<li><strong>Solution</strong> :
+<ul>
+<li>regrouper avec d’autres modalités, si cela a du sens</li>
+<li>les exclure du calcul</li>
+<li>dans certains outils, on parle d’<em>apurement</em>
+<ul>
+<li>ventilation aléatoire des effectifs dans les autres modalités</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="interpretation" class="slide section level1">
+<h1>Interprétation</h1>
+<h3 id="contributions">Contributions</h3>
+<ul>
+<li>Idem que l’ACP et l’AFC</li>
+<li>Recherche des modalités avec une contribution <span class="math inline">\(&gt; \frac{100}{m}\)</span></li>
+</ul>
+<h3 id="qualite-de-representation">Qualité de représentation</h3>
+<p>Idem que pour l’ACP.</p>
+<h3 id="variables-supplementaires">Variables supplémentaires</h3>
+<p>Possibilité d’ajouter des variables qualitatives et quantitatives illustratives</p>
+</div>
+<div id="exemple-simple" class="slide section level1">
+<h1>Exemple simple</h1>
+<p>Etude sur des enfants dans une école primaire, ayant subi une intoxication alimentaire.</p>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:right;">
+Age
+</th>
+<th style="text-align:right;">
+Time
+</th>
+<th style="text-align:right;">
+Sick
+</th>
+<th style="text-align:right;">
+Sex
+</th>
+<th style="text-align:right;">
+Nausea
+</th>
+<th style="text-align:right;">
+Vomiting
+</th>
+<th style="text-align:right;">
+Abdominals
+</th>
+<th style="text-align:right;">
+Fever
+</th>
+<th style="text-align:right;">
+Diarrhae
+</th>
+<th style="text-align:right;">
+Potato
+</th>
+<th style="text-align:right;">
+Fish
+</th>
+<th style="text-align:right;">
+Mayo
+</th>
+<th style="text-align:right;">
+Courgette
+</th>
+<th style="text-align:right;">
+Cheese
+</th>
+<th style="text-align:right;">
+Icecream
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+72
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+36
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+45
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+85
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+88
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+79
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+82
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+83
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+F
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+n
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+M
+</td>
+<td style="text-align:right;">
+n
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+<td style="text-align:right;">
+y
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="variables" class="slide section level1">
+<h1>Variables</h1>
+<ul>
+<li>2 variables quantitatives : <code>Age</code>, <code>Time</code></li>
+<li>1 variable <em>cible</em> : <code>Sick</code></li>
+<li>1 variable qualitative informative : <code>Sex</code></li>
+<li>5 variables binaires sur les symptômes : <code>Nausea</code>, <code>Vomiting</code>, <code>Abdominals</code>, <code>Fever</code>, <code>Diarrhae</code></li>
+<li>6 variables binaires sur les aliments consommés : <code>Potato</code>, <code>Fish</code>, <code>Mayo</code>, <code>Courgette</code>, <code>Cheese</code>, <code>Icecream</code></li>
+</ul>
+<pre><code>##       Age             Time       Sick   Sex    Nausea Vomiting Abdominals
+##  Min.   : 4.00   Min.   : 0.00   n:17   F:28   n:43   n:33     n:18      
+##  1st Qu.: 6.00   1st Qu.: 0.00   y:38   M:27   y:12   y:22     y:37      
+##  Median : 8.00   Median :12.00                                           
+##  Mean   :16.93   Mean   :10.16                                           
+##  3rd Qu.:10.00   3rd Qu.:16.50                                           
+##  Max.   :88.00   Max.   :22.00                                           
+##  Fever  Diarrhae Potato Fish   Mayo   Courgette Cheese Icecream
+##  n:20   n:20     n: 3   n: 1   n:10   n: 5      n: 7   n: 4    
+##  y:35   y:35     y:52   y:54   y:45   y:50      y:48   y:51    
+##                                                                
+##                                                                
+##                                                                
+## </code></pre>
+<p>A noter : 1 modalité rare (<code>Fish == &quot;n&quot;</code>)</p>
+</div>
+<div id="part-de-la-variance-expliquee" class="slide section level1">
+<h1>Part de la variance expliquée</h1>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Valeur propre
+</th>
+<th style="text-align:right;">
+Variance (%)
+</th>
+<th style="text-align:right;">
+Cumulée (%)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+dim 1
+</td>
+<td style="text-align:right;">
+0.34
+</td>
+<td style="text-align:right;">
+33.52
+</td>
+<td style="text-align:right;">
+33.52
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 2
+</td>
+<td style="text-align:right;">
+0.13
+</td>
+<td style="text-align:right;">
+12.91
+</td>
+<td style="text-align:right;">
+46.44
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 3
+</td>
+<td style="text-align:right;">
+0.11
+</td>
+<td style="text-align:right;">
+10.73
+</td>
+<td style="text-align:right;">
+57.17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 4
+</td>
+<td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:right;">
+9.59
+</td>
+<td style="text-align:right;">
+66.76
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 5
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+7.88
+</td>
+<td style="text-align:right;">
+74.64
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 6
+</td>
+<td style="text-align:right;">
+0.07
+</td>
+<td style="text-align:right;">
+7.11
+</td>
+<td style="text-align:right;">
+81.75
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 7
+</td>
+<td style="text-align:right;">
+0.06
+</td>
+<td style="text-align:right;">
+6.02
+</td>
+<td style="text-align:right;">
+87.77
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 8
+</td>
+<td style="text-align:right;">
+0.06
+</td>
+<td style="text-align:right;">
+5.58
+</td>
+<td style="text-align:right;">
+93.35
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 9
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+4.12
+</td>
+<td style="text-align:right;">
+97.47
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 10
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+1.30
+</td>
+<td style="text-align:right;">
+98.77
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dim 11
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+1.23
+</td>
+<td style="text-align:right;">
+100.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="part-de-la-variance-expliquee-1" class="slide section level1">
+<h1>Part de la variance expliquée</h1>
+<p><img src="acm-cours_files/figure-slidy/eigenfig-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="representation-graphique" class="slide section level1">
+<h1>Représentation graphique</h1>
+<p><img src="acm-cours_files/figure-slidy/graphs-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="representation-conjointe" class="slide section level1">
+<h1>Représentation conjointe</h1>
+<p><img src="acm-cours_files/figure-slidy/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="representation-de-chaque-variable-separemment" class="slide section level1">
+<h1>Représentation de chaque variable séparemment</h1>
+<p><img src="acm-cours_files/figure-slidy/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="representation-des-variables" class="slide section level1">
+<h1>Représentation des variables</h1>
+<p><img src="acm-cours_files/figure-slidy/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="en-gardant-5-axes" class="slide section level1">
+<h1>En gardant 5 axes</h1>
+<p>Ce qui implique 20 graphiques…</p>
+<p><img src="acm-cours_files/figure-slidy/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="modalites-importantes-contributions" class="slide section level1">
+<h1>Modalités importantes (contributions)</h1>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+Dim.1
+</th>
+<th style="text-align:right;">
+Dim.2
+</th>
+<th style="text-align:right;">
+Dim.3
+</th>
+<th style="text-align:right;">
+Dim.4
+</th>
+<th style="text-align:right;">
+Dim.5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Nausea_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 9.43%">5</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Nausea_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 9.43%">5</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.66%">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 32.08%">17</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vomit_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.55%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 13.21%">7</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.55%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vomit_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 11.32%">6</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 20.75%">11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 11.32%">6</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Abdo_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 28.30%">15</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Abdo_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 15.09%">8</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fever_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 26.42%">14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fever_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 15.09%">8</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Diarrhea_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 26.42%">14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Diarrhea_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 15.09%">8</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Potato_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 49.06%">26</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 39.62%">21</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 22.64%">12</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Potato_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fish_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 39.62%">21</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 100.00%">53</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Fish_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mayo_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 15.09%">8</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.66%">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mayo_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Courg_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 54.72%">29</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.55%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 24.53%">13</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Courg_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.66%">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cheese_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 9.43%">5</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.66%">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 77.36%">41</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cheese_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 11.32%">6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Icecream_n
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 16.98%">9</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 43.40%">23</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 37.74%">20</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 33.96%">18</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Icecream_y
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.77%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.89%">1</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="individus-importants-contributions" class="slide section level1">
+<h1>Individus importants (contributions)</h1>
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:right;">
+Dim.1
+</th>
+<th style="text-align:right;">
+Dim.2
+</th>
+<th style="text-align:right;">
+Dim.3
+</th>
+<th style="text-align:right;">
+Dim.4
+</th>
+<th style="text-align:right;">
+Dim.5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 10.71%">6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.36%">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 44.64%">25</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 100.00%">56</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 10.71%">6</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 14.29%">8</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.36%">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 12.50%">7</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 10.71%">6</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 12.50%">7</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.36%">3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 16.07%">9</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 17.86%">10</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 10.71%">6</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 23.21%">13</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 19.64%">11</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.36%">3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 26.79%">15</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 21.43%">12</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.36%">3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.36%">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 35.71%">20</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 17.86%">10</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 8.93%">5</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 23.21%">13</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 25.00%">14</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 12.50%">7</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.36%">3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 8.93%">5</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 8.93%">5</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 23.21%">13</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 3.57%">2</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 7.14%">4</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 14.29%">8</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 5.36%">3</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 12.50%">7</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 12.50%">7</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 1.79%">1</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: lightblue; width: 0.00%">0</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="variables-supplementaires-1" class="slide section level1">
+<h1>Variables supplémentaires</h1>
+<p><img src="acm-cours_files/figure-slidy/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="avec-modalite-rare" class="slide section level1">
+<h1>Avec modalité rare</h1>
+<p>2 possibilités :</p>
+<ul>
+<li>on fixe les modalités à exclure (par exemple <code>Fish == n</code>)</li>
+<li>on fixe un seuil de ventilation (par exemple 2%)</li>
+</ul>
+<p>Dans notre cas, nous avons une modalité rare pour une variable à 2 modalités. L’exclure n’est pas utile, il est préférable de placer la variable <code>Fish</code> en illustrative.</p>
+<blockquote>
+<p>Qu’est-ce que ca change ?</p>
+</blockquote>
+</div>
+<div id="part-de-la-variance-expliquee-2" class="slide section level1">
+<h1>Part de la variance expliquée</h1>
+<p><img src="acm-cours_files/figure-slidy/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="les-5-premiers-axes" class="slide section level1">
+<h1>Les 5 premiers axes</h1>
+<p><img src="acm-cours_files/figure-slidy/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="variables-supplementaires-2" class="slide section level1">
+<h1>Variables supplémentaires</h1>
+<p><img src="acm-cours_files/figure-slidy/unnamed-chunk-19-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+</body>
+</html>

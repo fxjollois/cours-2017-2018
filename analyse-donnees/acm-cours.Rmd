@@ -1,0 +1,339 @@
+---
+title: Analyse Factorielle des Correspondances Multiples (AFCM ou ACM)
+subtitle: DUT STID 2AFA
+author: FX Jollois
+output: 
+    slidy_presentation:
+        footer: "AFCM - STID2A2"
+        css: ../css/slidy-fxj.css
+        self_contained: false
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center", fig.height = 5)
+library(tibble)
+library(FactoMineR)
+library(knitr)
+library(kableExtra)
+library(formattable)
+```
+
+#  Que veut-on faire ?
+
+- Décrire et/ou résumer l'information contenue dans les données 
+    - Sans formuler d'hypothèses au préalable 
+- Tableau individus $\times$ variables **continues**
+    - On connaît : **ACP**
+- Table de contingence de deux variables
+    - On connaît : **AFC**
+- Tableau individus $\times$ variables **qualitatives**
+    - **ACM**
+
+## Problème et objectifs
+
+- Visualiser les ressemblances entre les modalités d'une même variable
+- Exploiter les ressources de la représentation simultanée pour analyser les liens entre plusieurs variables 
+
+# Tableau disjonctif complet  {.columns-2}
+
+Transformation de la table des modalités pour n'avoir que des indicatrices **binaires**
+
+
+```{r}
+n = 10
+tab = data.frame(
+  a = factor(c(3, 3, 1, 2, 1, 1, 3, 3, 1, 2)),
+  b = factor(c(1, 2, 2, 2, 1, 1, 2, 1, 2, 1)),
+  c = factor(c(2, 3, 1, 2, 4, 4, 3, 1, 1, 2))
+)
+tab %>%
+  kable("html") %>%
+  kable_styling(position = "float_left", full_width = FALSE)  %>%
+  add_header_above(c("vars" = 3))
+```
+
+
+```{r}
+dis = tab.disjonctif(tab)
+colnames(dis) = paste0(c(rep("a", 3), rep("b", 2), rep("c", 4)), colnames(dis))
+dis %>%
+  kable("html") %>%
+  kable_styling(position = "float_right", full_width = FALSE) %>%
+  add_header_above(c("a" = 3, "b" = 2, "c" = 4))
+```
+
+
+# Tableau de Burt
+
+Décompte des **présences conjointes** des modalités des variables
+
+
+```{r}
+dis %>%
+  kable("html") %>%
+  kable_styling(position = "float_left", full_width = FALSE) %>%
+  add_header_above(c("a" = 3, "b" = 2, "c" = 4)) 
+```
+
+```{r}
+burt = data.frame(t(dis) %*% dis) %>%
+  rownames_to_column()
+burt2 = cbind(var = c(rep("a", 3), rep("b", 2), rep("c", 4)), burt)
+names(burt2)[1:2] = ""
+burt2 %>%
+  kable("html") %>%
+  kable_styling(position = "float_right", full_width = FALSE) %>%
+  collapse_rows(columns = 1) %>%
+  add_header_above(c(" " = 2, "a" = 3, "b" = 2, "c" = 4)) 
+```
+
+# Principe
+
+Utiliser le tableau disjonctif complet comme une table de contingence particulière
+
+- Totaux en ligne, identiques et égaux au nombre de variables
+- Totaux en colonne, correspondant au nombre d'individus ayant chaque modalité
+- Réalisation de l'ACP avec la métrique du $\chi^2$ comme pour l'AFC
+
+Utiliser le tableau de Burt
+
+- Réalisation de l'AFC directement sur ce tableau
+
+Dans tous les cas
+
+> **Interprétation longue et délicate**
+
+# Informations
+
+- Nombre de valeurs propres = $m - p$
+    - $m$ : nombre de modalités
+    - $p$ : nombre de variables
+- Somme des valeurs propres = $(m - p) / p$
+- Caractéristique de l'ACM :
+    - faible part de variance expliquée sur les premiers axes
+- Choix du nombre de valeurs propres :
+    - au moins 5
+    - généralement la moitié des axes
+    - recherche d'un palier important de la part de variance expliquée
+
+# Modalités rares
+
+Modalités avec un effectif faible : $< 2\%$ (par exemple)
+
+- **Problème** : 
+    - poids importants dans le calcul
+    - axes fortement influencés par elles
+    - analyse faussée
+- **Solution** :
+    - regrouper avec d'autres modalités, si cela a du sens
+    - les exclure du calcul
+    - dans certains outils, on parle d'*apurement*
+        - ventilation aléatoire des effectifs dans les autres modalités
+
+# Interprétation
+
+### Contributions
+
+- Idem que l'ACP et l'AFC
+- Recherche des modalités avec une contribution $> \frac{100}{m}$
+
+### Qualité de représentation
+
+Idem que pour l'ACP.
+
+### Variables supplémentaires
+
+Possibilité d'ajouter des variables qualitatives et quantitatives illustratives
+
+
+# Exemple simple 
+
+Etude sur des enfants dans une école primaire, ayant subi une intoxication alimentaire.
+
+```{r}
+data(poison)
+p = data.frame(lapply(poison, function(v) {
+  if (is.numeric(v)) return(v)
+  if (levels(v)[1] == levels(poison$Sex)[1]) return(v)
+  sapply(strsplit(as.character(v), "_"), function(s) return(s[2]))
+}))
+formattable(p)
+```
+
+# Variables
+
+- 2 variables quantitatives : `r paste0('\x60', names(p)[1:2], '\x60')`
+- 1 variable *cible* : `r paste0('\x60', names(p)[3], '\x60')`
+- 1 variable qualitative informative : `r paste0('\x60', names(p)[4], '\x60')`
+- 5 variables binaires sur les symptômes : `r paste0('\x60', names(p)[5:9], '\x60')`
+- 6 variables binaires sur les aliments consommés : `r paste0('\x60', names(p)[10:15], '\x60')`
+
+```{r}
+summary(p)
+```
+
+A noter : 1 modalité rare (`Fish == "n"`)
+
+# Part de la variance expliquée
+
+```{r}
+acm <- MCA(
+  poison, 
+  quanti.sup = 1:2, # Variables quantitatives supplémentaires
+  quali.sup = 3:4,  # Variables qualitatives supplémentaires
+  graph=FALSE)
+```
+
+
+```{r eigentab}
+formattable(
+  round(
+    setNames(
+      data.frame(acm$eig), 
+      c("Valeur propre", "Variance (%)", "Cumulée (%)")), 2),
+  row.names = TRUE
+)
+```
+
+# Part de la variance expliquée
+
+```{r eigenfig}
+par(mar = c(2, 2, 1, 1) + .5)
+b = barplot(acm$eig[, 2], 
+        names.arg = 1:nrow(acm$eig), 
+        col ="darkslategray")
+lines(b[-11], acm$eig[-11,2] - acm$eig[-1,2], 
+      type = "b", pch = 19, col = "red")
+legend("topright", col = "red", lty = 1, legend = "Saut", bty = "n", pch = 19)
+```
+
+# Représentation graphique
+
+```{r graphs}
+par(mfrow = c(1, 2))
+plot(acm, invisible = c("var", "quali.sup", "quanti.sup"), 
+     autoLab = "yes")
+plot(acm, invisible = c("ind", "quali.sup", "quanti.sup"), 
+     autoLab = "yes")
+```
+
+
+# Représentation conjointe
+
+```{r}
+plot(acm, invisible = c("quali.sup", "quanti.sup"), 
+     autoLab = "yes")
+```
+
+# Représentation de chaque variable séparemment
+
+```{r}
+plotellipses(acm, keepvar = "quali")
+```
+
+# Représentation des variables
+
+```{r}
+plot(acm, choix = "var", invisible = c("quali.sup", "quanti.sup"))
+```
+
+
+# En gardant 5 axes
+
+Ce qui implique 20 graphiques...
+
+```{r, fig.height=7}
+par(mfrow = c(5, 4), mar = c(2, 2, 1, 0) + .1)
+for (i in 1:4) {
+  for (j in 2:5) {
+    plot(acm, 
+         axes = c(i, j),
+         title = paste(i, "-", j), 
+         invisible = c("ind", "quali.sup", "quanti.sup"), 
+         autoLab = "yes")
+  }
+}
+```
+
+
+# Modalités importantes (contributions)
+
+```{r}
+formattable(
+  data.frame(round(acm$var$contrib)),
+  list(
+     area() ~ proportion_bar("lightblue")
+  )
+)
+```
+
+# Individus importants (contributions)
+
+```{r}
+formattable(
+  data.frame(round(acm$ind$contrib)),
+  list(
+     area() ~ proportion_bar("lightblue")
+  )
+)
+```
+
+# Variables supplémentaires
+
+```{r}
+plot(acm, invisible = c("ind", "var"), autoLab = "yes")
+```
+
+
+# Avec modalité rare
+
+2 possibilités :
+
+- on fixe les modalités à exclure (par exemple `Fish == n`)
+- on fixe un seuil de ventilation (par exemple 2%)
+
+Dans notre cas, nous avons une modalité rare pour une variable à 2 modalités. L'exclure n'est pas utile, il est préférable de placer la variable `Fish` en illustrative.
+
+```{r}
+acm2 <- MCA(
+  poison, 
+  quanti.sup = 1:2, # Variables quantitatives supplémentaires
+  quali.sup = c(3:4, 11),  # Variables qualitatives supplémentaires
+  graph = FALSE)
+```
+
+> Qu'est-ce que ca change ?
+
+# Part de la variance expliquée
+
+```{r}
+par(mar = c(2, 2, 1, 1) + .5)
+b = barplot(acm2$eig[, 2], 
+        names.arg = 1:nrow(acm2$eig), 
+        col ="darkslategray")
+lines(b[-10], acm2$eig[-10,2] - acm2$eig[-1,2], 
+      type = "b", pch = 19, col = "red")
+legend("topright", col = "red", lty = 1, legend = "Saut", bty = "n", pch = 19)
+```
+
+# Les 5 premiers axes
+
+```{r, fig.height=7}
+par(mfrow = c(5, 4), mar = c(2, 2, 1, 0) + .1)
+for (i in 1:4) {
+  for (j in 2:5) {
+    plot(acm2, 
+         axes = c(i, j),
+         title = paste(i, "-", j), 
+         invisible = c("ind", "quali.sup", "quanti.sup"), 
+         autoLab = "yes")
+  }
+}
+```
+
+# Variables supplémentaires
+
+```{r}
+plot(acm2, invisible = c("ind", "var"), autoLab = "yes")
+```
+

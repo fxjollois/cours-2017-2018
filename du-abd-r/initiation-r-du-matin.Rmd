@@ -1,0 +1,505 @@
+---
+title: Initiation à `R`
+subtitle: DU Analyste Big Data
+output:
+    html_document:
+        toc: true
+        toc_float: true
+        toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Dans ce document sont présentés les concepts principaux du logiciel `R` (éléments de langage, données manipulées, manipulation de données, ...). 
+
+
+## Présentation de R et de son environnement
+
+Le logiciel **R** est un langage dédié à la statistique. Celui-ci est interprété (i.e. exécuté à la volée). Pour simplifier son utilisation, il est possible d'écrire des scripts contenant plusieurs commandes à exécuter. Il a l'avantage d'être open source, et surtout d'être très utilisé par la communauté scientifique. Toute nouvelle méthode statistique a très rapidement une implémentation dans ce langage, ce qui n'est pas le cas pour d'autres langages.
+
+Pour simplifier le développement de programme R, il est nécessaire d'avoir une interface graphique (appelée aussi *GUI*). Celle offerte par R est très simpliste et beaucoup préfèrent utiliser **RStudio**, à juste titre. Cet outil permet de réellement fluidifier le travail avec ce langage.
+
+Enfin, R, dans l'esprit open source, offre la possibilité de charger des paquets (ou *packages* ou *library*) afin d'étendre ses possibilités. Il en existe un très grand nombre sur le site du **CRAN**, parfois redondants entre eux. Pour cette session, nous allons utiliser les paquets contenus dans `tidyverse`, qui est une collection de librairies très bien faites et adaptées pour la *Data Science*.
+
+Voici quelques liens intéressants pour ce cours:
+
+- [R](http://www.r-project.org)
+- [RStudio](http://www.rstudio.com)
+- [tidyverse](https://www.tidyverse.org/)
+
+## Eléments de langages
+
+Nous allons voir ici les différentes structures de données utilisées dans R, ainsi que les moyens de les créer et de les manipuler.
+
+### Type `vector`
+
+Tout est `vector` de base (au minimum), il n'existe pas de type *scalaire*. La fonction `class()` renvoie la classe de l'objet passé en paramètre. Les fonction`is.<type>()` permet de tester si l'objet en paramètre est du type demandé.
+
+```{r}
+a = 5
+print(a)
+a
+class(a)
+is.vector(a)
+```
+
+Si nous créons le vecteur `1 2 3 4 5` (grâce à la commande `1:5`), nous pouvons voir que les retours des fonctions `class()` et `is.vector()` sont les mêmes que pour la variable `a` ci-dessus.
+
+```{r}
+1:5
+class(1:5)
+is.vector(1:5)
+```
+
+Ci-dessous sont présentés différents moyens de créer des vecteurs.
+
+```{r}
+c(1, 3, 5)
+c("A", "b")
+c("a", 1:3)
+vector("numeric", 5)
+1:5
+5:1
+seq(1, 5)
+seq(1, 5, length = 9)
+seq(1, 5, by = .5)
+seq(1, 5, by = .75)
+seq(5, 1, by = -.5)
+rep(1:5, times = 3)
+rep(1:5, each = 2)
+rep(1:5, times = 3, each = 2)
+runif(10)
+rnorm(10)
+rnorm(10, 100, 20)
+```
+
+Pour accéder aux éléments d'un vecteur, nous utilisons les `[]`. Dedans, nous pouvons soit mettre des indices, soit un vecteur booléen de même taille que le vecteur initial. Les fonctions `head()` et `tail()` permettent d'avoir les premières ou les dernières valeurs (6 par défaut, modifiables si besoin).
+
+```{r}
+x = rnorm(100)
+x[1]
+x[c(1, 5, 10)]
+x[x > 2]
+head(x)
+head(x, 10)
+tail(x)
+tail(x, 10)
+```
+
+
+### Type `list`
+
+Si nous souhaitons mettre ensemble des éléments de type différents, il existe aussi des `list` (nommées ou non, voire partiellement), créées via la fonction `list()`. Ci-dessous sont présentées différentes listes et comment on accède aux élément de celle-ci (avec des `[[]]` ou l'opérateur `$` suivi du nom du sous-objet.
+
+```{r}
+a = list(1:5, month.abb, pi)
+a
+class(a)
+b = list(b = 1:5, mois = month.abb, pi = pi)
+b
+c = list(1:5, mois = month.abb, pi = pi)
+c
+c[[1]]
+c[[2]]
+c[["mois"]]
+c$mois
+d = list(d1 = c, d2 = head(x))
+d
+d$d1
+d$d2
+d$d1$mois
+```
+
+### Type `matrix` (et `array`)
+
+Si on souhaite créer des tableaux à 2 dimensions, il faut utiliser la fonction `matrix()`, qui renvoie un objet `matrix`. On utilise les `[,]` pour accéder aux cellules de la matrice, avec tout ce qui est pour les lignes avant la virgule, et pour les colonnes après.
+
+```{r}
+matrix(0, nrow = 2, ncol = 5)
+matrix(1:10, 2, 5)
+matrix(1:10, 2, 5, byrow = TRUE)
+m = matrix(runif(100), 20, 5)
+m
+dim(m)
+head(m)
+m[1,]
+m[1:3,]
+m[,1]
+m[,1:3]
+m[1,1]
+m[1:3,1]
+m[1,1:3]
+m[1:3,1:3]
+```
+
+Le type `array` est une extension de `matrix` à plus de 2 dimensions. Nous ne verrons pas ce type pour le moment.
+
+```{r}
+class(m)
+is.array(m)
+```
+
+### Type `data.frame`
+
+En statistique, nous avons couramment besoin de tables d'individus (ou d'objets) décrits par des variables. En R, ce type de données est contenu, de base, dans des `data.frame`. Pour information, il existe un certain nombre de données déjà présentes dans R, dont vous pouvez obtenir la liste par la fonction `data()` exécutée dans la console. De plus, pour accéder à l'aide d'un jeu de données, vous pouvez exécuter soit `help(<jeu>)` ou `?<jeu>`. Ici, le jeu de données utilisé est `mtcars`.
+
+```{r}
+mtcars
+class(mtcars)
+head(mtcars)
+names(mtcars)
+rownames(mtcars)
+dim(mtcars)
+str(mtcars)
+```
+
+Pour accéder aux données, nous pouvons soit utiliser le même procédé que pour une `matrix`, soit des moyens plus spécifiques.
+
+```{r}
+mtcars[1,]
+mtcars[,1]
+mtcars[1]
+mtcars[,"mpg"]
+mtcars["mpg"]
+mtcars$mpg
+mtcars["Mazda RX4",]
+mtcars[1:5, c("mpg", "hp", "qsec")]
+mtcars[c("Mazda RX4", "Hornet Sportabout"), 1:3]
+mtcars[mtcars$mpg > 30,]
+```
+
+
+### Type `factor`
+
+Puisque R est un langage orienté statistique, il dispose d'un type particulier permettant de coder des variables qualitatives, le type `factor`. Comme nous pouvons le voir en transformant la variable en `numeric`, ce type code chaque modalité numériquement (en valeur entière de 1 à $n_{modalité}$) et garde la liste des modalités en plus (qu'on peut obtenir avec `levels()`). 
+
+```{r}
+class(iris$Species)
+head(iris$Species)
+levels(iris$Species)
+as.numeric(iris$Species)
+as.character(iris$Species)
+```
+
+
+### `tibble`
+
+Dans l'univers `tidyverse`, c'est l'utilisation du type [`tibble`](http://tibble.tidyverse.org/) qui est privilégié. Pour information, la fonction `tibble()` sert à transformer un objet dans cette classe, ou à en créer un nouveau (pas vu ici).
+
+```{r}
+library(tibble)
+mtt = as_tibble(mtcars)
+mtt
+class(mtt)
+head(mtt)
+```
+
+
+## Importation de données
+
+Le `tidyverse` inclut trois packages permettant l'importation de données externes, contenues dans des fichiers (ainsi que l'exportation). Nous allons ici importer des données classiques (150 *iris* de trois espèces différentes, décrits par 4 variable), disponibles dans trois formats : [texte délimité](Iris.txt), [Excel](Iris.xlsx) et [SAS](Iris.sas7bdat). Les trois fonctions qu'on va utiliser renvoient un objet de type `tibble`.
+
+### Texte délimité
+
+Pour cela, nous utilisons le package [`readr`](http://readr.tidyverse.org/), qui améliore les fonctions déjà présentes. Les nouvelles fonctions sont plutôt performantes, et *comprennent* les données, ce qui permet de limiter les besoins de paramétrisation de celles-ci.
+
+```{r}
+library(readr)
+iris_txt = read_delim("Iris.txt", delim = "\t")
+iris_txt
+```
+
+### Fichier Excel
+
+Le package [`readxl`](http://readxl.tidyverse.org/) permet donc de lire des fichiers Excel (quelque soit le format : `xlsx` ou `xls`). La fonction `read_excel()` détecte justement le format du fichier.
+
+```{r}
+library(readxl)
+iris_xlsx = read_excel("Iris.xlsx")
+iris_xlsx
+```
+
+### Fichier SAS
+
+Enfin, pour importer des données SAS mais aussi SPSS et Stata, il existe le package [`haven`](http://haven.tidyverse.org/), avec la fonction `read_sas()`.
+
+```{r}
+library(haven)
+iris_sas = read_sas("Iris.sas7bdat")
+iris_sas
+```
+
+
+## Manipulation de données
+
+Pour tout ce qui est manipulation de données, au sens `SQL`, nous disposons du package [`dplyr`](http://dplyr.tidyverse.org/) qui fournit toutes les fonctions utilisées ici. Bien qu'il y ait aussi des fonctions de base dans R, ce package est préférable.
+
+Vous remarquerez l'utilisation de l'opérateur `%>%` pour enchaîner les opérations. Celui-ci est fournit par le package [`magrittr`](http://magrittr.tidyverse.org/), lui aussi dans le `tidyverse`. Ce formalisme permet d'avoir un code plus lisible, car déroulant les étapes les unes après les autres, contrairement à la programmation classique dans R.
+
+```{r}
+library(dplyr)
+```
+
+
+### Restriction et projection
+
+Ici, les deux opérations consistent respectivement à sélectionner des lignes (*restriction*) ou des colonnes (*projection*).
+
+#### Restriction par filtre
+
+```{r}
+mtcars %>% filter(mpg > 30)
+mtcars %>% filter(mpg > 30 & qsec < 19)
+mtcars %>% filter(carb == 8)
+mtcars %>% filter(between(mpg, 30, 32))
+```
+
+#### Sélection de lignes par indices
+
+```{r}
+mtcars %>% slice(1:5)
+mtcars %>% slice(25:n()) # n() indique le nombre de lignes de la table
+mtcars %>% slice(seq(1, n(), by = 4))
+```
+
+#### Projection
+
+```{r}
+head(mtcars) %>% select(mpg)
+head(mtcars) %>% select(qsec, mpg, hp)
+head(mtcars) %>% select(5, 3, 9)
+head(mtcars) %>% select(starts_with("c")) # d'autres possibilités de ce type existent (voir ?select_helpers)
+```
+
+#### Suppression des doublons
+
+```{r}
+head(mtcars) %>% select(cyl)
+```
+
+```{r}
+head(mtcars) %>% select(cyl) %>% distinct()
+```
+
+### Tri
+
+La fonction `arrange()` permet le tri sur une ou plusieurs variables, avec `desc()` pour indiquer un ordre décroissant.
+
+```{r}
+head(mtcars) %>% arrange(mpg)
+head(mtcars) %>% arrange(am, mpg)
+head(mtcars) %>% arrange(desc(mpg))
+```
+
+### Ajout de variables
+
+Comme vous avez pu le remarquer, dans les différents exemples ci-dessus, le nom des lignes est supprimé. Pour le récupérer, nous utilisons la fonction `rownames_to_column()`, qui permet de le transformer en variable.
+
+```{r}
+head(mtcars) %>% rownames_to_column(var = "car")
+```
+
+Pour ajouter une variable, il existe la fonction `mutate()`.
+
+```{r}
+head(mtcars) %>% mutate(ratio = wt / hp, zero = 0, wt = NULL, hp = NULL)
+head(mtcars) %>% mutate(n = row_number(), rang_mpg = min_rank(desc(mpg)))
+```
+
+Si l'on veut garder uniquement la variable nouvellement créée, on utilise `transmute()`.
+
+```{r}
+head(mtcars) %>% transmute(ratio = wt / hp)
+```
+
+
+### Calcul d'agrégat
+
+Pour résumer une ou plusieurs variables, nous utilisons la fonction `summarise()`.
+
+```{r}
+mtcars %>% summarise(
+  n = n(),
+  mpg_mean = mean(mpg),
+  nbtype_carb = n_distinct(carb)
+)
+```
+
+Et si l'on souhaite effecture par groupes déterminés par les modalités d'une variable, il existe la fonction `group_by()`.
+
+```{r}
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(
+  n = n(),
+  mpg_mean = mean(mpg),
+  nbtype_carb = n_distinct(carb)
+)
+```
+
+
+### Jointure
+
+Pour tester les méthodes, nous créons une nouvelle table `engine`, indiquant le type en fonction de la valeur de `cyl`. Vous remarquerez que par rapport à `mtcars`, il y a une valeur en moins (4) et une valeur en plus (12).
+
+```{r}
+engine = tibble(
+  cyl = c(6, 8, 12),
+  type = c("medium", "big", "very big")
+)
+```
+
+Nous pouvons maintenant utiliser les différentes fonctions de jointure disponibles.
+
+```{r}
+mtcars %>% inner_join(engine)
+mtcars %>% left_join(engine)
+mtcars %>% right_join(engine)
+mtcars %>% full_join(engine)
+mtcars %>% semi_join(engine)
+mtcars %>% anti_join(engine)
+```
+
+### Sinon, du `SQL` sur les `data.frame`
+
+La librairie `sqldf` permet d'exécuter des requêtes `SQL` directement sur les `data.frame` présents dans `R`. Voici un exemple simple :
+
+```{r}
+library(sqldf)
+sqldf("
+SELECT cyl, AVG(mpg), AVG(disp), AVG(hp), AVG(drat), AVG(wt), AVG(qsec)
+  FROM mtcars
+  GROUP BY cyl;
+      ")
+```
+
+
+## Quelques statistiques descriptives
+
+La fonction `summary()` calcule des statistiques basiques sur un vecteur, celles-ci étant dépendantes du type du vecteur. Si elle est appliquée sur un `data.frame`, elle s'applique sur chaque variable.
+
+```{r}
+summary(mtcars)
+summary(mtcars$mpg)
+summary(mtcars$cyl)
+summary(as.factor(mtcars$cyl))
+```
+
+### Univarié
+
+On peut accéder aux fonctions de calculs des statistiques descriptives directement. Pour les variables quantitatives, nous allons utiliser comme exemple `mpg` qui représente la consommation.
+
+```{r}
+mean(mtcars$mpg)
+sum(mtcars$mpg)
+var(mtcars$mpg)
+sd(mtcars$mpg)
+min(mtcars$mpg)
+max(mtcars$mpg)
+range(mtcars$mpg)
+median(mtcars$mpg)
+quantile(mtcars$mpg)
+quantile(mtcars$mpg, probs = 0.99)
+quantile(mtcars$mpg, probs = c(0.01, 0.1, 0.9, 0.99))
+```
+
+Il existe tout un ensemble de fonctions graphiques dans R base. Mais il est existe la librairie [`ggplot2`](http://ggplot2.tidyverse.org/), proposée dans le `tidyverse`,  qui permet de faire de très bons graphiques et dont voici quelques exemples.
+
+```{r}
+library(ggplot2)
+ggplot(mtcars, aes(mpg)) + geom_histogram()
+ggplot(mtcars, aes(mpg)) + geom_histogram(bins = 20)
+ggplot(mtcars, aes(mpg)) + 
+  geom_histogram(aes(y = ..density..),
+                 breaks = c(10, 15, 18, 20, 22, 25, 35))
+ggplot(mtcars, aes("", mpg)) + geom_boxplot()
+ggplot(mtcars, aes(sample = mpg)) + geom_qq()
+```
+
+Pour les variables qualitatives, nous allons utiliser la variable `cyl` qui représente le nombre de cylindre. Celle-ci étant codée numériquement, toutes les fonctions vues précédemment peuvent s'appliquer (mais n'avoir aucun sens).
+
+```{r}
+table(mtcars$cyl)
+prop.table(table(mtcars$cyl))
+ggplot(mtcars, aes(factor(cyl))) + geom_bar()
+ggplot(mtcars, aes("", fill = factor(cyl))) + geom_bar()
+ggplot(mtcars, aes("", fill = factor(cyl))) + 
+  geom_bar(width = 1) +
+  coord_polar(theta = "y")
+```
+
+### Bivarié
+
+#### Quanti - Quanti
+
+Dans ce cadre, on peut bien évidemment calculer les statistiques usuelles (covariance, corrélation) et le nuage de points.
+
+```{r}
+cov(mtcars$mpg, mtcars$wt)
+cor(mtcars$mpg, mtcars$wt)
+ggplot(mtcars, aes(wt, mpg)) + geom_point()
+```
+
+On peut aller plus loin en faisant un modéle linéaire simple. 
+
+```{r}
+m = lm(mpg ~ wt, data = mtcars)
+m
+summary(m)
+plot(m)
+ggplot(mtcars, aes(wt, mpg)) + 
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+#### Quali - Quali
+
+Ici, on calcule bien évidemment la table de contingence, mais aussi les fréquences totales et marginales (en lignes et en colonnes).
+
+```{r}
+t <- table(mtcars$cyl, mtcars$am)
+print(t)
+prop.table(t)
+prop.table(t, margin = 1)
+prop.table(t, margin = 2)
+ggplot(mtcars, aes(factor(cyl), fill = factor(am))) +
+  geom_bar()
+ggplot(mtcars, aes(factor(cyl), fill = factor(am))) +
+  geom_bar(position = "dodge")
+ggplot(mtcars, aes(factor(cyl), fill = factor(am))) +
+  geom_bar(position = "fill")
+ggplot(mtcars, aes("", fill = factor(cyl))) +
+  geom_bar(position = "fill", width = 1) +
+  coord_polar(theta = "y") +
+  facet_wrap(~ factor(am))
+```
+
+#### Quali - Quanti
+
+En plus d'obtenir les statistiques par modalité de la variable qualitative, on peut représenter les boîtes à moustaches.
+
+```{r}
+tapply(mtcars$mpg, mtcars$cyl, mean)
+tapply(mtcars$mpg, mtcars$cyl, summary)
+ggplot(mtcars, aes(factor(cyl), mpg)) +
+  geom_boxplot()
+ggplot(mtcars, aes(mpg)) +
+  geom_histogram() +
+  facet_wrap(~ factor(cyl), ncol = 1)
+ggplot(mtcars, aes(mpg, col = factor(cyl))) +
+  geom_density()
+```
+
+
+## A faire
+
+Sur les données `starwars` (du package `dplyr`), répondre aux demandes suivantes :
+
+1. Lister les personnages humains (cf "Human" dans `species` - on ne veut que leur nom)
+1. Lister les différents mondes d'origine (`homeworld`)
+1. Calculer la taille moyenne, et le poids moyen de tous les personnages
+1. Pour chaque espèce (`species` donc), calculer le nombre de personnage (en triant le résultat par ordre décroissant du nombre de personnage)
+1. Calculer la table de contingence des couleurs des yeux (`eye_color`) et des cheveux (`hair_color`), et représenté graphiquement le lien entre les deux variables
+1. Visualiser si le lien entre la taille (`height`) et le poids (`mass`) dépend de l'espèce (`species`)

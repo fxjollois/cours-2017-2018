@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title>TP Visualisation avec D3</title>
+        <meta charset="utf-8">
+        <!--
+            Données : http://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/download.html
+            Explication : http://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/series_format.html
+            Annuelle : http://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/time_series/HadCRUT.4.4.0.0.annual_ns_avg.txt
+            Mensuelle : http://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/time_series/HadCRUT.4.4.0.0.monthly_ns_avg.txt
+        -->
+        
+        <!-- jQuery -->
+        <script src="jquery-2.2.4.min.js"></script>
+        
+        <!-- D3.js -->
+        <script src="d3.v3.min.js"></script>
+
+        <!-- Bootstrap -->
+        <link href="bootstrap-3.3.6-dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        
+        <link rel="stylesheet" href="style.css">
+        
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="page-header">
+                <h1>Evoluation de la température</h1>
+            </div>
+            <p>Anomalies de température par rapport à la période 1961-1990</p>
+
+            <div id = "tabs">
+                <div class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a href="#pancourbe" aria-controls="pancourbe" role="tab" data-toggle="tab">Courbe</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#panheatmap" aria-controls="panheatmap" role="tab" data-toggle="tab">Heatmap</a>
+                    </li>
+                </div>
+                
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="pancourbe">
+                        <h2>Courbe annuelle</h2>   
+                        <div class="input-group" role="group" id="choix"></div>
+                        <div id = "courbe"></div>
+                        <div id = "infos"></div>
+                        <script src="script.js"></script>
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="panheatmap">
+                        <h2>Heatmap mensuelle</h2>
+                        <div id = "heatmap"></div>
+                        <script src="script2.js"></script>
+                    </div>
+                </div>
+            </div>
+
+            <script src="bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+        <script>
+            $('#tabs a').click(function (e) {
+                $('#tabs .active').removeClass("active");
+                e.preventDefault();
+                $(this).tab('show');
+            });
+        </script>
+        </div>
+    </body>
+</html>

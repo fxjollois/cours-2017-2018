@@ -1,0 +1,123 @@
+/*
+	Couleur foncée  : #37474fff
+	Couleur moyenne foncée : #cacacaff
+	Couleur moyenne claire : #e0e0e0ff
+	Couleur claire  : #ffffffff
+
+	strong foncé : #8B0000ff
+	strong clair : #ffd966ff
+
+	a foncé : #FF8C00ff
+	a clair : #ffffffff
+*/
+
+@import url('https://fonts.googleapis.com/css?family=Oswald|Roboto+slab');
+.remark-container {
+	background-color: #000000ff;
+}
+.remark-slide-content {
+	font-family: 'Roboto Slab', serif;
+	background-color: #37474fff;
+	color: #e0e0e0ff;
+	font-size: 26px;
+}
+.remark-slide-content h1,
+.remark-slide-content h2 {
+	font-family: 'Oswald', sans-serif;
+	color: #ffffffff;
+}
+
+.remark-slide-content h1 { font-size: 2em; }
+.remark-slide-content h2 { font-size: 1.5em; }
+.remark-slide-content h3 { font-size: 1.25em; }
+
+.footnote {
+	position: absolute;
+	bottom: .5em;
+}
+
+strong {
+	color: #ffd966ff;
+}
+
+a {
+	color: #ffffffff;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.small {
+	font-size: .8em;
+}
+/* pour deux colonnes */
+.left-column30 {
+	width: 28%;
+	float: left;
+}
+.right-column70 {
+	width: 68%;
+	float: right;
+}
+
+.left-column50 {
+	width: 48%;
+	float: left;
+}
+.right-column50 {
+	width: 48%;
+	float: right;
+}
+
+/* pour maximiser la taille des images */
+img {
+    max-width: 100%;
+}
+
+/* slide inverse niveau couleur */
+
+.inverse {
+	background: #e0e0e0ff;
+	color: #37474fff;
+}
+.inverse h1, .inverse h2 {
+	color: #37474fff;
+}
+.inverse a {
+	color: #FF8C00ff;
+}
+.inverse strong {
+	color: #8B0000ff;
+}
+
+/* Barre de progressions */
+
+#myProgress {
+	width: 100px;
+	height: 10px;
+	background-color: #e0e0e0ff;
+}
+#myBar {
+	height: 10px;
+	background-color: #cacacaff;
+}
+.inverse #myProgress {
+	background-color: #cacacaff;
+}
+.inverse #myBar {
+	background-color: #ffffffff;
+}
+.title #myProgress {
+	visibility: hidden;
+}
+
+
+/* suppression de l'ombre */
+.remark-slide-scaler {
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+/* slide citation */
+.citation blockquote {
+	font-size: 3em;
+}

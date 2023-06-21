@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Introduction to Data Analysis &amp; Data Visualization</title>
+
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<link href="libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="libs/highlightjs-1.1/highlight.js"></script>
+<!--
+    Font Awesome
+-->
+<script src="https://use.fontawesome.com/32d8325004.js"></script>
+<link rel="stylesheet" href="libs/font-awesome-4.7.0/css/font-awesome.min.css">
+
+<!--
+    CSS perso
+-->
+<style>
+    .contenu {
+        margin-bottom: 50px;
+    }
+
+    .contact-liens {
+        text-align: center;
+    }
+    .contact-liens:hover {
+        text-decoration: none;
+    }
+    .contact-icones {
+        height: 30px;
+    }
+
+    /* Espacement pour barre du haut et pied de page */
+    #header, .section.level1 {
+        margin-top: 60px;
+        margin-bottom: 60px;
+    }
+    /* Espacement pour table des matières */
+    #TOC {
+        margin-top: 100px;
+    }
+    
+    .footer {
+        position: fixed;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        left: 0;
+        background-color: #E6E6E6;
+    }
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="libs/bootstrap-journal.min.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-main">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">FX Jollois</a>
+    </div>
+    <div id="navbar-main" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Données <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+              <li><a href="accesdonnees.html">A télécharger</a></li>
+              <li><a href="donnees-integrees-r.html">Sous R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Enseignement <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">DUT 1ère année</li>
+            <li><a href="exploitation-donnees.html">Exploitation de données</a></li>
+            <li><a href="initiation-a-r.html">Initiation à R</a></li>
+            <li><a href="reporting.html">Reporting</a></li>
+            <li><a href="complements-r.html">Compléments sur R</a></li>
+            <li class="dropdown-header">DUT 2ème année</li>
+            <li><a href="prog-stat-r.html">Programmation statistique avec R</a></li>
+            <li class="dropdown-header">LP MDS Santé</li>
+            <li><a href="info-dec-sante.html">Informatique décisionnelle</a></li>
+            <li class="dropdown-header">DU Analyste Big Data</li>
+            <li><a href="initiation-r-du.html">Initiation à R</a></li>
+            <li><a href="connexion-r-mongodb.html">Connexion entre R et MongoDB</a></li>
+            <li class="dropdown-header">DU Dataviz</li>
+            <li><a href="analyse-donnees.html">Analyse de données</a></li>
+            <li><a href="visualisation-donnees.html">Visualisation de données - R</a></li>
+            <li><a href="visualisation-donnees-tableau.html">Visualisation de données - Tableau</a></li>
+            <li><a href="visualisation-donnees-d3.html">Visualisation de données - D3</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Master</li>
+            <li><a href="slides/cnam-classif-modeles.html">Classification et Modèles de mélange</a></li>
+            <li><a href="analyse-donnees-massives.html">Analyse de Données Massives</a></li>
+            <li class="dropdown-header">Iran</li>
+            <li><a href="stat-prog-R.html">Statistical Programming using R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Recherche <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="recherche.html">Sujets</a></li>
+            <li><a href="publications.html">Publications</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Réalisations <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="realisations.html">Détail</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://up5.fr/explore-data" target="_blank">explore-data</a></li>
+            <li><a href="http://fxjollois.github.io/cours-sql/" target="_blank">Appli web de cours pour SQL</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container-fluid -->
+</div>
+<div class="contenu">
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Introduction to Data Analysis &amp; Data Visualization</h1>
+<h3 class="subtitle"><em>Statistical Programming using <code>R</code></em></h3>
+
+</div>
+
+
+<p>All the following code can be executed into <code>R</code> console, without any additional <em>packages</em> installation or <em>data</em> laoding, except when indicated.</p>
+<div id="introduction-to-r-language" class="section level2">
+<h2>Introduction to <code>R</code> language</h2>
+<div id="some-useful-things" class="section level3">
+<h3>Some useful things</h3>
+<div id="basic-commands" class="section level4">
+<h4>Basic commands</h4>
+<pre class="r"><code>1 + 2</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>a = 1
+a + 2</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>c(1, 2)</code></pre>
+<pre><code>## [1] 1 2</code></pre>
+<pre class="r"><code>c(1, 2) + 3</code></pre>
+<pre><code>## [1] 4 5</code></pre>
+<pre class="r"><code>1:5</code></pre>
+<pre><code>## [1] 1 2 3 4 5</code></pre>
+<pre class="r"><code>seq(1, 5)</code></pre>
+<pre><code>## [1] 1 2 3 4 5</code></pre>
+<pre class="r"><code>seq(1, 5, by = .5)</code></pre>
+<pre><code>## [1] 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0</code></pre>
+<pre class="r"><code>seq(1, 5, length = 9)</code></pre>
+<pre><code>## [1] 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0</code></pre>
+<pre class="r"><code>rep(1, 5)</code></pre>
+<pre><code>## [1] 1 1 1 1 1</code></pre>
+<pre class="r"><code>rep(c(1, 3), times = 5)</code></pre>
+<pre><code>##  [1] 1 3 1 3 1 3 1 3 1 3</code></pre>
+<pre class="r"><code>rep(c(1, 3), each = 5)</code></pre>
+<pre><code>##  [1] 1 1 1 1 1 3 3 3 3 3</code></pre>
+<pre class="r"><code>rep(c(1, 3), times = 2, each = 5)</code></pre>
+<pre><code>##  [1] 1 1 1 1 1 3 3 3 3 3 1 1 1 1 1 3 3 3 3 3</code></pre>
+<pre class="r"><code>rep(c(1, 3), times = 2, each = 5, length = 11)</code></pre>
+<pre><code>##  [1] 1 1 1 1 1 3 3 3 3 3 1</code></pre>
+<pre class="r"><code>ifelse(1 &gt; 2, &quot;sup&quot;, &quot;inf&quot;)</code></pre>
+<pre><code>## [1] &quot;inf&quot;</code></pre>
+<pre class="r"><code>for(v in 1:5) print(v**2)</code></pre>
+<pre><code>## [1] 1
+## [1] 4
+## [1] 9
+## [1] 16
+## [1] 25</code></pre>
+<pre class="r"><code>sample(1:10)</code></pre>
+<pre><code>##  [1]  4  3  5  1  9  6 10  2  8  7</code></pre>
+<pre class="r"><code>paste(&quot;good&quot;, &quot;morning&quot;)</code></pre>
+<pre><code>## [1] &quot;good morning&quot;</code></pre>
+<pre class="r"><code>paste(&quot;good&quot;, &quot;morning&quot;, sep = &quot;-&quot;)</code></pre>
+<pre><code>## [1] &quot;good-morning&quot;</code></pre>
+<pre class="r"><code>paste0(&quot;good&quot;, &quot;morning&quot;)</code></pre>
+<pre><code>## [1] &quot;goodmorning&quot;</code></pre>
+<pre class="r"><code>paste(&quot;good&quot;, c(&quot;morning&quot;, &quot;afternoon&quot;))</code></pre>
+<pre><code>## [1] &quot;good morning&quot;   &quot;good afternoon&quot;</code></pre>
+</div>
+<div id="working-directory" class="section level4">
+<h4>Working directory</h4>
+<pre class="r"><code># this code is not executed
+getwd()
+setwd(&quot;path/to/your/working/directory&quot;)
+getwd() # if no change, problem with previous line</code></pre>
+</div>
+<div id="packages" class="section level4">
+<h4>Packages</h4>
+<p>Packages directory</p>
+<pre class="r"><code># this code is not executed
+.libPaths()
+.libPaths(&quot;path/to/your/packages/directory&quot;)
+.libPaths() # if no change, problem with previous line</code></pre>
+<p>Package installation</p>
+<pre class="r"><code># this code is not executed
+install.packages(&quot;packagename&quot;) # one or more packages name
+library(package) # without any quote</code></pre>
+</div>
+<div id="functions" class="section level4">
+<h4>Functions</h4>
+<pre class="r"><code>f &lt;- function(a, b) {
+    return(a ** b)
+}
+f(2, 5)</code></pre>
+<pre><code>## [1] 32</code></pre>
+<pre class="r"><code>f(a = 2, b = 5)</code></pre>
+<pre><code>## [1] 32</code></pre>
+<pre class="r"><code>f(a = 2, 5)</code></pre>
+<pre><code>## [1] 32</code></pre>
+<pre class="r"><code>f(b = 2, a = 5)</code></pre>
+<pre><code>## [1] 25</code></pre>
+<pre class="r"><code>f(b = 2, 5)</code></pre>
+<pre><code>## [1] 25</code></pre>
+<pre class="r"><code>f &lt;- function(a, b = 1) {
+    return(a ** b)
+}
+f(2, 5)</code></pre>
+<pre><code>## [1] 32</code></pre>
+<pre class="r"><code>f(2)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code>f &lt;- function(a, b = 1, ...) {
+    s = sum(a, ...)
+    return(s ** b)
+}
+f(2, 5)</code></pre>
+<pre><code>## [1] 32</code></pre>
+<pre class="r"><code>f(c(1, 2, 3), 5)</code></pre>
+<pre><code>## [1] 7776</code></pre>
+<pre class="r"><code>f(c(1, NA, 3), 5)</code></pre>
+<pre><code>## [1] NA</code></pre>
+<pre class="r"><code>sum(c(1, NA, 3))</code></pre>
+<pre><code>## [1] NA</code></pre>
+<pre class="r"><code>sum(c(1, NA, 3), na.rm = TRUE)</code></pre>
+<pre><code>## [1] 4</code></pre>
+<pre class="r"><code>f(c(1, NA, 3), 5, na.rm = TRUE)</code></pre>
+<pre><code>## [1] 1024</code></pre>
+</div>
+<div id="import-data-from-text-files" class="section level4">
+<h4>Import data from text files</h4>
+<p>We present here different files, with specific needs to correctly import data into <code>R</code>. We use the <code>read.table()</code> command, with options.</p>
+<div id="heart.txt" class="section level5">
+<h5><a href="donnees/heart.txt">heart.txt</a></h5>
+<ul>
+<li>Tabulated separated variables (default value)</li>
+<li>attriutes names in the first line (<code>header = T</code>)</li>
+</ul>
+<pre class="r"><code>heart = read.table(&quot;donnees/heart.txt&quot;, header = T)
+head(heart)</code></pre>
+<pre><code>##   age     sexe type_douleur pression cholester sucre electro taux_max
+## 1  70 masculin            D      130       322     A       C      109
+## 2  67  feminin            C      115       564     A       C      160
+## 3  57 masculin            B      124       261     A       A      141
+## 4  64 masculin            D      128       263     A       A      105
+## 5  74  feminin            B      120       269     A       C      121
+## 6  65 masculin            D      120       177     A       A      140
+##   angine depression pic vaisseau    coeur
+## 1    non        2.4   2        D presence
+## 2    non        1.6   2        A  absence
+## 3    non        0.3   1        A presence
+## 4    oui        0.2   2        B  absence
+## 5    oui        0.2   1        B  absence
+## 6    non        0.4   1        A  absence</code></pre>
+</div>
+<div id="hepatitis.txt" class="section level5">
+<h5><a href="donnees/hepatitis.TXT">hepatitis.TXT</a></h5>
+<ul>
+<li>Tabulated separated variables</li>
+<li>attributes names in the first line (<code>header = T</code>)</li>
+<li>missing value indicated with <code>&quot;?&quot;</code> (<code>na.strings = &quot;?&quot;</code>)</li>
+</ul>
+<pre class="r"><code>hep = read.table(&quot;donnees/hepatitis.TXT&quot;, header = T, na.strings = &quot;?&quot;)
+head(hep)</code></pre>
+<pre><code>##   AGE    SEX STEROID ANTIVIRALS FATIGUE MALAISE ANOREXIA LIVER_BIG
+## 1  30   male      no         no      no      no       no        no
+## 2  50 female      no         no     yes      no       no        no
+## 3  78 female     yes         no     yes      no       no       yes
+## 4  31 female    &lt;NA&gt;        yes      no      no       no       yes
+## 5  34 female     yes         no      no      no       no       yes
+## 6  34 female     yes         no      no      no       no       yes
+##   LIVER_FIRM SPLEEN_PALPABLE SPIDERS ASCITES VARICES BILIRUBIN
+## 1         no              no      no      no      no       1.0
+## 2         no              no      no      no      no       0.9
+## 3         no              no      no      no      no       0.7
+## 4         no              no      no      no      no       0.7
+## 5         no              no      no      no      no       1.0
+## 6         no              no      no      no      no       0.9
+##   ALK_PHOSPHATE SGOT ALBUMIN PROTIME HISTOLOGY Class
+## 1         85.00   18     4.0   61.85        no  LIVE
+## 2        135.00   42     3.5   61.85        no  LIVE
+## 3         96.00   32     4.0   61.85        no  LIVE
+## 4         46.00   52     4.0   80.00        no  LIVE
+## 5        105.33  200     4.0   61.85        no  LIVE
+## 6         95.00   28     4.0   75.00        no  LIVE</code></pre>
+</div>
+<div id="iris_bis.txx" class="section level5">
+<h5><a href="donnees/Iris_bis.txt">Iris_bis.txx</a></h5>
+<ul>
+<li>delimited variables with <code>&quot;%&quot;</code> (<code>sep = &quot;%&quot;</code>)</li>
+<li>attributes names in the first line (<code>header = T</code>)</li>
+<li>specific decimal separator (<code>dec = &quot;.&quot;</code>)</li>
+</ul>
+<pre class="r"><code>ir = read.table(&quot;donnees/Iris_bis.txt&quot;, header = T, sep = &quot;%&quot;, dec = &quot;,&quot;)</code></pre>
+</div>
+<div id="detroit_homicide.txt" class="section level5">
+<h5><a href="donnees/Detroit_homicide.txt">Detroit_homicide.txt</a></h5>
+<ul>
+<li>attributes names in the first line (<code>header = T</code>)</li>
+<li>35 first rows useless (<code>skip = 35</code>)</li>
+</ul>
+<pre class="r"><code>dh = read.table(&quot;donnees/Detroit_homicide.txt&quot;, skip = 35, header = T)
+head(dh)</code></pre>
+<pre><code>##      FTP UEMP   MAN    LIC     GR CLEAR     WM  NMAN   GOV   HE     WE
+## 1 260.35 11.0 455.5 178.15 215.98  93.4 558724 538.1 133.9 2.98 117.18
+## 2 269.80  7.0 480.2 156.41 180.48  88.5 538584 547.6 137.6 3.09 134.02
+## 3 272.04  5.2 506.1 198.02 209.57  94.4 519171 562.8 143.6 3.23 141.68
+## 4 272.96  4.3 535.8 222.10 231.67  92.0 500457 591.0 150.3 3.33 147.98
+## 5 272.51  3.5 576.0 301.92 297.65  91.0 482418 626.1 164.3 3.46 159.85
+## 6 261.34  3.2 601.7 391.22 367.62  87.4 465029 659.8 179.5 3.60 157.19
+##     HOM   ACC    ASR
+## 1  8.60 39.17 306.18
+## 2  8.90 40.27 315.16
+## 3  8.52 45.31 277.53
+## 4  8.89 49.51 234.07
+## 5 13.07 55.05 230.84
+## 6 14.57 53.90 217.99</code></pre>
+</div>
+</div>
+</div>
+<div id="working-with-data.frame" class="section level3">
+<h3>Working with <code>data.frame</code></h3>
+<p>About <code>data.frame</code> (basic manipulation)</p>
+<pre class="r"><code>head(iris)</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa</code></pre>
+<pre class="r"><code>class(iris)</code></pre>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>names(iris)</code></pre>
+<pre><code>## [1] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot;  &quot;Petal.Length&quot; &quot;Petal.Width&quot; 
+## [5] &quot;Species&quot;</code></pre>
+<pre class="r"><code>dim(iris)</code></pre>
+<pre><code>## [1] 150   5</code></pre>
+<pre class="r"><code>nrow(iris)</code></pre>
+<pre><code>## [1] 150</code></pre>
+<pre class="r"><code>ncol(iris)</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>str(iris)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    150 obs. of  5 variables:
+##  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+##  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+##  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+##  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+##  $ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+<p>For illustration, we extract 20 random rows from <code>iris</code>.</p>
+<pre class="r"><code>iris = head(iris[sample(seq(nrow(iris))),], 20)</code></pre>
+<p>Get one column from a <code>data.frame</code></p>
+<pre class="r"><code>iris$Sepal.Length</code></pre>
+<pre><code>##  [1] 5.0 7.9 4.5 6.6 6.4 6.2 4.7 6.4 5.8 6.7 6.6 5.1 6.4 7.1 4.9 5.1 6.3
+## [18] 7.7 6.3 5.5</code></pre>
+<pre class="r"><code>iris[,1]</code></pre>
+<pre><code>##  [1] 5.0 7.9 4.5 6.6 6.4 6.2 4.7 6.4 5.8 6.7 6.6 5.1 6.4 7.1 4.9 5.1 6.3
+## [18] 7.7 6.3 5.5</code></pre>
+<pre class="r"><code>iris[,&quot;Sepal.Length&quot;]</code></pre>
+<pre><code>##  [1] 5.0 7.9 4.5 6.6 6.4 6.2 4.7 6.4 5.8 6.7 6.6 5.1 6.4 7.1 4.9 5.1 6.3
+## [18] 7.7 6.3 5.5</code></pre>
+<pre class="r"><code>iris[1]</code></pre>
+<pre><code>##     Sepal.Length
+## 94           5.0
+## 132          7.9
+## 42           4.5
+## 59           6.6
+## 112          6.4
+## 98           6.2
+## 30           4.7
+## 52           6.4
+## 143          5.8
+## 145          6.7
+## 76           6.6
+## 99           5.1
+## 75           6.4
+## 103          7.1
+## 58           4.9
+## 24           5.1
+## 104          6.3
+## 118          7.7
+## 73           6.3
+## 37           5.5</code></pre>
+<pre class="r"><code>iris[&quot;Sepal.Length&quot;]</code></pre>
+<pre><code>##     Sepal.Length
+## 94           5.0
+## 132          7.9
+## 42           4.5
+## 59           6.6
+## 112          6.4
+## 98           6.2
+## 30           4.7
+## 52           6.4
+## 143          5.8
+## 145          6.7
+## 76           6.6
+## 99           5.1
+## 75           6.4
+## 103          7.1
+## 58           4.9
+## 24           5.1
+## 104          6.3
+## 118          7.7
+## 73           6.3
+## 37           5.5</code></pre>
+<p>Get more than one column</p>
+<pre class="r"><code>iris[,c(1,3)]</code></pre>
+<pre><code>##     Sepal.Length Petal.Length
+## 94           5.0          3.3
+## 132          7.9          6.4
+## 42           4.5          1.3
+## 59           6.6          4.6
+## 112          6.4          5.3
+## 98           6.2          4.3
+## 30           4.7          1.6
+## 52           6.4          4.5
+## 143          5.8          5.1
+## 145          6.7          5.7
+## 76           6.6          4.4
+## 99           5.1          3.0
+## 75           6.4          4.3
+## 103          7.1          5.9
+## 58           4.9          3.3
+## 24           5.1          1.7
+## 104          6.3          5.6
+## 118          7.7          6.7
+## 73           6.3          4.9
+## 37           5.5          1.3</code></pre>
+<pre class="r"><code>iris[,c(&quot;Sepal.Length&quot;, &quot;Petal.Length&quot;)]</code></pre>
+<pre><code>##     Sepal.Length Petal.Length
+## 94           5.0          3.3
+## 132          7.9          6.4
+## 42           4.5          1.3
+## 59           6.6          4.6
+## 112          6.4          5.3
+## 98           6.2          4.3
+## 30           4.7          1.6
+## 52           6.4          4.5
+## 143          5.8          5.1
+## 145          6.7          5.7
+## 76           6.6          4.4
+## 99           5.1          3.0
+## 75           6.4          4.3
+## 103          7.1          5.9
+## 58           4.9          3.3
+## 24           5.1          1.7
+## 104          6.3          5.6
+## 118          7.7          6.7
+## 73           6.3          4.9
+## 37           5.5          1.3</code></pre>
+<pre class="r"><code>iris[c(1,3)]</code></pre>
+<pre><code>##     Sepal.Length Petal.Length
+## 94           5.0          3.3
+## 132          7.9          6.4
+## 42           4.5          1.3
+## 59           6.6          4.6
+## 112          6.4          5.3
+## 98           6.2          4.3
+## 30           4.7          1.6
+## 52           6.4          4.5
+## 143          5.8          5.1
+## 145          6.7          5.7
+## 76           6.6          4.4
+## 99           5.1          3.0
+## 75           6.4          4.3
+## 103          7.1          5.9
+## 58           4.9          3.3
+## 24           5.1          1.7
+## 104          6.3          5.6
+## 118          7.7          6.7
+## 73           6.3          4.9
+## 37           5.5          1.3</code></pre>
+<pre class="r"><code>iris[c(&quot;Sepal.Length&quot;, &quot;Petal.Length&quot;)]</code></pre>
+<pre><code>##     Sepal.Length Petal.Length
+## 94           5.0          3.3
+## 132          7.9          6.4
+## 42           4.5          1.3
+## 59           6.6          4.6
+## 112          6.4          5.3
+## 98           6.2          4.3
+## 30           4.7          1.6
+## 52           6.4          4.5
+## 143          5.8          5.1
+## 145          6.7          5.7
+## 76           6.6          4.4
+## 99           5.1          3.0
+## 75           6.4          4.3
+## 103          7.1          5.9
+## 58           4.9          3.3
+## 24           5.1          1.7
+## 104          6.3          5.6
+## 118          7.7          6.7
+## 73           6.3          4.9
+## 37           5.5          1.3</code></pre>
+<pre class="r"><code>iris[-c(2, 4, 5)]</code></pre>
+<pre><code>##     Sepal.Length Petal.Length
+## 94           5.0          3.3
+## 132          7.9          6.4
+## 42           4.5          1.3
+## 59           6.6          4.6
+## 112          6.4          5.3
+## 98           6.2          4.3
+## 30           4.7          1.6
+## 52           6.4          4.5
+## 143          5.8          5.1
+## 145          6.7          5.7
+## 76           6.6          4.4
+## 99           5.1          3.0
+## 75           6.4          4.3
+## 103          7.1          5.9
+## 58           4.9          3.3
+## 24           5.1          1.7
+## 104          6.3          5.6
+## 118          7.7          6.7
+## 73           6.3          4.9
+## 37           5.5          1.3</code></pre>
+<p>Get one row from a <code>data.frame</code></p>
+<pre class="r"><code>iris[1,]</code></pre>
+<pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+## 94            5         2.3          3.3           1 versicolor</code></pre>
+<pre class="r"><code>iris[c(1,3),]</code></pre>
+<pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+## 94          5.0         2.3          3.3         1.0 versicolor
+## 42          4.5         2.3          1.3         0.3     setosa</code></pre>
+<pre class="r"><code>iris[iris$Sepal.Length &gt; 6,]</code></pre>
+<pre><code>##     Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+## 132          7.9         3.8          6.4         2.0  virginica
+## 59           6.6         2.9          4.6         1.3 versicolor
+## 112          6.4         2.7          5.3         1.9  virginica
+## 98           6.2         2.9          4.3         1.3 versicolor
+## 52           6.4         3.2          4.5         1.5 versicolor
+## 145          6.7         3.3          5.7         2.5  virginica
+## 76           6.6         3.0          4.4         1.4 versicolor
+## 75           6.4         2.9          4.3         1.3 versicolor
+## 103          7.1         3.0          5.9         2.1  virginica
+## 104          6.3         2.9          5.6         1.8  virginica
+## 118          7.7         3.8          6.7         2.2  virginica
+## 73           6.3         2.5          4.9         1.5 versicolor</code></pre>
+<p>Data types</p>
+<pre class="r"><code>class(names(iris))</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>class(iris$Sepal.Length)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>class(iris$Species)</code></pre>
+<pre><code>## [1] &quot;factor&quot;</code></pre>
+<pre class="r"><code>head(iris$Species)</code></pre>
+<pre><code>## [1] versicolor virginica  setosa     versicolor virginica  versicolor
+## Levels: setosa versicolor virginica</code></pre>
+<p>Group two <code>data.frame</code> together</p>
+<pre class="r"><code>cbind(iris[,1], iris[,4:5])</code></pre>
+<pre><code>##     iris[, 1] Petal.Width    Species
+## 94        5.0         1.0 versicolor
+## 132       7.9         2.0  virginica
+## 42        4.5         0.3     setosa
+## 59        6.6         1.3 versicolor
+## 112       6.4         1.9  virginica
+## 98        6.2         1.3 versicolor
+## 30        4.7         0.2     setosa
+## 52        6.4         1.5 versicolor
+## 143       5.8         1.9  virginica
+## 145       6.7         2.5  virginica
+## 76        6.6         1.4 versicolor
+## 99        5.1         1.1 versicolor
+## 75        6.4         1.3 versicolor
+## 103       7.1         2.1  virginica
+## 58        4.9         1.0 versicolor
+## 24        5.1         0.5     setosa
+## 104       6.3         1.8  virginica
+## 118       7.7         2.2  virginica
+## 73        6.3         1.5 versicolor
+## 37        5.5         0.2     setosa</code></pre>
+<pre class="r"><code>rbind(iris[1:3,], iris[8:10,])</code></pre>
+<pre><code>##     Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+## 94           5.0         2.3          3.3         1.0 versicolor
+## 132          7.9         3.8          6.4         2.0  virginica
+## 42           4.5         2.3          1.3         0.3     setosa
+## 52           6.4         3.2          4.5         1.5 versicolor
+## 143          5.8         2.7          5.1         1.9  virginica
+## 145          6.7         3.3          5.7         2.5  virginica</code></pre>
+</div>
+<div id="univariate-statistics" class="section level3">
+<h3>Univariate statistics</h3>
+<p>We now work on the complete <code>iris</code> dataset.</p>
+<div id="quantitative" class="section level4">
+<h4>Quantitative</h4>
+<div id="numerical-statistics" class="section level5">
+<h5>Numerical statistics</h5>
+<pre class="r"><code>mean(iris$Sepal.Length)</code></pre>
+<pre><code>## [1] 5.843333</code></pre>
+<pre class="r"><code>sd(iris$Sepal.Length)</code></pre>
+<pre><code>## [1] 0.8280661</code></pre>
+<pre class="r"><code>var(iris$Sepal.Length)</code></pre>
+<pre><code>## [1] 0.6856935</code></pre>
+<pre class="r"><code>median(iris$Sepal.Length)</code></pre>
+<pre><code>## [1] 5.8</code></pre>
+<pre class="r"><code>min(iris$Sepal.Length)</code></pre>
+<pre><code>## [1] 4.3</code></pre>
+<pre class="r"><code>max(iris$Sepal.Length)</code></pre>
+<pre><code>## [1] 7.9</code></pre>
+<pre class="r"><code>range(iris$Sepal.Length)</code></pre>
+<pre><code>## [1] 4.3 7.9</code></pre>
+<pre class="r"><code>quantile(iris$Sepal.Length)</code></pre>
+<pre><code>##   0%  25%  50%  75% 100% 
+##  4.3  5.1  5.8  6.4  7.9</code></pre>
+<pre class="r"><code>quantile(iris$Sepal.Length, .1)</code></pre>
+<pre><code>## 10% 
+## 4.8</code></pre>
+<pre class="r"><code>quantile(iris$Sepal.Length, c(.01, .1, .9, .99))</code></pre>
+<pre><code>##  1% 10% 90% 99% 
+## 4.4 4.8 6.9 7.7</code></pre>
+<pre class="r"><code>summary(iris$Sepal.Length)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   4.300   5.100   5.800   5.843   6.400   7.900</code></pre>
+<pre class="r"><code>shapiro.test(iris$Sepal.Length)</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  iris$Sepal.Length
+## W = 0.97609, p-value = 0.01018</code></pre>
+</div>
+<div id="basic-graphics" class="section level5">
+<h5>Basic graphics</h5>
+<pre class="r"><code>hist(iris$Sepal.Length)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre class="r"><code>boxplot(iris$Sepal.Length)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-22-2.png" width="672" /></p>
+<pre class="r"><code>qqnorm(iris$Sepal.Length)
+qqline(iris$Sepal.Length)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-22-3.png" width="672" /></p>
+<pre class="r"><code>plot(ecdf(iris$Sepal.Length))</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-22-4.png" width="672" /></p>
+</div>
+</div>
+<div id="qualitative" class="section level4">
+<h4>Qualitative</h4>
+<p><code>factor</code></p>
+<div id="numerical-statistics-1" class="section level5">
+<h5>Numerical statistics</h5>
+<pre class="r"><code>t = table(iris$Species)
+prop.table(t)</code></pre>
+<pre><code>## 
+##     setosa versicolor  virginica 
+##  0.3333333  0.3333333  0.3333333</code></pre>
+<pre class="r"><code>chisq.test(t)</code></pre>
+<pre><code>## 
+##  Chi-squared test for given probabilities
+## 
+## data:  t
+## X-squared = 0, df = 2, p-value = 1</code></pre>
+<pre class="r"><code>chisq.test(t, p = c(.2, .3, .5))</code></pre>
+<pre><code>## 
+##  Chi-squared test for given probabilities
+## 
+## data:  t
+## X-squared = 22.222, df = 2, p-value = 1.495e-05</code></pre>
+</div>
+<div id="basic-graphics-1" class="section level5">
+<h5>Basic graphics</h5>
+<pre class="r"><code>barplot(table(iris$Species))
+plot(iris$Species) # work only because Species is declared as factor</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<pre class="r"><code>pie(table(iris$Species))</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-24-2.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="bivariate-statistics" class="section level3">
+<h3>Bivariate statistics</h3>
+<div id="two-quantitatives" class="section level4">
+<h4>Two quantitatives</h4>
+<div id="numerical" class="section level5">
+<h5>Numerical</h5>
+<pre class="r"><code>cov(iris$Sepal.Length, iris$Sepal.Width)</code></pre>
+<pre><code>## [1] -0.042434</code></pre>
+<pre class="r"><code>cor(iris$Sepal.Length, iris$Sepal.Width)</code></pre>
+<pre><code>## [1] -0.1175698</code></pre>
+<pre class="r"><code>cor.test(iris$Sepal.Length, iris$Sepal.Width)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  iris$Sepal.Length and iris$Sepal.Width
+## t = -1.4403, df = 148, p-value = 0.1519
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.27269325  0.04351158
+## sample estimates:
+##        cor 
+## -0.1175698</code></pre>
+<pre class="r"><code>m = lm(Sepal.Length ~ Sepal.Width, data = iris)
+m</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Sepal.Length ~ Sepal.Width, data = iris)
+## 
+## Coefficients:
+## (Intercept)  Sepal.Width  
+##      6.5262      -0.2234</code></pre>
+<pre class="r"><code>summary(m)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Sepal.Length ~ Sepal.Width, data = iris)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.5561 -0.6333 -0.1120  0.5579  2.2226 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   6.5262     0.4789   13.63   &lt;2e-16 ***
+## Sepal.Width  -0.2234     0.1551   -1.44    0.152    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.8251 on 148 degrees of freedom
+## Multiple R-squared:  0.01382,    Adjusted R-squared:  0.007159 
+## F-statistic: 2.074 on 1 and 148 DF,  p-value: 0.1519</code></pre>
+</div>
+<div id="graphics" class="section level5">
+<h5>Graphics</h5>
+<pre class="r"><code>plot(iris$Sepal.Length, iris$Sepal.Width)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<pre class="r"><code>plot(iris$Sepal.Length ~ iris$Sepal.Width)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-26-2.png" width="672" /></p>
+<pre class="r"><code>plot(Sepal.Length ~ Sepal.Width, data = iris)
+abline(m, col = &quot;red&quot;)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-26-3.png" width="672" /></p>
+</div>
+</div>
+<div id="two-qualitatives" class="section level4">
+<h4>Two qualitatives</h4>
+<p>Create a new ordinal attribute from <code>Sepal.Length</code>, with 5 values for instance.</p>
+<pre class="r"><code>iris$Sepal.Length.ord = cut(iris$Sepal.Length, 5)
+table(iris$Sepal.Length.ord)</code></pre>
+<pre><code>## 
+##  (4.3,5.02] (5.02,5.74] (5.74,6.46] (6.46,7.18]  (7.18,7.9] 
+##          32          41          42          24          11</code></pre>
+<pre class="r"><code>diff(range(iris$Sepal.Length)) / 5</code></pre>
+<pre><code>## [1] 0.72</code></pre>
+<div id="numerical-statistics-2" class="section level5">
+<h5>Numerical statistics</h5>
+<pre class="r"><code>t = table(iris$Species, iris$Sepal.Length.ord)
+t</code></pre>
+<pre><code>##             
+##              (4.3,5.02] (5.02,5.74] (5.74,6.46] (6.46,7.18] (7.18,7.9]
+##   setosa             28          21           1           0          0
+##   versicolor          3          18          20           9          0
+##   virginica           1           2          21          15         11</code></pre>
+<pre class="r"><code>prop.table(t)</code></pre>
+<pre><code>##             
+##               (4.3,5.02] (5.02,5.74] (5.74,6.46] (6.46,7.18]  (7.18,7.9]
+##   setosa     0.186666667 0.140000000 0.006666667 0.000000000 0.000000000
+##   versicolor 0.020000000 0.120000000 0.133333333 0.060000000 0.000000000
+##   virginica  0.006666667 0.013333333 0.140000000 0.100000000 0.073333333</code></pre>
+<pre class="r"><code>prop.table(t, margin = 1)</code></pre>
+<pre><code>##             
+##              (4.3,5.02] (5.02,5.74] (5.74,6.46] (6.46,7.18] (7.18,7.9]
+##   setosa           0.56        0.42        0.02        0.00       0.00
+##   versicolor       0.06        0.36        0.40        0.18       0.00
+##   virginica        0.02        0.04        0.42        0.30       0.22</code></pre>
+<pre class="r"><code>prop.table(t, margin = 2)</code></pre>
+<pre><code>##             
+##              (4.3,5.02] (5.02,5.74] (5.74,6.46] (6.46,7.18] (7.18,7.9]
+##   setosa     0.87500000  0.51219512  0.02380952  0.00000000 0.00000000
+##   versicolor 0.09375000  0.43902439  0.47619048  0.37500000 0.00000000
+##   virginica  0.03125000  0.04878049  0.50000000  0.62500000 1.00000000</code></pre>
+<pre class="r"><code>chisq.test(t)</code></pre>
+<pre><code>## Warning in chisq.test(t): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  t
+## X-squared = 112.1, df = 8, p-value &lt; 2.2e-16</code></pre>
+</div>
+<div id="graphics-1" class="section level5">
+<h5>Graphics</h5>
+<pre class="r"><code>barplot(t)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<pre class="r"><code>barplot(t, beside = TRUE)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-29-2.png" width="672" /></p>
+<pre class="r"><code>barplot(prop.table(t, margin = 2))</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-29-3.png" width="672" /></p>
+<pre class="r"><code>assocplot(t)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-29-4.png" width="672" /></p>
+<pre class="r"><code>mosaicplot(t)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-29-5.png" width="672" /></p>
+</div>
+</div>
+<div id="one-quantitative-vs.one-qualitative" class="section level4">
+<h4>One quantitative vs. one qualitative</h4>
+<div id="numerical-statistics-3" class="section level5">
+<h5>Numerical statistics</h5>
+<pre class="r"><code>tapply(iris$Sepal.Length, iris$Species, mean)</code></pre>
+<pre><code>##     setosa versicolor  virginica 
+##      5.006      5.936      6.588</code></pre>
+<pre class="r"><code>tapply(iris$Sepal.Length, iris$Species, summary)</code></pre>
+<pre><code>## $setosa
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   4.300   4.800   5.000   5.006   5.200   5.800 
+## 
+## $versicolor
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   4.900   5.600   5.900   5.936   6.300   7.000 
+## 
+## $virginica
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   4.900   6.225   6.500   6.588   6.900   7.900</code></pre>
+<pre class="r"><code>anova(lm(Sepal.Length ~ Species, data = iris))</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: Sepal.Length
+##            Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Species     2 63.212  31.606  119.26 &lt; 2.2e-16 ***
+## Residuals 147 38.956   0.265                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>m = aov(Sepal.Length ~ Species, data = iris)
+m</code></pre>
+<pre><code>## Call:
+##    aov(formula = Sepal.Length ~ Species, data = iris)
+## 
+## Terms:
+##                  Species Residuals
+## Sum of Squares  63.21213  38.95620
+## Deg. of Freedom        2       147
+## 
+## Residual standard error: 0.5147894
+## Estimated effects may be unbalanced</code></pre>
+<pre class="r"><code>summary(m)</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value Pr(&gt;F)    
+## Species       2  63.21  31.606   119.3 &lt;2e-16 ***
+## Residuals   147  38.96   0.265                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="graphics-2" class="section level5">
+<h5>Graphics</h5>
+<pre class="r"><code>boxplot(Sepal.Length ~ Species, data = iris)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<pre class="r"><code>par(mfrow = c(3, 1), mar = c(2, 2, 0, 0) + .1)
+x = iris$Sepal.Length
+for (v in levels(iris$Species)) {
+    hist(x[iris$Species == v], 
+         freq = FALSE,
+         xlim = range(x),
+         breaks = seq(min(x), max(x), length = 10),
+         main = NULL)
+}</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="multivariate-statistics-basic" class="section level3">
+<h3>Multivariate statistics (basic)</h3>
+<p>on <code>data.frame</code></p>
+<pre class="r"><code>summary(iris)</code></pre>
+<pre><code>##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+##  Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100  
+##  1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
+##  Median :5.800   Median :3.000   Median :4.350   Median :1.300  
+##  Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199  
+##  3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800  
+##  Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500  
+##        Species      Sepal.Length.ord
+##  setosa    :50   (4.3,5.02] :32     
+##  versicolor:50   (5.02,5.74]:41     
+##  virginica :50   (5.74,6.46]:42     
+##                  (6.46,7.18]:24     
+##                  (7.18,7.9] :11     
+## </code></pre>
+<pre class="r"><code>apply(iris[1:4], 2, mean)</code></pre>
+<pre><code>## Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+##     5.843333     3.057333     3.758000     1.199333</code></pre>
+<pre class="r"><code>apply(iris[1:4], 2, summary)</code></pre>
+<pre><code>##         Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Min.           4.300       2.000        1.000       0.100
+## 1st Qu.        5.100       2.800        1.600       0.300
+## Median         5.800       3.000        4.350       1.300
+## Mean           5.843       3.057        3.758       1.199
+## 3rd Qu.        6.400       3.300        5.100       1.800
+## Max.           7.900       4.400        6.900       2.500</code></pre>
+<pre class="r"><code>apply(iris[1:4], 2, tapply, iris$Species, mean)</code></pre>
+<pre><code>##            Sepal.Length Sepal.Width Petal.Length Petal.Width
+## setosa            5.006       3.428        1.462       0.246
+## versicolor        5.936       2.770        4.260       1.326
+## virginica         6.588       2.974        5.552       2.026</code></pre>
+<pre class="r"><code>cor(iris[1:4])</code></pre>
+<pre><code>##              Sepal.Length Sepal.Width Petal.Length Petal.Width
+## Sepal.Length    1.0000000  -0.1175698    0.8717538   0.8179411
+## Sepal.Width    -0.1175698   1.0000000   -0.4284401  -0.3661259
+## Petal.Length    0.8717538  -0.4284401    1.0000000   0.9628654
+## Petal.Width     0.8179411  -0.3661259    0.9628654   1.0000000</code></pre>
+<pre class="r"><code>plot(Sepal.Length ~ Sepal.Width, data = iris, 
+     col = rainbow(3)[iris$Species], pch = 19)
+legend(&quot;topright&quot;, 
+       pch = 19, col = rainbow(3), 
+       legend = levels(iris$Species))</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<pre class="r"><code>pairs(iris[-5])</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<pre class="r"><code>pairs(iris[-5], col = rainbow(3)[iris$Species], pch = 19, upper.panel = NULL)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-35-2.png" width="672" /></p>
+</div>
+<div id="advanced-manipulation-using-basic-r-code" class="section level3">
+<h3>Advanced manipulation, using basic <code>R</code> code</h3>
+<div id="subset" class="section level4">
+<h4><code>subset()</code></h4>
+<pre class="r"><code>subset(iris, subset = Species == &quot;setosa&quot;)</code></pre>
+<pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1           5.1         3.5          1.4         0.2  setosa
+## 2           4.9         3.0          1.4         0.2  setosa
+## 3           4.7         3.2          1.3         0.2  setosa
+## 4           4.6         3.1          1.5         0.2  setosa
+## 5           5.0         3.6          1.4         0.2  setosa
+## 6           5.4         3.9          1.7         0.4  setosa
+## 7           4.6         3.4          1.4         0.3  setosa
+## 8           5.0         3.4          1.5         0.2  setosa
+## 9           4.4         2.9          1.4         0.2  setosa
+## 10          4.9         3.1          1.5         0.1  setosa
+## 11          5.4         3.7          1.5         0.2  setosa
+## 12          4.8         3.4          1.6         0.2  setosa
+## 13          4.8         3.0          1.4         0.1  setosa
+## 14          4.3         3.0          1.1         0.1  setosa
+## 15          5.8         4.0          1.2         0.2  setosa
+## 16          5.7         4.4          1.5         0.4  setosa
+## 17          5.4         3.9          1.3         0.4  setosa
+## 18          5.1         3.5          1.4         0.3  setosa
+## 19          5.7         3.8          1.7         0.3  setosa
+## 20          5.1         3.8          1.5         0.3  setosa
+## 21          5.4         3.4          1.7         0.2  setosa
+## 22          5.1         3.7          1.5         0.4  setosa
+## 23          4.6         3.6          1.0         0.2  setosa
+## 24          5.1         3.3          1.7         0.5  setosa
+## 25          4.8         3.4          1.9         0.2  setosa
+## 26          5.0         3.0          1.6         0.2  setosa
+## 27          5.0         3.4          1.6         0.4  setosa
+## 28          5.2         3.5          1.5         0.2  setosa
+## 29          5.2         3.4          1.4         0.2  setosa
+## 30          4.7         3.2          1.6         0.2  setosa
+## 31          4.8         3.1          1.6         0.2  setosa
+## 32          5.4         3.4          1.5         0.4  setosa
+## 33          5.2         4.1          1.5         0.1  setosa
+## 34          5.5         4.2          1.4         0.2  setosa
+## 35          4.9         3.1          1.5         0.2  setosa
+## 36          5.0         3.2          1.2         0.2  setosa
+## 37          5.5         3.5          1.3         0.2  setosa
+## 38          4.9         3.6          1.4         0.1  setosa
+## 39          4.4         3.0          1.3         0.2  setosa
+## 40          5.1         3.4          1.5         0.2  setosa
+## 41          5.0         3.5          1.3         0.3  setosa
+## 42          4.5         2.3          1.3         0.3  setosa
+## 43          4.4         3.2          1.3         0.2  setosa
+## 44          5.0         3.5          1.6         0.6  setosa
+## 45          5.1         3.8          1.9         0.4  setosa
+## 46          4.8         3.0          1.4         0.3  setosa
+## 47          5.1         3.8          1.6         0.2  setosa
+## 48          4.6         3.2          1.4         0.2  setosa
+## 49          5.3         3.7          1.5         0.2  setosa
+## 50          5.0         3.3          1.4         0.2  setosa
+##    Sepal.Length.ord
+## 1       (5.02,5.74]
+## 2        (4.3,5.02]
+## 3        (4.3,5.02]
+## 4        (4.3,5.02]
+## 5        (4.3,5.02]
+## 6       (5.02,5.74]
+## 7        (4.3,5.02]
+## 8        (4.3,5.02]
+## 9        (4.3,5.02]
+## 10       (4.3,5.02]
+## 11      (5.02,5.74]
+## 12       (4.3,5.02]
+## 13       (4.3,5.02]
+## 14       (4.3,5.02]
+## 15      (5.74,6.46]
+## 16      (5.02,5.74]
+## 17      (5.02,5.74]
+## 18      (5.02,5.74]
+## 19      (5.02,5.74]
+## 20      (5.02,5.74]
+## 21      (5.02,5.74]
+## 22      (5.02,5.74]
+## 23       (4.3,5.02]
+## 24      (5.02,5.74]
+## 25       (4.3,5.02]
+## 26       (4.3,5.02]
+## 27       (4.3,5.02]
+## 28      (5.02,5.74]
+## 29      (5.02,5.74]
+## 30       (4.3,5.02]
+## 31       (4.3,5.02]
+## 32      (5.02,5.74]
+## 33      (5.02,5.74]
+## 34      (5.02,5.74]
+## 35       (4.3,5.02]
+## 36       (4.3,5.02]
+## 37      (5.02,5.74]
+## 38       (4.3,5.02]
+## 39       (4.3,5.02]
+## 40      (5.02,5.74]
+## 41       (4.3,5.02]
+## 42       (4.3,5.02]
+## 43       (4.3,5.02]
+## 44       (4.3,5.02]
+## 45      (5.02,5.74]
+## 46       (4.3,5.02]
+## 47      (5.02,5.74]
+## 48       (4.3,5.02]
+## 49      (5.02,5.74]
+## 50       (4.3,5.02]</code></pre>
+<pre class="r"><code>subset(iris, subset = Species == &quot;setosa&quot; &amp; Sepal.Length &gt; 5.5)</code></pre>
+<pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 15          5.8         4.0          1.2         0.2  setosa
+## 16          5.7         4.4          1.5         0.4  setosa
+## 19          5.7         3.8          1.7         0.3  setosa
+##    Sepal.Length.ord
+## 15      (5.74,6.46]
+## 16      (5.02,5.74]
+## 19      (5.02,5.74]</code></pre>
+<pre class="r"><code>subset(iris, select = c(Sepal.Length, Species))</code></pre>
+<pre><code>##     Sepal.Length    Species
+## 1            5.1     setosa
+## 2            4.9     setosa
+## 3            4.7     setosa
+## 4            4.6     setosa
+## 5            5.0     setosa
+## 6            5.4     setosa
+## 7            4.6     setosa
+## 8            5.0     setosa
+## 9            4.4     setosa
+## 10           4.9     setosa
+## 11           5.4     setosa
+## 12           4.8     setosa
+## 13           4.8     setosa
+## 14           4.3     setosa
+## 15           5.8     setosa
+## 16           5.7     setosa
+## 17           5.4     setosa
+## 18           5.1     setosa
+## 19           5.7     setosa
+## 20           5.1     setosa
+## 21           5.4     setosa
+## 22           5.1     setosa
+## 23           4.6     setosa
+## 24           5.1     setosa
+## 25           4.8     setosa
+## 26           5.0     setosa
+## 27           5.0     setosa
+## 28           5.2     setosa
+## 29           5.2     setosa
+## 30           4.7     setosa
+## 31           4.8     setosa
+## 32           5.4     setosa
+## 33           5.2     setosa
+## 34           5.5     setosa
+## 35           4.9     setosa
+## 36           5.0     setosa
+## 37           5.5     setosa
+## 38           4.9     setosa
+## 39           4.4     setosa
+## 40           5.1     setosa
+## 41           5.0     setosa
+## 42           4.5     setosa
+## 43           4.4     setosa
+## 44           5.0     setosa
+## 45           5.1     setosa
+## 46           4.8     setosa
+## 47           5.1     setosa
+## 48           4.6     setosa
+## 49           5.3     setosa
+## 50           5.0     setosa
+## 51           7.0 versicolor
+## 52           6.4 versicolor
+## 53           6.9 versicolor
+## 54           5.5 versicolor
+## 55           6.5 versicolor
+## 56           5.7 versicolor
+## 57           6.3 versicolor
+## 58           4.9 versicolor
+## 59           6.6 versicolor
+## 60           5.2 versicolor
+## 61           5.0 versicolor
+## 62           5.9 versicolor
+## 63           6.0 versicolor
+## 64           6.1 versicolor
+## 65           5.6 versicolor
+## 66           6.7 versicolor
+## 67           5.6 versicolor
+## 68           5.8 versicolor
+## 69           6.2 versicolor
+## 70           5.6 versicolor
+## 71           5.9 versicolor
+## 72           6.1 versicolor
+## 73           6.3 versicolor
+## 74           6.1 versicolor
+## 75           6.4 versicolor
+## 76           6.6 versicolor
+## 77           6.8 versicolor
+## 78           6.7 versicolor
+## 79           6.0 versicolor
+## 80           5.7 versicolor
+## 81           5.5 versicolor
+## 82           5.5 versicolor
+## 83           5.8 versicolor
+## 84           6.0 versicolor
+## 85           5.4 versicolor
+## 86           6.0 versicolor
+## 87           6.7 versicolor
+## 88           6.3 versicolor
+## 89           5.6 versicolor
+## 90           5.5 versicolor
+## 91           5.5 versicolor
+## 92           6.1 versicolor
+## 93           5.8 versicolor
+## 94           5.0 versicolor
+## 95           5.6 versicolor
+## 96           5.7 versicolor
+## 97           5.7 versicolor
+## 98           6.2 versicolor
+## 99           5.1 versicolor
+## 100          5.7 versicolor
+## 101          6.3  virginica
+## 102          5.8  virginica
+## 103          7.1  virginica
+## 104          6.3  virginica
+## 105          6.5  virginica
+## 106          7.6  virginica
+## 107          4.9  virginica
+## 108          7.3  virginica
+## 109          6.7  virginica
+## 110          7.2  virginica
+## 111          6.5  virginica
+## 112          6.4  virginica
+## 113          6.8  virginica
+## 114          5.7  virginica
+## 115          5.8  virginica
+## 116          6.4  virginica
+## 117          6.5  virginica
+## 118          7.7  virginica
+## 119          7.7  virginica
+## 120          6.0  virginica
+## 121          6.9  virginica
+## 122          5.6  virginica
+## 123          7.7  virginica
+## 124          6.3  virginica
+## 125          6.7  virginica
+## 126          7.2  virginica
+## 127          6.2  virginica
+## 128          6.1  virginica
+## 129          6.4  virginica
+## 130          7.2  virginica
+## 131          7.4  virginica
+## 132          7.9  virginica
+## 133          6.4  virginica
+## 134          6.3  virginica
+## 135          6.1  virginica
+## 136          7.7  virginica
+## 137          6.3  virginica
+## 138          6.4  virginica
+## 139          6.0  virginica
+## 140          6.9  virginica
+## 141          6.7  virginica
+## 142          6.9  virginica
+## 143          5.8  virginica
+## 144          6.8  virginica
+## 145          6.7  virginica
+## 146          6.7  virginica
+## 147          6.3  virginica
+## 148          6.5  virginica
+## 149          6.2  virginica
+## 150          5.9  virginica</code></pre>
+<pre class="r"><code>subset(iris, 
+       subset = Species == &quot;setosa&quot; &amp; Sepal.Length &gt; 5.5, 
+       select = c(Sepal.Length, Species))</code></pre>
+<pre><code>##    Sepal.Length Species
+## 15          5.8  setosa
+## 16          5.7  setosa
+## 19          5.7  setosa</code></pre>
+</div>
+<div id="transform" class="section level4">
+<h4><code>transform()</code></h4>
+<pre class="r"><code>transform(iris, Sepal.Length.ord = cut(Sepal.Length, 5))</code></pre>
+<pre><code>##     Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+## 1            5.1         3.5          1.4         0.2     setosa
+## 2            4.9         3.0          1.4         0.2     setosa
+## 3            4.7         3.2          1.3         0.2     setosa
+## 4            4.6         3.1          1.5         0.2     setosa
+## 5            5.0         3.6          1.4         0.2     setosa
+## 6            5.4         3.9          1.7         0.4     setosa
+## 7            4.6         3.4          1.4         0.3     setosa
+## 8            5.0         3.4          1.5         0.2     setosa
+## 9            4.4         2.9          1.4         0.2     setosa
+## 10           4.9         3.1          1.5         0.1     setosa
+## 11           5.4         3.7          1.5         0.2     setosa
+## 12           4.8         3.4          1.6         0.2     setosa
+## 13           4.8         3.0          1.4         0.1     setosa
+## 14           4.3         3.0          1.1         0.1     setosa
+## 15           5.8         4.0          1.2         0.2     setosa
+## 16           5.7         4.4          1.5         0.4     setosa
+## 17           5.4         3.9          1.3         0.4     setosa
+## 18           5.1         3.5          1.4         0.3     setosa
+## 19           5.7         3.8          1.7         0.3     setosa
+## 20           5.1         3.8          1.5         0.3     setosa
+## 21           5.4         3.4          1.7         0.2     setosa
+## 22           5.1         3.7          1.5         0.4     setosa
+## 23           4.6         3.6          1.0         0.2     setosa
+## 24           5.1         3.3          1.7         0.5     setosa
+## 25           4.8         3.4          1.9         0.2     setosa
+## 26           5.0         3.0          1.6         0.2     setosa
+## 27           5.0         3.4          1.6         0.4     setosa
+## 28           5.2         3.5          1.5         0.2     setosa
+## 29           5.2         3.4          1.4         0.2     setosa
+## 30           4.7         3.2          1.6         0.2     setosa
+## 31           4.8         3.1          1.6         0.2     setosa
+## 32           5.4         3.4          1.5         0.4     setosa
+## 33           5.2         4.1          1.5         0.1     setosa
+## 34           5.5         4.2          1.4         0.2     setosa
+## 35           4.9         3.1          1.5         0.2     setosa
+## 36           5.0         3.2          1.2         0.2     setosa
+## 37           5.5         3.5          1.3         0.2     setosa
+## 38           4.9         3.6          1.4         0.1     setosa
+## 39           4.4         3.0          1.3         0.2     setosa
+## 40           5.1         3.4          1.5         0.2     setosa
+## 41           5.0         3.5          1.3         0.3     setosa
+## 42           4.5         2.3          1.3         0.3     setosa
+## 43           4.4         3.2          1.3         0.2     setosa
+## 44           5.0         3.5          1.6         0.6     setosa
+## 45           5.1         3.8          1.9         0.4     setosa
+## 46           4.8         3.0          1.4         0.3     setosa
+## 47           5.1         3.8          1.6         0.2     setosa
+## 48           4.6         3.2          1.4         0.2     setosa
+## 49           5.3         3.7          1.5         0.2     setosa
+## 50           5.0         3.3          1.4         0.2     setosa
+## 51           7.0         3.2          4.7         1.4 versicolor
+## 52           6.4         3.2          4.5         1.5 versicolor
+## 53           6.9         3.1          4.9         1.5 versicolor
+## 54           5.5         2.3          4.0         1.3 versicolor
+## 55           6.5         2.8          4.6         1.5 versicolor
+## 56           5.7         2.8          4.5         1.3 versicolor
+## 57           6.3         3.3          4.7         1.6 versicolor
+## 58           4.9         2.4          3.3         1.0 versicolor
+## 59           6.6         2.9          4.6         1.3 versicolor
+## 60           5.2         2.7          3.9         1.4 versicolor
+## 61           5.0         2.0          3.5         1.0 versicolor
+## 62           5.9         3.0          4.2         1.5 versicolor
+## 63           6.0         2.2          4.0         1.0 versicolor
+## 64           6.1         2.9          4.7         1.4 versicolor
+## 65           5.6         2.9          3.6         1.3 versicolor
+## 66           6.7         3.1          4.4         1.4 versicolor
+## 67           5.6         3.0          4.5         1.5 versicolor
+## 68           5.8         2.7          4.1         1.0 versicolor
+## 69           6.2         2.2          4.5         1.5 versicolor
+## 70           5.6         2.5          3.9         1.1 versicolor
+## 71           5.9         3.2          4.8         1.8 versicolor
+## 72           6.1         2.8          4.0         1.3 versicolor
+## 73           6.3         2.5          4.9         1.5 versicolor
+## 74           6.1         2.8          4.7         1.2 versicolor
+## 75           6.4         2.9          4.3         1.3 versicolor
+## 76           6.6         3.0          4.4         1.4 versicolor
+## 77           6.8         2.8          4.8         1.4 versicolor
+## 78           6.7         3.0          5.0         1.7 versicolor
+## 79           6.0         2.9          4.5         1.5 versicolor
+## 80           5.7         2.6          3.5         1.0 versicolor
+## 81           5.5         2.4          3.8         1.1 versicolor
+## 82           5.5         2.4          3.7         1.0 versicolor
+## 83           5.8         2.7          3.9         1.2 versicolor
+## 84           6.0         2.7          5.1         1.6 versicolor
+## 85           5.4         3.0          4.5         1.5 versicolor
+## 86           6.0         3.4          4.5         1.6 versicolor
+## 87           6.7         3.1          4.7         1.5 versicolor
+## 88           6.3         2.3          4.4         1.3 versicolor
+## 89           5.6         3.0          4.1         1.3 versicolor
+## 90           5.5         2.5          4.0         1.3 versicolor
+## 91           5.5         2.6          4.4         1.2 versicolor
+## 92           6.1         3.0          4.6         1.4 versicolor
+## 93           5.8         2.6          4.0         1.2 versicolor
+## 94           5.0         2.3          3.3         1.0 versicolor
+## 95           5.6         2.7          4.2         1.3 versicolor
+## 96           5.7         3.0          4.2         1.2 versicolor
+## 97           5.7         2.9          4.2         1.3 versicolor
+## 98           6.2         2.9          4.3         1.3 versicolor
+## 99           5.1         2.5          3.0         1.1 versicolor
+## 100          5.7         2.8          4.1         1.3 versicolor
+## 101          6.3         3.3          6.0         2.5  virginica
+## 102          5.8         2.7          5.1         1.9  virginica
+## 103          7.1         3.0          5.9         2.1  virginica
+## 104          6.3         2.9          5.6         1.8  virginica
+## 105          6.5         3.0          5.8         2.2  virginica
+## 106          7.6         3.0          6.6         2.1  virginica
+## 107          4.9         2.5          4.5         1.7  virginica
+## 108          7.3         2.9          6.3         1.8  virginica
+## 109          6.7         2.5          5.8         1.8  virginica
+## 110          7.2         3.6          6.1         2.5  virginica
+## 111          6.5         3.2          5.1         2.0  virginica
+## 112          6.4         2.7          5.3         1.9  virginica
+## 113          6.8         3.0          5.5         2.1  virginica
+## 114          5.7         2.5          5.0         2.0  virginica
+## 115          5.8         2.8          5.1         2.4  virginica
+## 116          6.4         3.2          5.3         2.3  virginica
+## 117          6.5         3.0          5.5         1.8  virginica
+## 118          7.7         3.8          6.7         2.2  virginica
+## 119          7.7         2.6          6.9         2.3  virginica
+## 120          6.0         2.2          5.0         1.5  virginica
+## 121          6.9         3.2          5.7         2.3  virginica
+## 122          5.6         2.8          4.9         2.0  virginica
+## 123          7.7         2.8          6.7         2.0  virginica
+## 124          6.3         2.7          4.9         1.8  virginica
+## 125          6.7         3.3          5.7         2.1  virginica
+## 126          7.2         3.2          6.0         1.8  virginica
+## 127          6.2         2.8          4.8         1.8  virginica
+## 128          6.1         3.0          4.9         1.8  virginica
+## 129          6.4         2.8          5.6         2.1  virginica
+## 130          7.2         3.0          5.8         1.6  virginica
+## 131          7.4         2.8          6.1         1.9  virginica
+## 132          7.9         3.8          6.4         2.0  virginica
+## 133          6.4         2.8          5.6         2.2  virginica
+## 134          6.3         2.8          5.1         1.5  virginica
+## 135          6.1         2.6          5.6         1.4  virginica
+## 136          7.7         3.0          6.1         2.3  virginica
+## 137          6.3         3.4          5.6         2.4  virginica
+## 138          6.4         3.1          5.5         1.8  virginica
+## 139          6.0         3.0          4.8         1.8  virginica
+## 140          6.9         3.1          5.4         2.1  virginica
+## 141          6.7         3.1          5.6         2.4  virginica
+## 142          6.9         3.1          5.1         2.3  virginica
+## 143          5.8         2.7          5.1         1.9  virginica
+## 144          6.8         3.2          5.9         2.3  virginica
+## 145          6.7         3.3          5.7         2.5  virginica
+## 146          6.7         3.0          5.2         2.3  virginica
+## 147          6.3         2.5          5.0         1.9  virginica
+## 148          6.5         3.0          5.2         2.0  virginica
+## 149          6.2         3.4          5.4         2.3  virginica
+## 150          5.9         3.0          5.1         1.8  virginica
+##     Sepal.Length.ord
+## 1        (5.02,5.74]
+## 2         (4.3,5.02]
+## 3         (4.3,5.02]
+## 4         (4.3,5.02]
+## 5         (4.3,5.02]
+## 6        (5.02,5.74]
+## 7         (4.3,5.02]
+## 8         (4.3,5.02]
+## 9         (4.3,5.02]
+## 10        (4.3,5.02]
+## 11       (5.02,5.74]
+## 12        (4.3,5.02]
+## 13        (4.3,5.02]
+## 14        (4.3,5.02]
+## 15       (5.74,6.46]
+## 16       (5.02,5.74]
+## 17       (5.02,5.74]
+## 18       (5.02,5.74]
+## 19       (5.02,5.74]
+## 20       (5.02,5.74]
+## 21       (5.02,5.74]
+## 22       (5.02,5.74]
+## 23        (4.3,5.02]
+## 24       (5.02,5.74]
+## 25        (4.3,5.02]
+## 26        (4.3,5.02]
+## 27        (4.3,5.02]
+## 28       (5.02,5.74]
+## 29       (5.02,5.74]
+## 30        (4.3,5.02]
+## 31        (4.3,5.02]
+## 32       (5.02,5.74]
+## 33       (5.02,5.74]
+## 34       (5.02,5.74]
+## 35        (4.3,5.02]
+## 36        (4.3,5.02]
+## 37       (5.02,5.74]
+## 38        (4.3,5.02]
+## 39        (4.3,5.02]
+## 40       (5.02,5.74]
+## 41        (4.3,5.02]
+## 42        (4.3,5.02]
+## 43        (4.3,5.02]
+## 44        (4.3,5.02]
+## 45       (5.02,5.74]
+## 46        (4.3,5.02]
+## 47       (5.02,5.74]
+## 48        (4.3,5.02]
+## 49       (5.02,5.74]
+## 50        (4.3,5.02]
+## 51       (6.46,7.18]
+## 52       (5.74,6.46]
+## 53       (6.46,7.18]
+## 54       (5.02,5.74]
+## 55       (6.46,7.18]
+## 56       (5.02,5.74]
+## 57       (5.74,6.46]
+## 58        (4.3,5.02]
+## 59       (6.46,7.18]
+## 60       (5.02,5.74]
+## 61        (4.3,5.02]
+## 62       (5.74,6.46]
+## 63       (5.74,6.46]
+## 64       (5.74,6.46]
+## 65       (5.02,5.74]
+## 66       (6.46,7.18]
+## 67       (5.02,5.74]
+## 68       (5.74,6.46]
+## 69       (5.74,6.46]
+## 70       (5.02,5.74]
+## 71       (5.74,6.46]
+## 72       (5.74,6.46]
+## 73       (5.74,6.46]
+## 74       (5.74,6.46]
+## 75       (5.74,6.46]
+## 76       (6.46,7.18]
+## 77       (6.46,7.18]
+## 78       (6.46,7.18]
+## 79       (5.74,6.46]
+## 80       (5.02,5.74]
+## 81       (5.02,5.74]
+## 82       (5.02,5.74]
+## 83       (5.74,6.46]
+## 84       (5.74,6.46]
+## 85       (5.02,5.74]
+## 86       (5.74,6.46]
+## 87       (6.46,7.18]
+## 88       (5.74,6.46]
+## 89       (5.02,5.74]
+## 90       (5.02,5.74]
+## 91       (5.02,5.74]
+## 92       (5.74,6.46]
+## 93       (5.74,6.46]
+## 94        (4.3,5.02]
+## 95       (5.02,5.74]
+## 96       (5.02,5.74]
+## 97       (5.02,5.74]
+## 98       (5.74,6.46]
+## 99       (5.02,5.74]
+## 100      (5.02,5.74]
+## 101      (5.74,6.46]
+## 102      (5.74,6.46]
+## 103      (6.46,7.18]
+## 104      (5.74,6.46]
+## 105      (6.46,7.18]
+## 106       (7.18,7.9]
+## 107       (4.3,5.02]
+## 108       (7.18,7.9]
+## 109      (6.46,7.18]
+## 110       (7.18,7.9]
+## 111      (6.46,7.18]
+## 112      (5.74,6.46]
+## 113      (6.46,7.18]
+## 114      (5.02,5.74]
+## 115      (5.74,6.46]
+## 116      (5.74,6.46]
+## 117      (6.46,7.18]
+## 118       (7.18,7.9]
+## 119       (7.18,7.9]
+## 120      (5.74,6.46]
+## 121      (6.46,7.18]
+## 122      (5.02,5.74]
+## 123       (7.18,7.9]
+## 124      (5.74,6.46]
+## 125      (6.46,7.18]
+## 126       (7.18,7.9]
+## 127      (5.74,6.46]
+## 128      (5.74,6.46]
+## 129      (5.74,6.46]
+## 130       (7.18,7.9]
+## 131       (7.18,7.9]
+## 132       (7.18,7.9]
+## 133      (5.74,6.46]
+## 134      (5.74,6.46]
+## 135      (5.74,6.46]
+## 136       (7.18,7.9]
+## 137      (5.74,6.46]
+## 138      (5.74,6.46]
+## 139      (5.74,6.46]
+## 140      (6.46,7.18]
+## 141      (6.46,7.18]
+## 142      (6.46,7.18]
+## 143      (5.74,6.46]
+## 144      (6.46,7.18]
+## 145      (6.46,7.18]
+## 146      (6.46,7.18]
+## 147      (5.74,6.46]
+## 148      (6.46,7.18]
+## 149      (5.74,6.46]
+## 150      (5.74,6.46]</code></pre>
+</div>
+<div id="aggregate" class="section level4">
+<h4><code>aggregate()</code></h4>
+<pre class="r"><code>aggregate(Sepal.Length ~ 0, iris, mean)</code></pre>
+<pre><code>##   Sepal.Length
+## 1     5.843333</code></pre>
+<pre class="r"><code>aggregate(Sepal.Length ~ 0, iris, length)</code></pre>
+<pre><code>##   Sepal.Length
+## 1          150</code></pre>
+<pre class="r"><code>aggregate(Sepal.Length ~ Species, iris, mean)</code></pre>
+<pre><code>##      Species Sepal.Length
+## 1     setosa        5.006
+## 2 versicolor        5.936
+## 3  virginica        6.588</code></pre>
+<pre class="r"><code>aggregate(Sepal.Length ~ Species, iris, length)</code></pre>
+<pre><code>##      Species Sepal.Length
+## 1     setosa           50
+## 2 versicolor           50
+## 3  virginica           50</code></pre>
+<pre class="r"><code>aggregate(cbind(Sepal.Length, Sepal.Width) ~ Species, iris, mean)</code></pre>
+<pre><code>##      Species Sepal.Length Sepal.Width
+## 1     setosa        5.006       3.428
+## 2 versicolor        5.936       2.770
+## 3  virginica        6.588       2.974</code></pre>
+<pre class="r"><code>aggregate(. ~ Species, iris, mean)</code></pre>
+<pre><code>##      Species Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 1     setosa        5.006       3.428        1.462       0.246
+## 2 versicolor        5.936       2.770        4.260       1.326
+## 3  virginica        6.588       2.974        5.552       2.026
+##   Sepal.Length.ord
+## 1             1.46
+## 2             2.70
+## 3             3.66</code></pre>
+<pre class="r"><code>aggregate(Sepal.Length ~ Species, iris, function(v) {
+    return(c(mean = mean(v), sd = sd(v)))
+    })</code></pre>
+<pre><code>##      Species Sepal.Length.mean Sepal.Length.sd
+## 1     setosa         5.0060000       0.3524897
+## 2 versicolor         5.9360000       0.5161711
+## 3  virginica         6.5880000       0.6358796</code></pre>
+</div>
+<div id="setnames" class="section level4">
+<h4><code>setNames()</code></h4>
+<pre class="r"><code>setNames(aggregate(Sepal.Length ~ Species, iris, mean),
+         c(&quot;Species&quot;, &quot;Sepal Length mean&quot;))</code></pre>
+<pre><code>##      Species Sepal Length mean
+## 1     setosa             5.006
+## 2 versicolor             5.936
+## 3  virginica             6.588</code></pre>
+</div>
+<div id="merge" class="section level4">
+<h4><code>merge()</code></h4>
+<pre class="r"><code>a = aggregate(Sepal.Length ~ Species, iris, mean)
+a = setNames(a, c(&quot;Species&quot;, &quot;Sepal Length mean&quot;))
+b = aggregate(Sepal.Width ~ Species, iris, min)
+b = setNames(b, c(&quot;Species&quot;, &quot;Sepal Width min&quot;))
+merge(a, b)</code></pre>
+<pre><code>##      Species Sepal Length mean Sepal Width min
+## 1     setosa             5.006             2.3
+## 2 versicolor             5.936             2.0
+## 3  virginica             6.588             2.2</code></pre>
+<pre class="r"><code>a = aggregate(Sepal.Length ~ Species, iris, mean)
+b = aggregate(Sepal.Width ~ Species, iris, min)
+merge(a, b, by = &quot;Species&quot;)</code></pre>
+<pre><code>##      Species Sepal.Length Sepal.Width
+## 1     setosa        5.006         2.3
+## 2 versicolor        5.936         2.0
+## 3  virginica        6.588         2.2</code></pre>
+</div>
+</div>
+</div>
+<div id="data-visualization" class="section level2">
+<h2>Data visualization</h2>
+<p>In the following code, we need two packages:</p>
+<ul>
+<li><a href=""><code>ggplot2</code></a></li>
+<li><a href=""><code>FactoMineR</code></a></li>
+</ul>
+<div id="library-ggplot2" class="section level3">
+<h3>library <code>ggplot2</code></h3>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<p>Two functions: <code>qplot()</code> and <code>ggplot()</code>. The first one is a simplier version of the second one. We focus here on the <code>ggplot()</code>.</p>
+<div id="univariate" class="section level4">
+<h4>Univariate</h4>
+<div id="quantitative-1" class="section level5">
+<h5>Quantitative</h5>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length)) + geom_histogram()</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length)) + geom_density()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-43-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length)) + 
+    geom_histogram(aes(y = ..density..)) + 
+    geom_density()</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-43-3.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(sample = Sepal.Length)) + geom_qq()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-43-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(0, Sepal.Length)) + geom_boxplot()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-43-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length)) + stat_ecdf()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-43-6.png" width="672" /></p>
+</div>
+<div id="qualitative-1" class="section level5">
+<h5>Qualitative</h5>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length.ord)) + geom_bar()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length.ord)) + 
+    geom_bar(aes(y = (..count../(sum(..count..))))) </code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-44-2.png" width="672" /></p>
+<pre class="r"><code>library(scales)
+ggplot(iris, aes(Sepal.Length.ord)) + 
+    geom_bar(aes(y = (..count../(sum(..count..))))) +
+    scale_y_continuous(labels = percent) </code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-44-3.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(&quot;&quot;, fill = Sepal.Length.ord)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..))) +
+    scale_y_continuous(labels = percent)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-44-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(&quot;&quot;, fill = Sepal.Length.ord)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), width = 1) +
+    scale_y_continuous(labels = percent) +
+    coord_polar(theta = &quot;y&quot;)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-44-5.png" width="672" /></p>
+</div>
+</div>
+<div id="bivariate" class="section level4">
+<h4>Bivariate</h4>
+<div id="two-quantitatives-1" class="section level5">
+<h5>Two Quantitatives</h5>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_point()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_rug()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-45-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_smooth()</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39;</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-45-3.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_smooth(method = &quot;lm&quot;)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-45-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, Sepal.Width)) + 
+    geom_point() + 
+    geom_rug() + 
+    geom_smooth(method = &quot;lm&quot;)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-45-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, Sepal.Width)) + geom_bin2d(bins = 10)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-45-6.png" width="672" /></p>
+</div>
+<div id="two-qualitatives-1" class="section level5">
+<h5>Two qualitatives</h5>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length.ord)) + geom_bar() + facet_wrap(~ Species)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length.ord, fill = Species)) + geom_bar()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-46-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length.ord, fill = Species)) + 
+    geom_bar(position = &quot;fill&quot;) +
+    scale_y_continuous(labels = percent)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-46-3.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(&quot;&quot;, fill = Sepal.Length.ord)) + 
+    geom_bar(aes(y = (..count..)/sum(..count..)), width = 1) +
+    scale_y_continuous(labels = percent) +
+    coord_polar(theta = &quot;y&quot;) + 
+    facet_wrap(~ Species)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-46-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Species, Sepal.Length.ord)) + geom_bin2d()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-46-5.png" width="672" /></p>
+</div>
+<div id="qualitative-vs.quantitative" class="section level5">
+<h5>Qualitative vs. Quantitative</h5>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length)) + geom_histogram() + facet_grid(Species ~.)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, fill = Species)) + 
+    geom_histogram() + facet_grid(Species ~.)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-47-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, col = Species)) + geom_density()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-47-3.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Species, Sepal.Length)) + geom_boxplot()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-47-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Species, Sepal.Length, fill = Species)) + geom_boxplot()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-47-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Sepal.Length, col = Species)) + stat_ecdf()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-47-6.png" width="672" /></p>
+</div>
+</div>
+<div id="multivariate" class="section level4">
+<h4>Multivariate</h4>
+<p>Some graphics with more than 2 variables</p>
+<pre class="r"><code>ggplot(iris, aes(Petal.Length, Petal.Width, col = Species)) + 
+    geom_point()</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-48-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Petal.Length, Petal.Width, col = Species)) + 
+    geom_point() + facet_wrap(~ Sepal.Length.ord)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-48-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(iris, aes(Petal.Length, Petal.Width, col = Species)) + 
+    geom_point() + facet_grid(Species ~ Sepal.Length.ord)</code></pre>
+<p><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-48-3.png" width="672" /></p>
+</div>
+</div>
+<div id="library-factominer" class="section level3">
+<h3>library <code>FactoMineR</code></h3>
+<p>For data analysis, such as <em>Principle Components Analysis</em> (<strong>PCA</strong>)</p>
+<pre class="r"><code>library(FactoMineR)</code></pre>
+<pre class="r"><code>pca = PCA(iris, quali.sup = c(5, 6)) # since we add Sepal.Length.ord to iris data
+summary(pca)</code></pre>
+<pre><code>## 
+## Call:
+## PCA(X = iris, quali.sup = c(5, 6)) 
+## 
+## 
+## Eigenvalues
+##                        Dim.1   Dim.2   Dim.3   Dim.4
+## Variance               2.918   0.914   0.147   0.021
+## % of var.             72.962  22.851   3.669   0.518
+## Cumulative % of var.  72.962  95.813  99.482 100.000
+## 
+## Individuals (the 10 first)
+##                  Dist    Dim.1    ctr   cos2    Dim.2    ctr   cos2  
+## 1            |  2.319 | -2.265  1.172  0.954 |  0.480  0.168  0.043 |
+## 2            |  2.202 | -2.081  0.989  0.893 | -0.674  0.331  0.094 |
+## 3            |  2.389 | -2.364  1.277  0.979 | -0.342  0.085  0.020 |
+## 4            |  2.378 | -2.299  1.208  0.935 | -0.597  0.260  0.063 |
+## 5            |  2.476 | -2.390  1.305  0.932 |  0.647  0.305  0.068 |
+## 6            |  2.555 | -2.076  0.984  0.660 |  1.489  1.617  0.340 |
+## 7            |  2.468 | -2.444  1.364  0.981 |  0.048  0.002  0.000 |
+## 8            |  2.246 | -2.233  1.139  0.988 |  0.223  0.036  0.010 |
+## 9            |  2.592 | -2.335  1.245  0.812 | -1.115  0.907  0.185 |
+## 10           |  2.249 | -2.184  1.090  0.943 | -0.469  0.160  0.043 |
+##               Dim.3    ctr   cos2  
+## 1            -0.128  0.074  0.003 |
+## 2            -0.235  0.250  0.011 |
+## 3             0.044  0.009  0.000 |
+## 4             0.091  0.038  0.001 |
+## 5             0.016  0.001  0.000 |
+## 6             0.027  0.003  0.000 |
+## 7             0.335  0.511  0.018 |
+## 8            -0.089  0.036  0.002 |
+## 9             0.145  0.096  0.003 |
+## 10           -0.254  0.293  0.013 |
+## 
+## Variables
+##                 Dim.1    ctr   cos2    Dim.2    ctr   cos2    Dim.3    ctr
+## Sepal.Length |  0.890 27.151  0.792 |  0.361 14.244  0.130 | -0.276 51.778
+## Sepal.Width  | -0.460  7.255  0.212 |  0.883 85.247  0.779 |  0.094  5.972
+## Petal.Length |  0.992 33.688  0.983 |  0.023  0.060  0.001 |  0.054  2.020
+## Petal.Width  |  0.965 31.906  0.931 |  0.064  0.448  0.004 |  0.243 40.230
+##                cos2  
+## Sepal.Length  0.076 |
+## Sepal.Width   0.009 |
+## Petal.Length  0.003 |
+## Petal.Width   0.059 |
+## 
+## Supplementary categories
+##                   Dist     Dim.1    cos2  v.test     Dim.2    cos2  v.test
+## setosa       |   2.244 |  -2.225   0.983 -11.240 |   0.289   0.017   2.608
+## versicolor   |   0.748 |   0.496   0.441   2.508 |  -0.550   0.541  -4.967
+## virginica    |   1.753 |   1.728   0.971   8.732 |   0.261   0.022   2.359
+## (4.3,5.02]   |   2.070 |  -2.004   0.937  -7.455 |  -0.516   0.062  -3.433
+## (5.02,5.74]  |   0.994 |  -0.990   0.992  -4.340 |   0.079   0.006   0.622
+## (5.74,6.46]  |   0.979 |   0.950   0.942   4.235 |  -0.214   0.048  -1.707
+## (6.46,7.18]  |   1.631 |   1.562   0.917   4.872 |   0.451   0.077   2.514
+## (7.18,7.9]   |   2.738 |   2.482   0.822   4.990 |   1.040   0.144   3.736
+##                  Dim.3    cos2  v.test  
+## setosa       |  -0.043   0.000  -0.965 |
+## versicolor   |  -0.096   0.017  -2.166 |
+## virginica    |   0.139   0.006   3.131 |
+## (4.3,5.02]   |   0.056   0.001   0.935 |
+## (5.02,5.74]  |   0.037   0.001   0.721 |
+## (5.74,6.46]  |   0.097   0.010   1.925 |
+## (6.46,7.18]  |  -0.082   0.003  -1.136 |
+## (7.18,7.9]   |  -0.493   0.032  -4.421 |</code></pre>
+<pre class="r"><code>dimdesc(pca)</code></pre>
+<pre><code>## $Dim.1
+## $Dim.1$quanti
+##              correlation       p.value
+## Petal.Length   0.9915552 3.369916e-133
+## Petal.Width    0.9649790  6.609632e-88
+## Sepal.Length   0.8901688  2.190813e-52
+## Sepal.Width   -0.4601427  3.139724e-09
+## 
+## $Dim.1$quali
+##                         R2      p.value
+## Species          0.9346162 8.650956e-88
+## Sepal.Length.ord 0.7605984 5.445095e-44
+## 
+## $Dim.1$category
+##               Estimate      p.value
+## virginica    1.7283051 8.295665e-25
+## (7.18,7.9]   2.0821611 2.066701e-07
+## (6.46,7.18]  1.1621035 4.207377e-07
+## (5.74,6.46]  0.5501108 1.367268e-05
+## versicolor   0.4964480 1.164951e-02
+## (5.02,5.74] -1.3905151 8.028009e-06
+## (4.3,5.02]  -2.4038602 1.051683e-16
+## setosa      -2.2247532 2.073453e-62
+## 
+## 
+## $Dim.2
+## $Dim.2$quanti
+##              correlation      p.value
+## Sepal.Width    0.8827163 2.123801e-50
+## Sepal.Length   0.3608299 5.731933e-06
+## 
+## $Dim.2$quali
+##                         R2      p.value
+## Sepal.Length.ord 0.2006322 1.382761e-06
+## Species          0.1657182 1.646217e-06
+## 
+## $Dim.2$category
+##               Estimate      p.value
+## (7.18,7.9]   0.8721703 1.395107e-04
+## setosa       0.2889275 8.646553e-03
+## (6.46,7.18]  0.2831920 1.144684e-02
+## virginica    0.2612430 1.783576e-02
+## (4.3,5.02]  -0.6843715 4.893669e-04
+## versicolor  -0.5501705 2.374413e-07
+## 
+## 
+## $Dim.3
+## $Dim.3$quanti
+##              correlation      p.value
+## Petal.Width    0.2429827 0.0027349555
+## Sepal.Length  -0.2756577 0.0006395628
+## 
+## $Dim.3$quali
+##                          R2      p.value
+## Sepal.Length.ord 0.15386335 6.671063e-05
+## Species          0.06902197 5.212527e-03
+## 
+## $Dim.3$category
+##               Estimate      p.value
+## virginica   0.13896861 1.532356e-03
+## versicolor -0.09612951 2.983835e-02
+## (7.18,7.9] -0.41623009 5.267240e-06</code></pre>
+<pre class="r"><code>pca$eig</code></pre>
+<pre><code>##        eigenvalue percentage of variance cumulative percentage of variance
+## comp 1 2.91849782             72.9624454                          72.96245
+## comp 2 0.91403047             22.8507618                          95.81321
+## comp 3 0.14675688              3.6689219                          99.48213
+## comp 4 0.02071484              0.5178709                         100.00000</code></pre>
+<pre class="r"><code>plot(pca$eig[,3], type = &quot;b&quot;)
+eig = data.frame(comp = rownames(pca$eig),
+                 setNames(pca$eig, c(&quot;eigenvalue&quot;, &quot;percent&quot;, &quot;cum.percent&quot;)))
+ggplot(eig) +
+    geom_bar(aes(comp, percent), stat = &quot;identity&quot;) +
+    stat_summary(aes(comp, cum.percent, group = 1), 
+                 fun.y = sum, geom = &quot;line&quot;)
+plotellipses(pca)
+plot(pca, choix = &quot;ind&quot;, habillage = 5, invisible = &quot;quali&quot;, label = &quot;none&quot;)
+ggplot(cbind(iris, pca$ind$coord), aes(Dim.1, Dim.2, col = Species)) +
+    geom_point() +
+    stat_ellipse()</code></pre>
+</div>
+</div>
+<div id="some-work" class="section level2">
+<h2>Some work</h2>
+<p>Download the two following files :</p>
+<ul>
+<li><a href="donnees/pendigits.tra">pendigits.tra</a></li>
+<li><a href="donnees/pendigits.tes">pendigits.tes</a></li>
+</ul>
+<p>Data description can be found <a href="http://archive.ics.uci.edu/ml/datasets/Pen-Based+Recognition+of+Handwritten+Digits">here</a>: each line represent a draw of a digit between 0 and 9, with 8 points (<span class="math inline">\((x,y)\)</span> coordinates for each point) and the number drawn.</p>
+<ol style="list-style-type: decimal">
+<li>Import the two files, and group them into one <code>data.frame</code>
+<ul>
+<li><code>data.frame</code> dimensions: 10992 rows and 17 columns</li>
+<li>column names: X1, Y1, X2, Y2, X3, Y3, X4, Y4, X5, Y5, X6, Y6, X7, Y7, X8, Y8, digit</li>
+</ul></li>
+<li>Describe (quickly) all attributes
+<ul>
+<li>one by one first</li>
+<li>coordinates with respect to <code>digit</code></li>
+</ul></li>
+<li>Represent the first <code>&quot;0&quot;</code> drawn as following <img src="stat-prog-R-1_files/figure-html/unnamed-chunk-52-1.png" width="672" /></li>
+<li>Use the preceding code to create a function, with
+<ul>
+<li>Parameters:
+<ul>
+<li>a vector with the 16 values of each point (if it is a <code>data.frame</code>, transform it as simple vector)</li>
+<li>a numeric value (with <code>NULL</code> value by default), denoting the number to drawn (possibly not pass)</li>
+<li>a boolean vector (with <code>FALSE</code> value by default), indicating if the point number has to be added to the graph</li>
+<li>a boolean vector (with <code>FALSE</code> value by default), indicating if the plot is to added to the previous one</li>
+<li>a specific color (with <code>&quot;black&quot;</code> value by default)</li>
+</ul></li>
+<li>Output:
+<ul>
+<li>line representing the drawn</li>
+<li>number drawn as title (if known)</li>
+<li>point number (if wanted) <img src="stat-prog-R-1_files/figure-html/unnamed-chunk-53-1.png" width="672" /><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-53-2.png" width="672" /><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-53-3.png" width="672" /><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-53-4.png" width="672" /></li>
+</ul></li>
+</ul></li>
+<li>Use the function to represent, in one graph, each first drawn for each number <img src="stat-prog-R-1_files/figure-html/unnamed-chunk-54-1.png" width="672" /></li>
+<li>Compute the mean drawn for each number and represent it, with each drawn in (very) light gray <img src="stat-prog-R-1_files/figure-html/unnamed-chunk-55-1.png" width="672" /></li>
+<li>Perform a <em>PCA</em> on the data, and represent the first plan, with a specific color for each number <img src="stat-prog-R-1_files/figure-html/unnamed-chunk-56-1.png" width="672" /><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-56-2.png" width="672" /></li>
+<li>Represent each number projections on a specific plot <img src="stat-prog-R-1_files/figure-html/unnamed-chunk-57-1.png" width="672" /><img src="stat-prog-R-1_files/figure-html/unnamed-chunk-57-2.png" width="672" /></li>
+</ol>
+<blockquote>
+<p>We conclude here that we surely need to clusters data separatly for each digit, to detect if there really are different ways to write a digit (and how).</p>
+</blockquote>
+</div>
+
+</div>
+<div class="footer">
+      Site créé avec <a href="http://www.r-project.org" target="_blank"><code>R</code></a> et la 
+      librairie  <a href="http://rmarkdown.rstudio.com/" target="_blank"><code>rmarkdown</code></a>.
+</div>
+<script>
+    $("#TOC").css("margin-top", "100px");
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

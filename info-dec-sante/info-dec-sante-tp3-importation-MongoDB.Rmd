@@ -1,0 +1,65 @@
+---
+title: Base de données Médicaments - passage en *NoSQL*
+subtitle: Informatique Décisionnelle - LP MDS Santé
+---
+
+> Le document qui suit est fourni pour information. Merci de **ne pas exécuter** ces commandes sur le serveur !
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+
+Ce code permet de passer des données importées sous `R` (voir le code [ici](info-dec-sante-tp1-correction.html)) au format NoSQL dans *MongoDB*.
+
+On se connecte déjà à la base de données. Pour information, si la base de données ou la collection n'existe pas, elles sont automatiquement créées.
+
+```{r}
+library(mongolite)
+bd = mongo(url = "mongodb://193.51.82.104:2343",
+           db = "medicaments",
+           collection = "import20161109")
+```
+
+Ensuite, le code qui suit permet de créer une liste contenant les informations pour chaque médicament de la table `CIS`. On y ajoute les informations des tables `CIS_COMPO`, `CIS_CIP`, `CIS_CPD`, `CIS_GENER`, `CIS_HAS_SMR` et `CIS_HAS_ASMR`.
+
+```{r}
+#bd$drop()
+data = list()
+for (i in 1:nrow(CIS)) {
+    temp = as.list(CIS[i,])
+    attr(temp, "labels") = NULL
+    attr(temp, "info") = NULL
+    compo = subset(CIS_COMPO, CodeCIS == temp$CodeCIS, select = -CodeCIS)
+    if (length(compo) > 0) temp$Composition = compo
+    cip = subset(CIS_CIP, CodeCIS == temp$CodeCIS, select = -CodeCIS)
+    if (length(cip) > 0) temp$CIP = cip
+    cpd = subset(CIS_CPD, CodeCIS == temp$CodeCIS, select = -CodeCIS)
+    if (length(cpd) > 0) temp$CPD = cpd
+    gener = subset(CIS_GENER, CodeCIS == temp$CodeCIS, select = -CodeCIS)
+    if (length(gener) > 0) temp$GENER = gener
+    smr = subset(CIS_SMR, CodeCIS == temp$CodeCIS, select = -CodeCIS)
+    if (length(smr) > 0) temp$SMR = smr
+    asmr = subset(CIS_ASMR, CodeCIS == temp$CodeCIS, select = -CodeCIS)
+    if (length(asmr) > 0) temp$ASMR = asmr
+    
+    for (n in names(temp)) {
+      if (is.data.frame(temp[[n]])) {
+        if (nrow(temp[[n]]) == 0) {
+          temp[[n]] = NULL
+        }
+      } else {
+        if (is.na(temp[[n]])) {
+          temp[[n]] = NULL
+        }
+      }
+    }
+    data[[i]] = temp
+}
+library(jsonlite)
+df <- fromJSON(toJSON(data, auto_unbox = T))
+bd$insert(df[1:5000,])
+bd$insert(df[5001:10000,])
+bd$insert(df[10001:nrow(df),])
+```
+

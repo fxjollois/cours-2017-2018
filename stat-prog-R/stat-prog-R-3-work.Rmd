@@ -1,0 +1,141 @@
+---
+title: "`pendigits` data - diret clustering"
+subtitle: Statistical Programming using `R`
+---
+
+Here are the packages we use in this work.
+
+```{r}
+library(reshape2)
+library(ggplot2)
+library(FactoMineR)
+library(NbClust)
+```
+
+Here is the previous code (see [here](stat-prog-R-1-work.html) for details) that we need in this part.
+
+```{r}
+# Importation
+pen.tra = read.table("donnees/pendigits.tra", sep = ",")
+pen.tes = read.table("donnees/pendigits.tes", sep = ",")
+pen = rbind(pen.tra, pen.tes)
+names(pen) = c(paste0(c("X", "Y"), rep(1:8, each = 2)), "digit")
+pen$digit = factor(pen$digit)
+
+# Drawn function
+drawn <- function(v, n = NULL, point = FALSE, add = FALSE, color = "black") {
+    # Transformation of the data.frame if needed
+    if (is.data.frame(v))
+        v = unlist(v)
+    # extract x and y coordinates
+    x = v[seq(1, 15, by = 2)]
+    y = v[seq(2, 16, by = 2)]
+    # optimize space into graphics in reducing margin (sse ?par for more information)
+    opar = par(mar = c(0, 0, 2, 0) + .1)
+    if (!add) { # Create a graphic
+        plot(x, y, 
+             # Specify limits is a way to have always the same frame for plotting lines
+             xlim = c(-5, 105), ylim = c(-5, 105),
+             # Do not show axes
+             axes = FALSE,
+             # If point is TRUE, we add a space (with pch = " ") at each point
+             # If not, draw a line
+             type = ifelse(point, "b", "l"), 
+             pch = " ", 
+             # Specify color (black by default)
+             col = color,
+             # Add a title (NULL by default)
+             main = n)
+        if (point) text(x, y, 1:8)
+    } else { # Add line to the plot
+        # lines() add lines to an existing plot (the last produce)
+        lines(x, y, 
+              # same comment than before
+              xlim = c(-5, 105), ylim = c(-5, 105),
+              type = ifelse(point, "b", "l"), 
+              pch = " ", 
+              col = color)
+    }
+    par(opar)
+}
+
+# PCA
+res = PCA(pen, quali.sup = 17, graph = FALSE)
+res2 = data.frame(res$ind$coord, digit = pen$digit)
+```
+
+## Application on `pendigits`
+
+### `5` digit
+
+In our case, we have to perform a direct clustering for each digit. Here, we focus on the `5` digit. First, we compute $k$-means with 2 clusters, as we notice from the PCA. 
+
+```{r}
+km5 = kmeans(subset(pen, digit == 5, -digit), 2)
+plot(Dim.2 ~ Dim.1, subset(res2, digit == 5, -digit), 
+     col = rainbow(2)[km5$cluster], pch = 19)
+```
+
+We now use the `NbClust()` function to test all criteria, in order to get a good number of clusters.
+
+```{r}
+dig = 5
+km5.nbcl = NbClust(subset(pen, digit == dig, -digit), method = "kmeans", 
+                   index = "hartigan") # for all indices, use "all"
+```
+
+We can now use the result of the automatic choice made by `NbClust()` to represent this `r km5.nbcl$Best.nc[1]` clusters. We do not use `ggplot()` to plot the factorial map, to be able to have in one graphic the mean digit for the clusters, and the projections for the points.
+
+```{r}
+km5.sub = data.frame(subset(pen, digit == dig, -digit),
+                     cluster = factor(km5.nbcl$Best.partition))
+km5.pca = data.frame(subset(res2, digit == dig, -digit),
+                     cluster = factor(km5.nbcl$Best.partition))
+km5.mean = aggregate(. ~ cluster, km5.sub, mean)
+par(mfcol = c(2, km5.nbcl$Best.nc[1]), mar = c(0, 0, 0, 0) + .1)
+for (k in 1:km5.nbcl$Best.nc[1]) {
+    drawn(km5.mean[k,-1], point = TRUE)
+    plot(Dim.2 ~ Dim.1, subset(km5.pca, cluster == k),
+         xlim = range(res2$Dim.1),
+         ylim = range(res2$Dim.2),
+         col = rainbow(km5.nbcl$Best.nc[1])[k], pch = 19, 
+         axes = FALSE, xlab = "", ylab = "", frame.plot = TRUE)
+}
+```
+
+### For all digits
+
+We can apply the preceeding code to all digit, to get an estimation of the number of clusters for all of them. We transform it to directly get the part of the results we want.
+
+```{r}
+km.nbcl = lapply(0:9, function(dig) {
+    sub = subset(pen, digit == dig, -digit)
+    nbcl = NbClust(sub, 
+                   method = "kmeans", index = "hartigan")
+    sub$cluster = factor(nbcl$Best.partition)
+    res = list(nc = nbcl$Best.nc[1],
+               partition = nbcl$Best.partition,
+               sub = sub,
+               pca = data.frame(subset(res2, digit == dig, -digit),
+                                cluster = factor(nbcl$Best.partition)),
+               mean = aggregate(. ~ cluster, sub, mean))
+})
+```
+
+Now, we can represent all this results.
+
+
+```{r}
+for (dig in 0:9) {
+    par(mfcol = c(2, km.nbcl[[dig+1]]$nc), mar = c(0, 0, 0, 0) + .1)
+    for (k in 1:km.nbcl[[dig+1]]$nc) {
+        drawn(km.nbcl[[dig+1]]$mean[k,-1], point = TRUE)
+        plot(Dim.2 ~ Dim.1, subset(km.nbcl[[dig+1]]$pca, cluster == k),
+             xlim = range(res2$Dim.1),
+             ylim = range(res2$Dim.2),
+             col = rainbow(km.nbcl[[dig+1]]$nc)[k], pch = 19, 
+             axes = FALSE, xlab = "", ylab = "", frame.plot = TRUE)
+    }
+}
+```
+

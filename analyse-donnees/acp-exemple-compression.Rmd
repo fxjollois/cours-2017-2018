@@ -1,0 +1,168 @@
+---
+title: "ACP - exemple en compression d'image"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = "center")
+library(ggplot2)
+```
+
+Dans cet exemple d'utilisation de l'ACP, nous partons d'une image quelconque (quoique...), pour la compresser en utilisant l'ACP. Pour évaluer l'intérêt de la méthode, pour différents nombres d'axes, l'image reconstruite ainsi que la taille des éléments nécessaire à la reconstruction sont affichées.
+
+Le code est visible afin de reproduire l'exemple avec une autre photo.
+
+## Image initiale
+
+Comme indiquée, l'image prise ici est simplement ma photo disponible sur la page [contact](../contact). La librairie `jpeg` permet d'importer et d'exporter des fichiers JPG, grâce entre autres à la fonction `readJPEG()`.
+
+```{r import-jpeg}
+library(jpeg)
+fxj = readJPEG("../image_perso_FX.JPG")
+```
+
+Il est possible d'afficher cette photo, grâce à la fonction `rasterImage()`. On retrouve bien l'image originale. Sa taille est non négligeable (`r format(object.size(fxj), "auto")`). On en profite pour créer une fonction qui sera utile par la suite pour afficher les images reconstruite.
+
+```{r affiche-jpeg}
+afficheJPEG = function(mat, titre = NULL) {
+  par(mar = c(0, 0, 1, 0))
+  plot(c(0, 1), c(0, 1), axes = F, pch = "", main = titre)
+  rasterImage(mat, 0, 0, 1, 1)
+}
+
+afficheJPEG(fxj, paste0("Originale (= ", format(object.size(fxj), "auto"), ")"))
+```
+
+## Découpage en rouge, vert et bleu
+
+Pour compresser cette image, nous allons découper celle-ci dans les trois composantes classiques d'une image : rouge, vert et bleu. Chaque pixel est représenté par une triplet de valeurs entre 0 et 1, représentant la quantité de chaque couleur de base à afficher.
+
+```{r decoupe-jpeg}
+fxj.r = fxj[,,1]
+fxj.g = fxj[,,2]
+fxj.b = fxj[,,3]
+```
+
+Il est donc possible de représenter ces trois composantes d'une image séparément, tel que ci-dessous.
+
+```{r affiche-rgb, fig.width=50, fig.height=10}
+par(mar = c(0, 0, 3, 0), mfrow = c(1, 3), cex.main = 5)
+
+fxj.0 = fxj * 0
+fxj.0[,,1] = fxj.r
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1), axes = F, main = "Rouge")
+rasterImage(fxj.0, 0, 0, 1, 1)
+
+fxj.0 = fxj * 0
+fxj.0[,,2] = fxj.g
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1), axes = F, main = "Vert")
+rasterImage(fxj.0, 0, 0, 1, 1)
+
+fxj.0 = fxj * 0
+fxj.0[,,3] = fxj.b
+plot(NULL, xlim = c(0, 1), ylim = c(0, 1), axes = F, main = "Bleu")
+rasterImage(fxj.0, 0, 0, 1, 1)
+```
+
+## Compression via ACP
+
+La compression va utiliser une ACP sur chaque composante. Pour cela, nous calculons les valeurs de l'ACP pour chacune, que nous stockons dans une liste pour simplifier le travail par la suite.
+
+```{r acp-rgb}
+acp.r = prcomp(fxj.r, center = FALSE)
+acp.g = prcomp(fxj.g, center = FALSE)
+acp.b = prcomp(fxj.b, center = FALSE)
+
+acp = list(acp.r, acp.g, acp.b)
+```
+
+On créée trois fonctions permettant, é partir d'un nombre d'axes passé en paramétre :
+- de calculer la taille des objets utilisés pour recréer l'image, 
+- de reconstruire l'image,
+- d'afficher l'image reconstruite.
+
+```{r }
+tailleCOMP = function(nbaxes) {
+  taille.lignes = object.size(acp[[1]]$x[,1:nbaxes])
+  taille.colonnes = object.size(t(acp[[1]]$rotation[,1:nbaxes]))
+  paste0(nbaxes, " axes : ", 
+         format(taille.lignes, "auto"), 
+         " et ", 
+         format(taille.colonnes, "auto"), 
+         " (= ", format(taille.lignes + taille.colonnes, "auto"), ")")
+}
+
+reconstruction = function(nbaxes) {
+  comp = sapply(acp, function(j) { j$x[,1:nbaxes] %*% t(j$rotation[,1:nbaxes]) }, simplify = 'array')
+  comp[comp < 0] = 0
+  comp[comp > 1] = 1
+  return(comp)
+}
+afficheCOMP = function(nbaxes) {
+  afficheJPEG(reconstruction(nbaxes), tailleCOMP(nbaxes))
+}
+```
+
+Lorsque nous utilisons uniquement 1 axe, l'image reconstruite est bien évidemment assez loin de l'image de départ.
+
+```{r}
+afficheCOMP(1)
+```
+
+Avec 3 axes, on se rapproche , au moins de l'idée générale de l'image de base.
+
+```{r}
+afficheCOMP(3)
+```
+
+Avec 20 axes, l'image est clairement reconnaissable, avec une taille trés raisonnable par rapport é la taille initiale.
+
+```{r}
+afficheCOMP(20)
+```
+
+Bien évidemment, plus on ajoute d'axes, plus on se rapproche de l'image originale.
+
+```{r}
+afficheCOMP(50)
+```
+
+Avec 320 axes, bien qu'en ayant divisé presque par 4 la taille de l'image, celle reconstruite est trés proche de l'image originale.
+
+```{r}
+afficheCOMP(320)
+```
+
+## Qualité de l'image reconstruite
+
+On peut aller plus  loin et calculer, pour chaque nombre d'axes, la distance entre l'image originale et l'image reconstruite, en sommant les écarts au carré par exemple. On voit clairement que la taille augmente linéairement par rapport aux nombre d'axes. Pour la différence par rapport é l'originale, on remarque que le gain de qualité se fait trés rapidement.
+
+```{r difference}
+res = sapply(c(1:50, seq(60, 320, by = 20), 640), function(nbaxes) {
+  fxj.comp = reconstruction(nbaxes)
+  diff = sum((fxj - fxj.comp) ** 2)
+  taille = object.size(acp[[1]]$x[,1:nbaxes]) + object.size(t(acp[[1]]$rotation[,1:nbaxes]))
+  c(nbaxes = nbaxes, diff = diff, taille = taille)
+})
+
+res.df = data.frame(t(res))
+coeff = max(res.df$taille) / max(res.df$diff)
+
+ggplot(res.df, aes(nbaxes)) +
+  geom_line(aes(y = diff, colour = "Difference")) +
+  geom_line(aes(y = taille / coeff, colour = "Taille")) +
+  scale_y_continuous(sec.axis = sec_axis(~. * coeff, name = "Taille")) +
+  scale_colour_manual(values = c("red", "blue")) +
+  labs(x = "Nombre d'axes", y = "Différence par rapport é l'original", colour = "") +
+  theme_minimal()
+```
+
+Lorsqu'on zoome avec moins de 50 axes retenus, on remarque que la qualité de l'image reconstruite semble trés bonne méme avec seulement 50 axes retenus, comme vu précédemment. Cette compression permet de diviser la taille de l'image par **`r round(as.integer(object.size(fxj)) / res.df$taille[50], 1)`**.
+
+```{r}
+ggplot(head(res.df, 50), aes(nbaxes)) +
+  geom_line(aes(y = diff), col = "red") +
+  labs(x = "Nombre d'axes", y = "Différence par rapport é l'original") +
+  theme_minimal()
+```
+

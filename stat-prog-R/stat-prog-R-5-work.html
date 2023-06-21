@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>pendigits data - interactive analysis</title>
+
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<link href="libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="libs/highlightjs-1.1/highlight.js"></script>
+<!--
+    Font Awesome
+-->
+<script src="https://use.fontawesome.com/32d8325004.js"></script>
+<link rel="stylesheet" href="libs/font-awesome-4.7.0/css/font-awesome.min.css">
+
+<!--
+    CSS perso
+-->
+<style>
+    .contenu {
+        margin-bottom: 50px;
+    }
+
+    .contact-liens {
+        text-align: center;
+    }
+    .contact-liens:hover {
+        text-decoration: none;
+    }
+    .contact-icones {
+        height: 30px;
+    }
+
+    /* Espacement pour barre du haut et pied de page */
+    #header, .section.level1 {
+        margin-top: 60px;
+        margin-bottom: 60px;
+    }
+    /* Espacement pour table des matières */
+    #TOC {
+        margin-top: 100px;
+    }
+    
+    .footer {
+        position: fixed;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        left: 0;
+        background-color: #E6E6E6;
+    }
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="libs/bootstrap-journal.min.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-main">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">FX Jollois</a>
+    </div>
+    <div id="navbar-main" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Données <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+              <li><a href="accesdonnees.html">A télécharger</a></li>
+              <li><a href="donnees-integrees-r.html">Sous R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Enseignement <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-header">DUT 1ère année</li>
+            <li><a href="exploitation-donnees.html">Exploitation de données</a></li>
+            <li><a href="initiation-a-r.html">Initiation à R</a></li>
+            <li><a href="reporting.html">Reporting</a></li>
+            <li><a href="complements-r.html">Compléments sur R</a></li>
+            <li class="dropdown-header">DUT 2ème année</li>
+            <li><a href="prog-stat-r.html">Programmation statistique avec R</a></li>
+            <li class="dropdown-header">LP MDS Santé</li>
+            <li><a href="info-dec-sante.html">Informatique décisionnelle</a></li>
+            <li class="dropdown-header">DU Analyste Big Data</li>
+            <li><a href="initiation-r-du.html">Initiation à R</a></li>
+            <li><a href="connexion-r-mongodb.html">Connexion entre R et MongoDB</a></li>
+            <li class="dropdown-header">DU Dataviz</li>
+            <li><a href="analyse-donnees.html">Analyse de données</a></li>
+            <li><a href="visualisation-donnees.html">Visualisation de données - R</a></li>
+            <li><a href="visualisation-donnees-tableau.html">Visualisation de données - Tableau</a></li>
+            <li><a href="visualisation-donnees-d3.html">Visualisation de données - D3</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Master</li>
+            <li><a href="slides/cnam-classif-modeles.html">Classification et Modèles de mélange</a></li>
+            <li><a href="analyse-donnees-massives.html">Analyse de Données Massives</a></li>
+            <li class="dropdown-header">Iran</li>
+            <li><a href="stat-prog-R.html">Statistical Programming using R</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Recherche <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="recherche.html">Sujets</a></li>
+            <li><a href="publications.html">Publications</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Réalisations <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="realisations.html">Détail</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="http://up5.fr/explore-data" target="_blank">explore-data</a></li>
+            <li><a href="http://fxjollois.github.io/cours-sql/" target="_blank">Appli web de cours pour SQL</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container-fluid -->
+</div>
+<div class="contenu">
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore"><code>pendigits</code> data - interactive analysis</h1>
+<h3 class="subtitle"><em>Statistical Programming using <code>R</code></em></h3>
+
+</div>
+
+
+<p>Now, we want to build an application which includes all the methods we see in previous sessions. Our goal is to create a tool that permits us to analyse the data, in order to chose an as good as possible number of clusters, for each digit.</p>
+<p>The app includes 4 panels: the description of data and one for each method (HAC, <span class="math inline">\(k\)</span>-means, mixture model). The original data are also presented. Here is the <em>specifications</em> for each panel:</p>
+<ul>
+<li><strong>Description</strong>: 4 sub-panels
+<ul>
+<li>Distribution of the digits (bar chart)</li>
+<li>Distribution of the coordinates, according to the digits (boxplot)</li>
+<li>Average digit</li>
+<li>PCA projection (global plot or separated for each digit)</li>
+</ul></li>
+<li>For each method:
+<ul>
+<li>Left side:
+<ul>
+<li>Choice of the digit</li>
+<li>Choice of the number of clusters</li>
+</ul></li>
+<li>Right side:
+<ul>
+<li>Specific graph:
+<ul>
+<li><strong>HAC</strong>: dendrogram</li>
+<li><strong>kmeans</strong>: evolution of <span class="math inline">\(r^2\)</span></li>
+<li><strong>mclust</strong>: evolution of the user specified criterion (<span class="math inline">\(BIC\)</span>, <span class="math inline">\(ICL\)</span>, <span class="math inline">\(AIC\)</span>, <span class="math inline">\(AIC3\)</span>)</li>
+</ul></li>
+<li>For each cluster:
+<ul>
+<li>Plot of the average digit</li>
+<li>PCA projection</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<p>You can run directly this application with:</p>
+<pre class="r"><code>runUrl(&quot;http://fxjollois.github.io/stat-prog-R/pendigits.zip&quot;)</code></pre>
+<p>Here are the two files for this application:</p>
+<p><div>
+<ul>
+<li>
+<a href="stat-prog-R/pendigits/ui.R">
+<code>ui.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+library(shinythemes)
+
+shinyUI(navbarPage(
+    "Pen digits",
+    theme = shinytheme("darkly"),
+    
+    # Description of the data
+    tabPanel(
+        "Description",
+        tabsetPanel(
+            tabPanel(
+                "Digit distribution",
+                helpText("The digits are approximatively equi-distributed"),
+                plotOutput("desc.digit")
+            ),
+            tabPanel(
+                "Coordinates distribution",
+                helpText(""),
+                plotOutput("desc.coord")
+            ),
+            tabPanel(
+                "Average digits",
+                helpText(""),
+                plotOutput("desc.average")
+            ),
+            tabPanel(
+                "PCA",
+                radioButtons("desc.pca.type",
+                             "Plot type",
+                             c("Global", "Separated"),
+                             inline = TRUE),
+                plotOutput("desc.pca.plot")
+            )
+        )
+    ),
+    
+    # HAC
+    tabPanel(
+        "HAC",
+        sidebarLayout(
+            sidebarPanel(
+                selectInput("hac.digit",
+                            "Digit",
+                            0:9),
+                radioButtons("hac.ncl",
+                             "Number of clusters",
+                             1:10)
+            ),
+            mainPanel(
+                plotOutput("hac.tree"),
+                plotOutput("hac.plot")
+            )
+        )
+    ),
+    
+    # kmeans
+    tabPanel(
+        "kmeans",
+        sidebarLayout(
+            sidebarPanel(
+                selectInput("km.digit",
+                            "Digit",
+                            0:9),
+                radioButtons("km.ncl",
+                             "Number of clusters",
+                             1:10)
+            ),
+            mainPanel(
+                plotOutput("km.r2", height = 200),
+                plotOutput("km.plot")
+            )
+        )
+    ),
+    
+    # Mixture model
+    tabPanel(
+        "mclust",
+        sidebarLayout(
+            sidebarPanel(
+                selectInput("mclust.digit",
+                            "Digit",
+                            0:9),
+                radioButtons("mclust.ncl",
+                             "Number of clusters",
+                             1:10)
+            ),
+            mainPanel(
+                fluidRow(
+                    column(3, selectInput("mclust.choice", "Criterion", c("BIC", "ICL", "AIC", "AIC3"))),
+                    column(9, plotOutput("mclust.crit", height = 200))
+                ),
+                plotOutput("mclust.plot")
+            )
+        )
+    ),
+    
+    # Original data
+    navbarMenu(
+        "Original data",
+        tabPanel("pendigits.tra",
+                 tags$pre(includeText("../../donnees/pendigits.tra"))),
+        tabPanel("pendigits.tes",
+                 tags$pre(includeText("../../donnees/pendigits.tes")))
+    )
+
+))</code>
+</pre>
+</div><div>
+<ul>
+<li>
+<a href="stat-prog-R/pendigits/server.R">
+<code>server.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code>library(shiny)
+library(reshape2)
+library(ggplot2)
+library(scales)
+library(FactoMineR)
+library(mclust)
+
+load("pendigits.RData")
+
+showDigitPartition &lt;- function(z, mean, pca) {
+    tab = table(z)
+    ncl = length(tab)
+    par(mfcol = c(2, ncl), mar = c(0, 0, 0, 0) + .1)
+    for (k in 1:ncl) {
+        if (ncl == 1) {
+            drawn(mean, n = tab[k], point = TRUE)
+        } else {
+            drawn(mean[k,], n = tab[k], point = TRUE)
+        }
+        plot(Dim.2 ~ Dim.1, subset(pca, cluster == k),
+             xlim = range(res2$Dim.1),
+             ylim = range(res2$Dim.2),
+             col = rainbow(ncl)[k], pch = 19, 
+             axes = FALSE, xlab = "", ylab = "", frame.plot = TRUE)
+    }
+}
+
+shinyServer(function(input, output) {
+   
+    # Description
+    output$desc.digit &lt;- renderPlot({
+        ggplot(pen, aes(digit, fill = digit)) + 
+            geom_bar() +
+            xlab("") + ylab("") +
+            theme_minimal() +
+            theme(axis.text.x = element_blank(),
+                  axis.ticks.x = element_blank())
+    })
+    output$desc.coord &lt;- renderPlot({
+        ggplot(pen.melt, aes(digit, value, color = digit)) + 
+            geom_boxplot() +
+            facet_wrap(~ variable) +
+            theme_minimal() +
+            xlab("") + ylab("") +
+            theme(axis.text.x = element_blank(),
+                  axis.ticks.x = element_blank())
+    })
+    output$desc.average &lt;- renderPlot({
+        par(mfrow = c(2, 5))
+        for (i in 0:9) {
+            s = subset(pen, digit == i)
+            # Computing the average values
+            mean = apply(s[-17], 2, mean)
+            # Drawn the first drawn
+            drawn(s[1,1:16], col = "gray90", n = i)
+            # Add all other drawn
+            for (j in 2:nrow(s)) 
+                drawn(s[j,1:16], col = "gray90", add = TRUE)
+            # Last, add the average line
+            drawn(mean[-17], add = TRUE)
+        }
+    })
+    output$desc.pca.plot &lt;- renderPlot({
+        g = ggplot(res2, aes(Dim.1, Dim.2, color = digit)) +
+            geom_point() +
+            theme_minimal()
+        if (input$desc.pca.type == "Separated") {
+            g = g + facet_wrap(~ digit) +
+                guides(color = FALSE)
+        } 
+        g
+    })
+    
+    # HAC
+    output$hac.tree &lt;- renderPlot({
+        dig = as.numeric(input$hac.digit)
+        ncl = as.numeric(input$hac.ncl)
+        tree = hac.ward[[dig+1]]
+        par(mar = c(2, 2, 0, 0) + .1)
+        plot(tree, hang = -1, labels = FALSE,
+             main = "")
+        if (ncl &gt; 1)
+            rect.hclust(tree, ncl)
+    })
+    output$hac.plot &lt;- renderPlot({
+        dig = as.numeric(input$hac.digit)
+        ncl = as.numeric(input$hac.ncl)
+        z = cutree(hac.ward[[dig+1]], ncl)
+        mean = apply(subset(pen, digit == dig, -digit), 2, tapply, z, mean)
+        pca = data.frame(subset(res2, digit == dig, -digit),
+                         cluster = z)
+        showDigitPartition(z, mean, pca)
+    })
+
+    # kmeans
+    output$km.r2 &lt;- renderPlot({
+        dig = as.numeric(input$km.digit)
+        ncl = as.numeric(input$km.ncl)
+        I = km[[dig+1]][[1]]$totss
+        B = sapply(km[[dig+1]], function(res) return(res$betweenss))
+        ggplot(data.frame(G = 1:10, r2 = B / I), aes(G, r2)) +
+            geom_line() +
+            scale_x_discrete(limits = 1:10) +
+            scale_y_continuous(labels = percent) +
+            theme_minimal() +
+            geom_vline(xintercept = ncl, color = "grey30", linetype = 2) +
+            geom_hline(yintercept = B[ncl] / I, color = "grey30", linetype = 2)
+    })
+    output$km.plot &lt;- renderPlot({
+        dig = as.numeric(input$km.digit)
+        ncl = as.numeric(input$km.ncl)
+        z = km[[dig+1]][[ncl]]$cluster
+        mean = km[[dig+1]][[ncl]]$centers
+        pca = data.frame(subset(res2, digit == dig, -digit),
+                         cluster = z)
+        showDigitPartition(z, mean, pca)
+    })
+
+    # Mixture model
+    output$mclust.crit &lt;- renderPlot({
+        dig = as.numeric(input$mclust.digit)
+        ncl = as.numeric(input$mclust.ncl)
+        crit = data.frame(t(sapply(mclust[[dig+1]], function(m) {
+            return(c(G = m$G, BIC = m$bic, ICL = m$ICL, AIC = m$AIC, AIC3 = m$AIC3))
+        })))
+        names(crit) = c("G", "BIC", "ICL", "AIC", "AIC3")
+        ggplot(crit, aes_string("G", input$mclust.choice)) +
+            geom_line() +
+            scale_x_discrete(limits = 1:10) +
+            theme_minimal() +
+            geom_vline(xintercept = ncl, color = "grey30", linetype = 2) +
+            geom_hline(yintercept = crit[ncl,input$mclust.choice], color = "grey30", linetype = 2)
+    })
+    output$mclust.plot &lt;- renderPlot({
+        dig = as.numeric(input$mclust.digit)
+        ncl = as.numeric(input$mclust.ncl)
+        z = mclust[[dig+1]][[ncl]]$classification
+        mean = t(mclust[[dig+1]][[ncl]]$parameters$mean)
+        pca = data.frame(subset(res2, digit == dig, -digit),
+                         cluster = z)
+        showDigitPartition(z, mean, pca)
+    })    
+})</code>
+</pre>
+</div></p>
+<p>In <code>server.R</code>, we <strong>load</strong> a specific file, named a <code>RData</code> file. This file contains the results of the computation done in a third file (<code>code.R</code>, presented below). It allows us to pre-compute results, instead of online computing.</p>
+<div>
+<ul>
+<li>
+<a href="stat-prog-R/pendigits/code.R">
+<code>code.R</code>
+</a>
+</li>
+</ul>
+<pre class="r">
+<code># Importation
+pen.tra = read.table("../../donnees/pendigits.tra", sep = ",")
+pen.tes = read.table("../../donnees/pendigits.tes", sep = ",")
+
+pen = rbind(pen.tra, pen.tes)
+names(pen) = c(paste0(c("X", "Y"), rep(1:8, each = 2)), "digit")
+pen$digit = factor(pen$digit)
+
+# remove useless variables
+rm(pen.tra, pen.tes)
+
+# Melt data
+pen.melt = melt(pen, id.vars = 17)
+
+# Drawn function
+drawn &lt;- function(v, n = NULL, point = FALSE, add = FALSE, color = "black") {
+    # Transformation of the data.frame if needed
+    if (is.data.frame(v))
+        v = unlist(v)
+    # extract x and y coordinates
+    x = v[seq(1, 15, by = 2)]
+    y = v[seq(2, 16, by = 2)]
+    # optimize space into graphics in reducing margin (sse ?par for more information)
+    opar = par(mar = c(0, 0, 2, 0) + .1)
+    if (!add) { # Create a graphic
+        plot(x, y, 
+             # Specify limits is a way to have always the same frame for plotting lines
+             xlim = c(-5, 105), ylim = c(-5, 105),
+             # Do not show axes
+             axes = FALSE,
+             # If point is TRUE, we add a space (with pch = " ") at each point
+             # If not, draw a line
+             type = ifelse(point, "b", "l"), 
+             pch = " ", 
+             # Specify color (black by default)
+             col = color,
+             # Add a title (NULL by default)
+             main = n)
+        if (point) text(x, y, 1:8)
+    } else { # Add line to the plot
+        # lines() add lines to an existing plot (the last produce)
+        lines(x, y, 
+              # same comment than before
+              xlim = c(-5, 105), ylim = c(-5, 105),
+              type = ifelse(point, "b", "l"), 
+              pch = " ", 
+              col = color)
+    }
+    par(opar)
+}
+
+# PCA
+res = PCA(pen, quali.sup = 17, graph = FALSE)
+res2 = data.frame(res$ind$coord, digit = pen$digit)
+
+# Compute HAC
+## Ward criterion
+hac.ward = lapply(0:9, function(dig) {
+    sub = subset(pen, digit == dig, -digit)
+    h = hclust(dist(sub), "ward.D2")
+    return(h)
+})
+
+# Compute k-means
+km = lapply(0:9, function(dig) {
+    sub = subset(pen, digit == dig, -digit)
+    res = lapply(1:10, kmeans, x = sub, nstart = 30, iter.max = 20)
+    return(res)
+})
+
+# Compute Mclust
+mclust = lapply(0:9, function(dig) {
+    sub = subset(pen, digit == dig, -digit)
+    res = lapply(1:10, function(G) {
+        m = Mclust(data = sub, G = G)
+        p = nMclustParams(m$modelName, m$d, G)
+        m$ICL = icl(m)
+        m$AIC = -2 * m$loglik + 2 * p
+        m$AIC3 = -2 * m$loglik + 3 * p
+        return(m)
+    })
+    return(res)
+})
+
+# save results
+save.image(file = "pendigits.RData")</code>
+</pre>
+</div>
+
+</div>
+<div class="footer">
+      Site créé avec <a href="http://www.r-project.org" target="_blank"><code>R</code></a> et la 
+      librairie  <a href="http://rmarkdown.rstudio.com/" target="_blank"><code>rmarkdown</code></a>.
+</div>
+<script>
+    $("#TOC").css("margin-top", "100px");
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
